@@ -43,7 +43,17 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": ""
+							"raw": "127.0.0.1:8080/login",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"login"
+							]
 						}
 					},
 					"response": []
@@ -58,7 +68,27 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": ""
+							"raw": "127.0.0.1:8080/login?username=Ann&passwd=qwerty",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "Ann"
+								},
+								{
+									"key": "passwd",
+									"value": "qwerty"
+								}
+							]
 						}
 					},
 					"response": []
@@ -98,7 +128,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/signup?username=Andrey&passwd=qwerty",
+							"raw": "127.0.0.1:8080/signup?username=Ann&passwd=qwerty",
 							"host": [
 								"127",
 								"0",
@@ -112,7 +142,7 @@
 							"query": [
 								{
 									"key": "username",
-									"value": "Andrey"
+									"value": "Ann"
 								},
 								{
 									"key": "passwd",
@@ -133,7 +163,67 @@
 							"raw": ""
 						},
 						"url": {
+							"raw": "127.0.0.1:8080/profile",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get /leaderbord",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
 							"raw": ""
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/leaderbord",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"leaderbord"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get /logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/logout",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"logout"
+							]
 						}
 					},
 					"response": []
