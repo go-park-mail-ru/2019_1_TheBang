@@ -128,7 +128,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/signup?nickname=surfingbird&name=Andrey&surname=Baronskiy&DOB=03.11.1998&passwd=qwertys",
+							"raw": "127.0.0.1:8080/signup?nickname=surfingbird&name=Andrey&surname=Baronskiy&DOB=03.11.1998&passwd=qwertys&=",
 							"host": [
 								"127",
 								"0",
@@ -159,6 +159,10 @@
 								{
 									"key": "passwd",
 									"value": "qwertys"
+								},
+								{
+									"key": "",
+									"value": ""
 								}
 							]
 						}

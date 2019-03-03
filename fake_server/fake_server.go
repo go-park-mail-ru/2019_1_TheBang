@@ -20,16 +20,14 @@ type Profile struct {
 	Photo string
 }
 
-//toDo реализовать корректную отправку ошибок
-type ErrorDescripiton struct {
-	message string
-	_type string
-	code string
-//toDo добавить id ошибки для будущих логов
+type InfoText struct {
+	Data string
 }
 
-type ErrorR struct {
-	error ErrorDescripiton
+func InfoTextToJson(data string) []byte {
+	infotext := InfoText{Data: data}
+	result, _ := json.Marshal(&infotext) // намеренное игнорирование ошибки
+	return result
 }
 
 // toDO заменить на бд
@@ -71,18 +69,18 @@ var (
 func GetGreeting(r *http.Request) string{
 	cookie, err := r.Cookie("session_id")
 	if err == http.ErrNoCookie {
-		return "Hellow, unknown\n"
+		return "Hellow, unknown"
 	}
 
 	name := cookie.Value
-	return fmt.Sprintf("Hellow, %v\n", name)
+	return fmt.Sprintf("Hellow, %v", name)
 }
 
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 	hellowStr := GetGreeting(r)
-	w.Write([]byte(hellowStr))
-	w.Write([]byte("this is root!"))
+	dataJson := InfoTextToJson(hellowStr + ", this is root!")
+	w.Write(dataJson)
 }
 
 func CreateAccount(user Profile, passwd string) error {
@@ -121,19 +119,24 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		err := CreateAccount(profile, passwd)
 
 		if err != nil {
-			w.Write([]byte(err.Error()))
+			//toDo нужно изменить статус ответа
+			w.WriteHeader(http.StatusNotFound)
+			dataJson := InfoTextToJson("Wrong nickname or passwd!")
+			w.Write(dataJson)
 			return
 		}
 
-		answer := fmt.Sprintf("User %v was created!", profile.Nickname)
-		w.Write([]byte(answer))
+		w.WriteHeader(http.StatusCreated)
+		dataStr := fmt.Sprintf("User %v was created!", profile.Nickname)
+		dataJson := InfoTextToJson(dataStr)
+		w.Write(dataJson)
 
 		return
 	}
 
 	hellowStr := GetGreeting(r)
-	w.Write([]byte(hellowStr))
-	w.Write([]byte("this is signup!"))
+	dataJson := InfoTextToJson(hellowStr + ", this is signup!")
+	w.Write(dataJson)
 }
 
 func LoginAcount(username, passwd string) error {
@@ -156,7 +159,10 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 
 		err := LoginAcount(username, passwd)
 		if err != nil {
-			w.Write([]byte(err.Error()))
+			w.WriteHeader(http.StatusNotFound)
+			dataJson := InfoTextToJson("Wrong nickname or passwd!")
+			w.Write(dataJson)
+
 			return
 		}
 
@@ -170,20 +176,20 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &cookie)
 
 		answer := fmt.Sprintf("User %v was login!", username)
-		w.Write([]byte(answer))
-
+		dataJson := InfoTextToJson(answer + ", this is login!")
+		w.Write(dataJson)
 		return
 	}
 
 	hellowStr := GetGreeting(r)
-	w.Write([]byte(hellowStr))
-	w.Write([]byte("this is login!"))
+	dataJson := InfoTextToJson(hellowStr + ", this is login!")
+	w.Write(dataJson)
 }
 
 func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 	hellowStr := GetGreeting(r)
-	w.Write([]byte(hellowStr))
-	w.Write([]byte("this is leaderbord!"))
+	dataJson := InfoTextToJson(hellowStr + ", this is leaderbord!")
+	w.Write(dataJson)
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
@@ -196,14 +202,14 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, session)
 	}
 
-	w.Write([]byte(hellowStr))
-	w.Write([]byte("this is logout!"))
+	dataJson := InfoTextToJson(hellowStr + ", you successfully logout!")
+	w.Write(dataJson)
 }
 
 func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
 	hellowStr := GetGreeting(r)
-	w.Write([]byte(hellowStr))
-	w.Write([]byte("this is profiles!"))
+	dataJson := InfoTextToJson(hellowStr + ", this is profiles!")
+	w.Write(dataJson)
 }
 
 func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -217,8 +223,10 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	profile, ok := storageProf.data[id]
 	if !ok {
 		storageProf.mu.Unlock()
-		//toDo заменить на адекватную ошбику в json
-		w.Write([]byte("We have not this user!"))
+		//toDo подумать еще над статусом ответа
+		w.WriteHeader(http.StatusNotFound)
+		dataJson := InfoTextToJson("We have not this user!")
+		w.Write(dataJson)
 		return
 	}
 	storageProf.mu.Unlock()
@@ -235,11 +243,13 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 		storageProf.data[id] = updateProf
 		storageProf.mu.Unlock()
 
-		w.Write([]byte("profile was updated!"))
+		w.WriteHeader(http.StatusAccepted)
+		dataJson := InfoTextToJson("Userinfo was updated!")
+		w.Write(dataJson)
 		return
 	}
 
-	jsonPorf, _:= json.Marshal(&profile) //ошибку намеренно не обрабатываем
+	jsonPorf, _ := json.Marshal(&profile) //ошибку намеренно не обрабатываем
 	w.Write([]byte(jsonPorf))
 }
 
@@ -247,9 +257,11 @@ func main() {
 		r := mux.NewRouter()
 		r.HandleFunc("/", RootHandler).Methods("GET")
 		r.HandleFunc("/signup", SignupHandler).Methods("GET", "POST")
+
 		r.HandleFunc("/login", LogInHandler).Methods("GET", "POST")
-		r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 		r.HandleFunc("/logout", LogoutHandler).Methods("GET")
+
+		r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 
 		r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
 		r.HandleFunc("/profiles/{id:[0-9]+}", ThisProfileHandler).Methods("GET", "PUT")
