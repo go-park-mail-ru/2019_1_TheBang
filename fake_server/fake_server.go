@@ -1,28 +1,71 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 )
 
+type Profile struct {
+	Id int `json:"user_id, string"`
+	Nickname string
+	Name string
+	Surname string
+	DOB string //toDo нужно заменить на time.Time
+	Photo string
+}
+
+//toDo реализовать корректную отправку ошибок
+type ErrorDescripiton struct {
+	message string
+	_type string
+	code string
+//toDo добавить id ошибки для будущих логов
+}
+
+type ErrorR struct {
+	error ErrorDescripiton
+}
+
+// toDO заменить на бд
 type AccountStorage struct {
 	data map[string]string
 	mu sync.Mutex
+	count int // костыль для id
 }
 
-func CreateStorage() AccountStorage {
+// toDO заменить на бд
+type ProfileStorage struct {
+	data map[int]Profile
+	mu sync.Mutex
+	count int // костыль для id
+}
+
+// toDO заменить на бд
+func CreateAccountStorage() AccountStorage {
 	acc := AccountStorage{}
 	acc.data = make(map[string]string)
 
 	return acc
 }
 
+// toDO заменить на бд
+func CreateProfileStorage() ProfileStorage {
+	prof := ProfileStorage{}
+	prof.data = make(map[int]Profile)
+
+	return prof
+}
+
+// toDO заменить на бд
 var (
-	storage = CreateStorage()
+	storageAcc = CreateAccountStorage()
+	storageProf = CreateProfileStorage()
 )
 
 func GetGreeting(r *http.Request) string{
@@ -42,33 +85,47 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("this is root!"))
 }
 
-func CreateAccount(username, passwd string) error {
-	storage.mu.Lock()
-	if _, ok := storage.data[username]; ok {
+func CreateAccount(user Profile, passwd string) error {
+	storageAcc.mu.Lock()
+	if _, ok := storageAcc.data[user.Nickname]; ok {
 		err := errors.New("This user already exists!")
-		storage.mu.Unlock()
+		storageAcc.mu.Unlock()
 		return err
 	}
+	user.Id = storageAcc.count
 
-	storage.data[username] = passwd
+	storageAcc.data[user.Nickname] = passwd
+	storageProf.data[storageProf.count] = user
 
-	storage.mu.Unlock()
+	storageAcc.count += 1
+	storageProf.count += 1
+
+	storageAcc.mu.Unlock()
 
 	return nil
 }
 
+//toDo заменить тип DOB на time.Time
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		username := r.FormValue("username")
+
+		profile := Profile{
+			Nickname: r.FormValue("nickname"),
+			Name:  r.FormValue("name"),
+			Surname: r.FormValue("surname"),
+			DOB: r.FormValue("DOB"),
+		}
+
 		passwd := r.FormValue("passwd")
 
-		err := CreateAccount(username, passwd)
+		err := CreateAccount(profile, passwd)
+
 		if err != nil {
 			w.Write([]byte(err.Error()))
 			return
 		}
 
-		answer := fmt.Sprintf("User %v was created!", username)
+		answer := fmt.Sprintf("User %v was created!", profile.Nickname)
 		w.Write([]byte(answer))
 
 		return
@@ -80,20 +137,21 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginAcount(username, passwd string) error {
-	storage.mu.Lock()
-	if _, ok := storage.data[username]; !ok {
+	storageAcc.mu.Lock()
+	if _, ok := storageAcc.data[username]; !ok {
 		err := errors.New("Wrong answer or password!")
-		storage.mu.Unlock()
+		storageAcc.mu.Unlock()
 		return err
 	}
-	storage.mu.Unlock()
+	storageAcc.mu.Unlock()
 
 	return nil
 }
 
+//toDo более сложную обработку cookie
 func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		username := r.FormValue("username")
+		username := r.FormValue("nickname")
 		passwd := r.FormValue("passwd")
 
 		err := LoginAcount(username, passwd)
@@ -142,10 +200,47 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("this is logout!"))
 }
 
-func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
 	hellowStr := GetGreeting(r)
 	w.Write([]byte(hellowStr))
-	w.Write([]byte("this is profile!"))
+	w.Write([]byte("this is profiles!"))
+}
+
+func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
+	//toDo реализовать проверку прав на изменение профиля + доп логика
+
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"]) //ошибку намеренно не обрабатываем
+	//toDo подумать о кейсах, когда может быть не корректное значение
+
+	storageProf.mu.Lock()
+	profile, ok := storageProf.data[id]
+	if !ok {
+		storageProf.mu.Unlock()
+		//toDo заменить на адекватную ошбику в json
+		w.Write([]byte("We have not this user!"))
+		return
+	}
+	storageProf.mu.Unlock()
+
+	if r.Method == http.MethodPut {
+		updateProf := Profile{
+			Nickname: r.FormValue("nickname"),
+			Name:  r.FormValue("name"),
+			Surname: r.FormValue("surname"),
+			DOB: r.FormValue("DOB"),
+		}
+
+		storageProf.mu.Lock()
+		storageProf.data[id] = updateProf
+		storageProf.mu.Unlock()
+
+		w.Write([]byte("profile was updated!"))
+		return
+	}
+
+	jsonPorf, _:= json.Marshal(&profile) //ошибку намеренно не обрабатываем
+	w.Write([]byte(jsonPorf))
 }
 
 func main() {
@@ -155,7 +250,9 @@ func main() {
 		r.HandleFunc("/login", LogInHandler).Methods("GET", "POST")
 		r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 		r.HandleFunc("/logout", LogoutHandler).Methods("GET")
-		r.HandleFunc("/profile", ProfileHandler).Methods("GET")
+
+		r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
+		r.HandleFunc("/profiles/{id:[0-9]+}", ThisProfileHandler).Methods("GET", "PUT")
 
 
 	http.ListenAndServe(":8080", r)
