@@ -1,11 +1,14 @@
 package main
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -83,13 +86,47 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(dataJson)
 }
 
-func CreateAccount(user Profile, passwd string) error {
+func CreateAccount(r *http.Request) error {
+	user := Profile{
+		Nickname: r.FormValue("nickname"),
+		Name:  r.FormValue("name"),
+		Surname: r.FormValue("surname"),
+		DOB: r.FormValue("DOB"),
+	}
+
+	passwd := r.FormValue("passwd")
+	//toDo добавить логику к обработке фотки
+
 	storageAcc.mu.Lock()
 	if _, ok := storageAcc.data[user.Nickname]; ok {
 		err := errors.New("This user already exists!")
 		storageAcc.mu.Unlock()
 		return err
 	}
+
+	// toDo сделать ограничение по размеру
+	pic, _, errPic := r.FormFile("photo")
+	if errPic != nil {
+		err := errors.New("image was failed!")
+		return err
+	}
+	defer pic.Close()
+
+	hasher := md5.New()
+	io.Copy(hasher, pic)
+	picname := string(hasher.Sum(nil))
+
+	//toDo при запуске из IDE и консоли  - разные директории!
+	file, err := os.Create("fake_server/tmp/" + picname)
+	if err != nil {
+		err := errors.New("image was not saved on disk!")
+		return err
+	}
+
+	//toDo записать в новый созданных фаил
+	_ = file
+
+	user.Photo = picname
 	user.Id = storageAcc.count
 
 	storageAcc.data[user.Nickname] = passwd
@@ -104,39 +141,31 @@ func CreateAccount(user Profile, passwd string) error {
 }
 
 //toDo заменить тип DOB на time.Time
+//toDo добавить возможность загрузки картинки
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-
-		profile := Profile{
-			Nickname: r.FormValue("nickname"),
-			Name:  r.FormValue("name"),
-			Surname: r.FormValue("surname"),
-			DOB: r.FormValue("DOB"),
-		}
-
-		passwd := r.FormValue("passwd")
-
-		err := CreateAccount(profile, passwd)
+		err := CreateAccount(r)
 
 		if err != nil {
 			//toDo нужно изменить статус ответа
 			w.WriteHeader(http.StatusNotFound)
-			dataJson := InfoTextToJson("Wrong nickname or passwd!")
+			dataJson := InfoTextToJson(err.Error())
 			w.Write(dataJson)
 			return
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		dataStr := fmt.Sprintf("User %v was created!", profile.Nickname)
-		dataJson := InfoTextToJson(dataStr)
+		dataJson := InfoTextToJson("User as created!")
 		w.Write(dataJson)
 
 		return
 	}
 
-	hellowStr := GetGreeting(r)
-	dataJson := InfoTextToJson(hellowStr + ", this is signup!")
-	w.Write(dataJson)
+	//toDo убрать костыль для проверки
+	//hellowStr := GetGreeting(r)
+	//dataJson := InfoTextToJson(hellowStr + ", this is signup!")
+	//w.Write(dataJson)
+	w.Write([]byte(html))
 }
 
 func LoginAcount(username, passwd string) error {
@@ -214,6 +243,7 @@ func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
 
 func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	//toDo реализовать проверку прав на изменение профиля + доп логика
+	//toDo добавить возможность редактирования изображения
 
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"]) //ошибку намеренно не обрабатываем
@@ -269,3 +299,57 @@ func main() {
 
 	http.ListenAndServe(":8080", r)
 }
+
+var html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        form {
+            width: 400px;
+            height: 500px;
+            background-color: lightblue;
+            display: flex;
+            flex-direction: column;
+            padding: 50px;
+            box-sizing: border-box;
+        }
+
+        form div {
+            flex-grow: 13;
+        }
+    </style>
+
+</head>
+<body>
+<form action="/signup" method="post" enctype="multipart/form-data">
+    <div>photo:</div>
+    <input type="file" name="photo">
+    <br>
+    <div>nickname:</div>
+    <input type="text" name="nickname">
+    <br>
+    <div>name:</div>
+    <input type="text" name="name">
+    <br>
+    <div>surname:</div>
+    <input type="text" name="surname">
+    <br>
+    <div>DOB:</div>
+    <input type="text" name="DOB">
+    <br>
+    <div>passwd:</div>
+    <input type="text" name="passwd">
+    <br>
+    <input type="submit" value="Upload">
+</form>
+</body>
+</html>`
