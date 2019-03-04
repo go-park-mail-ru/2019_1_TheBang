@@ -105,29 +105,32 @@ func CreateAccount(r *http.Request) error {
 	}
 
 	// toDo сделать ограничение по размеру
-	pic, _, errPic := r.FormFile("photo")
-	if errPic != nil {
+	//toDo еще разобраться с r.FormFile()
+	//toDo привести код в порядок
+	filein, _, err := r.FormFile("photo")
+
+	if err != nil {
 		storageAcc.mu.Unlock()
 		err := errors.New("image was failed!")
 		return err
 	}
-	defer pic.Close()
+	defer filein.Close()
 
 	hasher := md5.New()
-	io.Copy(hasher, pic)
-	picname := string(hasher.Sum(nil))
+	io.Copy(hasher, filein)
+	filename := string(hasher.Sum(nil))
 
-	//toDo при запуске из IDE и консоли  - разные директории!
-	file, err := os.Create("fake_server/tmp/" + picname)
+	fileout, err := os.OpenFile("fake_server/tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
+		fmt.Println(err.Error())
 		err := errors.New("image was not saved on disk!")
 		return err
 	}
+	defer fileout.Close()
 
-	//toDo записать в новый созданных фаил
-	_ = file
+	io.Copy(fileout, filein)
 
-	user.Photo = picname
+	user.Photo = filename
 	user.Id = storageAcc.count
 
 	storageAcc.data[user.Nickname] = passwd
