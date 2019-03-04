@@ -86,6 +86,7 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(dataJson)
 }
 
+//toDo заменить постоянных unlock на defer
 func CreateAccount(r *http.Request) error {
 	user := Profile{
 		Nickname: r.FormValue("nickname"),
@@ -107,26 +108,33 @@ func CreateAccount(r *http.Request) error {
 	// toDo сделать ограничение по размеру
 	//toDo еще разобраться с r.FormFile()
 	//toDo привести код в порядок
-	filein, _, err := r.FormFile("photo")
+	file, header, err := r.FormFile("photo")
+	if err != nil {
+		storageAcc.mu.Unlock()
+		err := errors.New("image was failed in form!")
+		return err
+	}
+	defer file.Close()
 
+	hasher := md5.New()
+	io.Copy(hasher, file)
+	filename := string(hasher.Sum(nil))
+
+	fileout, err := os.OpenFile("fake_server/tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		storageAcc.mu.Unlock()
+		err := errors.New("image was not saved on disk!")
+		return err
+	}
+	defer fileout.Close()
+
+	filein, err := header.Open()
 	if err != nil {
 		storageAcc.mu.Unlock()
 		err := errors.New("image was failed!")
 		return err
 	}
 	defer filein.Close()
-
-	hasher := md5.New()
-	io.Copy(hasher, filein)
-	filename := string(hasher.Sum(nil))
-
-	fileout, err := os.OpenFile("fake_server/tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		fmt.Println(err.Error())
-		err := errors.New("image was not saved on disk!")
-		return err
-	}
-	defer fileout.Close()
 
 	io.Copy(fileout, filein)
 
