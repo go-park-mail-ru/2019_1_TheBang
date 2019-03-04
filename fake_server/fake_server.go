@@ -107,6 +107,7 @@ func CreateAccount(r *http.Request) error {
 	// toDo сделать ограничение по размеру
 	pic, _, errPic := r.FormFile("photo")
 	if errPic != nil {
+		storageAcc.mu.Unlock()
 		err := errors.New("image was failed!")
 		return err
 	}
