@@ -267,8 +267,13 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	//toDo добавить возможность редактирования изображения
 
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"]) //ошибку намеренно не обрабатываем
-	//toDo подумать о кейсах, когда может быть не корректное значение
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		dataJson := InfoTextToJson("Wrong user id! " + err.Error())
+		w.Write(dataJson)
+		return
+	}
 
 	storageProf.mu.Lock()
 	defer storageProf.mu.Unlock()
