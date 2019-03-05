@@ -61,6 +61,7 @@ func CreateProfileStorage() ProfileStorage {
 var (
 	storageAcc = CreateAccountStorage()
 	storageProf = CreateProfileStorage()
+	defaultImg = "default_img"
 )
 
 func InfoTextToJson(data string) []byte {
@@ -96,7 +97,6 @@ func CreateAccount(r *http.Request) error {
 	}
 
 	passwd := r.FormValue("passwd")
-	//toDo добавить логику к обработке фотки
 
 	storageAcc.mu.Lock()
 	if _, ok := storageAcc.data[user.Nickname]; ok {
@@ -106,39 +106,46 @@ func CreateAccount(r *http.Request) error {
 	}
 
 	// toDo сделать ограничение по размеру
-	//toDo еще разобраться с r.FormFile()
 	//toDo привести код в порядок
-	file, header, err := r.FormFile("photo")
-	if err != nil {
-		storageAcc.mu.Unlock()
-		err := errors.New("image was failed in form!")
-		return err
+	withPhoto := r.FormValue("with_photo")
+	if withPhoto == "yes" {
+		file, header, err := r.FormFile("photo")
+		if err != nil {
+			storageAcc.mu.Unlock()
+			err := errors.New("image was failed in form!")
+			return err
+		}
+		defer file.Close()
+
+		hasher := md5.New()
+		io.Copy(hasher, file)
+		filename := string(hasher.Sum(nil))
+
+		//toDo при фейле удалить созданный фаил
+		//toDo при сборке из консоил изменить путь
+		fileout, err := os.OpenFile("fake_server/tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			storageAcc.mu.Unlock()
+			err := errors.New("image was not saved on disk!")
+			return err
+		}
+		defer fileout.Close()
+
+		filein, err := header.Open()
+		if err != nil {
+			storageAcc.mu.Unlock()
+			err := errors.New("image was failed!")
+			return err
+		}
+		defer filein.Close()
+
+		io.Copy(fileout, filein)
+
+		user.Photo = filename
+	} else {
+		user.Photo = defaultImg
 	}
-	defer file.Close()
 
-	hasher := md5.New()
-	io.Copy(hasher, file)
-	filename := string(hasher.Sum(nil))
-
-	fileout, err := os.OpenFile("fake_server/tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		storageAcc.mu.Unlock()
-		err := errors.New("image was not saved on disk!")
-		return err
-	}
-	defer fileout.Close()
-
-	filein, err := header.Open()
-	if err != nil {
-		storageAcc.mu.Unlock()
-		err := errors.New("image was failed!")
-		return err
-	}
-	defer filein.Close()
-
-	io.Copy(fileout, filein)
-
-	user.Photo = filename
 	user.Id = storageAcc.count
 
 	storageAcc.data[user.Nickname] = passwd
@@ -159,8 +166,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		err := CreateAccount(r)
 
 		if err != nil {
-			//toDo нужно изменить статус ответа
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusBadRequest)
 			dataJson := InfoTextToJson(err.Error())
 			w.Write(dataJson)
 			return
@@ -265,7 +271,6 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	profile, ok := storageProf.data[id]
 	if !ok {
 		storageProf.mu.Unlock()
-		//toDo подумать еще над статусом ответа
 		w.WriteHeader(http.StatusNotFound)
 		dataJson := InfoTextToJson("We have not this user!")
 		w.Write(dataJson)
@@ -295,7 +300,7 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(jsonPorf))
 }
 
-func Handler() {
+func main() {
 		r := mux.NewRouter()
 		r.HandleFunc("/", RootHandler).Methods("GET")
 		r.HandleFunc("/signup", SignupHandler).Methods("GET", "POST")
