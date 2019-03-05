@@ -87,7 +87,6 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(dataJson)
 }
 
-//toDo заменить постоянных unlock на defer
 func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 	user := Profile{
 		Nickname: r.FormValue("nickname"),
@@ -99,9 +98,10 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 	passwd := r.FormValue("passwd")
 
 	storageAcc.mu.Lock()
+	defer storageAcc.mu.Unlock()
+
 	if _, ok := storageAcc.data[user.Nickname]; ok {
 		err := errors.New("This user already exists!")
-		storageAcc.mu.Unlock()
 		return err
 	}
 
@@ -111,7 +111,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 	if withPhoto == "yes" {
 		file, header, err := r.FormFile("photo")
 		if err != nil {
-			storageAcc.mu.Unlock()
 			err := errors.New("image was failed in form!")
 			return err
 		}
@@ -127,7 +126,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 
 		filein, err := header.Open()
 		if err != nil {
-			storageAcc.mu.Unlock()
 			err := errors.New("image was failed!")
 			return err
 		}
@@ -135,7 +133,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 
 		fileout, err := os.OpenFile("fake_server/tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
-			storageAcc.mu.Unlock()
 			//toDo тут скорее всего 500-я ошибка
 			w.WriteHeader(http.StatusInternalServerError)
 			err := errors.New("image was not saved on disk!")
@@ -146,7 +143,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 		b, err := io.Copy(fileout, filein)
 		if err != nil {
 			_ = b // просто обрабатывать ошибку было нельзя
-			storageAcc.mu.Unlock()
 			//toDo тут скорее всего 500-я ошибка
 			w.WriteHeader(http.StatusInternalServerError)
 			err := errors.New("image was not saved!")
@@ -165,8 +161,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 
 	storageAcc.count += 1
 	storageProf.count += 1
-
-	storageAcc.mu.Unlock()
 
 	return nil
 }
@@ -197,12 +191,12 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 func LoginAcount(username, passwd string) error {
 	storageAcc.mu.Lock()
+	defer storageAcc.mu.Unlock()
+
 	if _, ok := storageAcc.data[username]; !ok {
 		err := errors.New("Wrong answer or password!")
-		storageAcc.mu.Unlock()
 		return err
 	}
-	storageAcc.mu.Unlock()
 
 	return nil
 }
@@ -277,15 +271,15 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	//toDo подумать о кейсах, когда может быть не корректное значение
 
 	storageProf.mu.Lock()
+	defer storageProf.mu.Unlock()
+
 	profile, ok := storageProf.data[id]
 	if !ok {
-		storageProf.mu.Unlock()
 		w.WriteHeader(http.StatusNotFound)
 		dataJson := InfoTextToJson("We have not this user!")
 		w.Write(dataJson)
 		return
 	}
-	storageProf.mu.Unlock()
 
 	if r.Method == http.MethodPut {
 		updateProf := Profile{
@@ -295,9 +289,7 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 			DOB: r.FormValue("DOB"),
 		}
 
-		storageProf.mu.Lock()
 		storageProf.data[id] = updateProf
-		storageProf.mu.Unlock()
 
 		w.WriteHeader(http.StatusAccepted)
 		dataJson := InfoTextToJson("Userinfo was updated!")
