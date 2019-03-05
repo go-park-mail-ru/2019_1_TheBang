@@ -88,7 +88,7 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 //toDo заменить постоянных unlock на defer
-func CreateAccount(r *http.Request) error {
+func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 	user := Profile{
 		Nickname: r.FormValue("nickname"),
 		Name:  r.FormValue("name"),
@@ -123,13 +123,7 @@ func CreateAccount(r *http.Request) error {
 
 		//toDo при фейле удалить созданный фаил
 		//toDo при сборке из консоил изменить путь
-		fileout, err := os.OpenFile("fake_server/tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
-		if err != nil {
-			storageAcc.mu.Unlock()
-			err := errors.New("image was not saved on disk!")
-			return err
-		}
-		defer fileout.Close()
+		//toDo если у 2 пользователей одинаковые изображение, обработка коллизий
 
 		filein, err := header.Open()
 		if err != nil {
@@ -139,7 +133,25 @@ func CreateAccount(r *http.Request) error {
 		}
 		defer filein.Close()
 
-		io.Copy(fileout, filein)
+		fileout, err := os.OpenFile("fake_server/tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			storageAcc.mu.Unlock()
+			//toDo тут скорее всего 500-я ошибка
+			w.WriteHeader(http.StatusInternalServerError)
+			err := errors.New("image was not saved on disk!")
+			return err
+		}
+		defer fileout.Close()
+
+		b, err := io.Copy(fileout, filein)
+		if err != nil {
+			_ = b // просто обрабатывать ошибку было нельзя
+			storageAcc.mu.Unlock()
+			//toDo тут скорее всего 500-я ошибка
+			w.WriteHeader(http.StatusInternalServerError)
+			err := errors.New("image was not saved!")
+			return err
+		}
 
 		user.Photo = filename
 	} else {
@@ -163,10 +175,9 @@ func CreateAccount(r *http.Request) error {
 //toDo добавить возможность загрузки картинки
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		err := CreateAccount(r)
+		err := CreateAccount(w, r)
 
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
 			dataJson := InfoTextToJson(err.Error())
 			w.Write(dataJson)
 			return
@@ -179,11 +190,9 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//toDo убрать костыль для проверки
-	//hellowStr := GetGreeting(r)
-	//dataJson := InfoTextToJson(hellowStr + ", this is signup!")
-	//w.Write(dataJson)
-	w.Write([]byte(html))
+	hellowStr := GetGreeting(r)
+	dataJson := InfoTextToJson(hellowStr + ", this is signup!")
+	w.Write(dataJson)
 }
 
 func LoginAcount(username, passwd string) error {
@@ -316,58 +325,3 @@ func main() {
 
 	http.ListenAndServe(":8080", r)
 }
-
-//toDo на будущее убрать эту заглушку
-var html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <style>
-
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        form {
-            width: 400px;
-            height: 500px;
-            background-color: lightblue;
-            display: flex;
-            flex-direction: column;
-            padding: 50px;
-            box-sizing: border-box;
-        }
-
-        form div {
-            flex-grow: 13;
-        }
-    </style>
-
-</head>
-<body>
-<form action="/signup" method="post" enctype="multipart/form-data">
-    <div>photo:</div>
-    <input type="file" name="photo">
-    <br>
-    <div>nickname:</div>
-    <input type="text" name="nickname">
-    <br>
-    <div>name:</div>
-    <input type="text" name="name">
-    <br>
-    <div>surname:</div>
-    <input type="text" name="surname">
-    <br>
-    <div>DOB:</div>
-    <input type="text" name="DOB">
-    <br>
-    <div>passwd:</div>
-    <input type="text" name="passwd">
-    <br>
-    <input type="submit" value="Upload">
-</form>
-</body>
-</html>`
