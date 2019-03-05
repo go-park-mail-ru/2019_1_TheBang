@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -307,19 +306,17 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(jsonPorf))
 }
 
-func determineListenAddress() (string, error) {
+func determineListenAddress() string {
 	port := os.Getenv("PORT")
 	if port == "" {
-		return "", fmt.Errorf("$PORT not set")
+		return ":5000"
 	}
-	return ":" + port, nil
+	return ":" + port
 }
 
 func main() {
-	addr, err := determineListenAddress()
-	if err != nil {
-		log.Fatal(err)
-	}
+	addr:= determineListenAddress()
+
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", RootHandler).Methods("GET")
@@ -333,5 +330,5 @@ func main() {
 	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
 	r.HandleFunc("/profiles/{id:[0-9]+}", ThisProfileHandler).Methods("GET", "PUT")
 
-	http.ListenAndServe(addr, r)
+	 http.ListenAndServe(addr, r)
 }
