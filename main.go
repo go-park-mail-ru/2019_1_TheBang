@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -306,19 +307,31 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(jsonPorf))
 }
 
+func determineListenAddress() (string, error) {
+	port := os.Getenv("PORT")
+	if port == "" {
+		return "", fmt.Errorf("$PORT not set")
+	}
+	return ":" + port, nil
+}
+
 func main() {
-		r := mux.NewRouter()
-		r.HandleFunc("/", RootHandler).Methods("GET")
-		r.HandleFunc("/signup", SignupHandler).Methods("GET", "POST")
+	addr, err := determineListenAddress()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		r.HandleFunc("/login", LogInHandler).Methods("GET", "POST")
-		r.HandleFunc("/logout", LogoutHandler).Methods("GET")
+	r := mux.NewRouter()
+	r.HandleFunc("/", RootHandler).Methods("GET")
+	r.HandleFunc("/signup", SignupHandler).Methods("GET", "POST")
 
-		r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
+	r.HandleFunc("/login", LogInHandler).Methods("GET", "POST")
+	r.HandleFunc("/logout", LogoutHandler).Methods("GET")
 
-		r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
-		r.HandleFunc("/profiles/{id:[0-9]+}", ThisProfileHandler).Methods("GET", "PUT")
+	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 
+	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
+	r.HandleFunc("/profiles/{id:[0-9]+}", ThisProfileHandler).Methods("GET", "PUT")
 
-	http.ListenAndServe(":8080", r)
+	http.ListenAndServe(addr, r)
 }
