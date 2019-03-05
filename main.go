@@ -306,16 +306,13 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(jsonPorf))
 }
 
-func determineListenAddress() string {
-	port := os.Getenv("PORT")
-	if port == "" {
-		return ":5000"
-	}
-	return ":" + port
-}
+
 
 func main() {
-	addr:= determineListenAddress()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5000"
+	}
 
 
 	r := mux.NewRouter()
@@ -330,5 +327,5 @@ func main() {
 	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
 	r.HandleFunc("/profiles/{id:[0-9]+}", ThisProfileHandler).Methods("GET", "PUT")
 
-	 http.ListenAndServe(addr, r)
+	 http.ListenAndServe(":" + port, r)
 }
