@@ -27,12 +27,6 @@ type InfoText struct {
 	Data string
 }
 
-func InfoTextToJson(data string) []byte {
-	infotext := InfoText{Data: data}
-	result, _ := json.Marshal(&infotext) // намеренное игнорирование ошибки
-	return result
-}
-
 // toDO заменить на бд
 type AccountStorage struct {
 	data map[string]string
@@ -68,6 +62,12 @@ var (
 	storageAcc = CreateAccountStorage()
 	storageProf = CreateProfileStorage()
 )
+
+func InfoTextToJson(data string) []byte {
+	infotext := InfoText{Data: data}
+	result, _ := json.Marshal(&infotext) // намеренное игнорирование ошибки
+	return result
+}
 
 func GetGreeting(r *http.Request) string{
 	cookie, err := r.Cookie("session_id")
@@ -295,7 +295,7 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(jsonPorf))
 }
 
-func main() {
+func Handler() {
 		r := mux.NewRouter()
 		r.HandleFunc("/", RootHandler).Methods("GET")
 		r.HandleFunc("/signup", SignupHandler).Methods("GET", "POST")
@@ -312,6 +312,7 @@ func main() {
 	http.ListenAndServe(":8080", r)
 }
 
+//toDo на будущее убрать эту заглушку
 var html = `<!DOCTYPE html>
 <html lang="en">
 <head>
