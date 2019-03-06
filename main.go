@@ -121,7 +121,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 		filename := string(hasher.Sum(nil))
 
 		//toDo при фейле удалить созданный фаил
-		//toDo при сборке из консоил изменить путь
 		//toDo если у 2 пользователей одинаковые изображение, обработка коллизий
 
 		filein, err := header.Open()
@@ -131,7 +130,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 		}
 		defer filein.Close()
 
-		fileout, err := os.OpenFile("fake_server/tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
+		fileout, err := os.OpenFile("tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			//toDo тут скорее всего 500-я ошибка
 			w.WriteHeader(http.StatusInternalServerError)
@@ -313,7 +312,6 @@ func main() {
 	if port == "" {
 		port = "5000"
 	}
-
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", RootHandler).Methods("GET")
