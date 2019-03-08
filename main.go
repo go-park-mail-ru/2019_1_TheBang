@@ -10,8 +10,9 @@ import (
 var (
 	storageAcc = CreateAccountStorage()
 	storageProf = CreateProfileStorage()
-	defaultImg = "default_img"
 	SECRET string
+	CookieName string = "session_id"
+	ServerName = "TheBang server"
 )
 
 func GetGreeting(r *http.Request) string{
@@ -44,11 +45,11 @@ func main() {
 	r.HandleFunc("/login", LogInHandler).Methods("POST") //ok
 	r.HandleFunc("/logout", LogoutHandler).Methods("GET") //ok
 
-	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET") //ok
+	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 
 	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET") //ok
-	r.HandleFunc("/profiles/{id:[0-9]+}/details", ThisProfileHandler).Methods("GET") //ок
-	r.HandleFunc("/profiles/{id:[0-9]+}/update", UpdateProfileInfoHandler).Methods("PUT") //ок
+	r.HandleFunc("/profiles/{id:[0-9]+}/details", ThisProfileHandler).Methods("GET") //ok
+	r.HandleFunc("/profiles/{id:[0-9]+}/update", UpdateProfileInfoHandler).Methods("PUT")
 	r.HandleFunc("/profiles/{id:[0-9]+}/avatar", ChangeProfileAvatarHandler).Methods("POST")
 
 	http.ListenAndServe(":" + port, r)

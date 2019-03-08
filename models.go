@@ -26,6 +26,8 @@ type ProfileStorage struct {
 	count int // костыль для id
 }
 
+//func (p *ProfileStorage)
+
 // toDO заменить на бд
 func CreateProfileStorage() ProfileStorage {
 	prof := ProfileStorage{}
@@ -35,14 +37,14 @@ func CreateProfileStorage() ProfileStorage {
 }
 
 type Profile struct {
-	Id int `json:"user_id, string"`
-	Nickname string
-	Name string
-	Surname string
-	DOB string //toDo нужно заменить на time.Time
-	Photo string
+	Id int `json:"id"`
+	Nickname string `json:"nickname"`
+	Name string `json:"name"`
+	Surname string `json:"surname"`
+	DOB string `json:"dob"`
+	Photo string `json:"photo"`
 }
 
 type InfoText struct {
-	Data string
+	Data string `json:"data"`
 }

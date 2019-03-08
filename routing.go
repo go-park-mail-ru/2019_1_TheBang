@@ -1,17 +1,19 @@
 package main
 
 import (
-	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
-	"io"
+	"github.com/dgrijalva/jwt-go"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
+)
+
+var (
+	defaultImg = "default_img"
 )
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,12 +57,12 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAccount(w http.ResponseWriter, r *http.Request) error {
-	// toDo use gorilla shema
-	user := Profile{
+	//toDo валидация формы
+	var user = Profile{
 		Nickname: r.FormValue("nickname"),
-		Name:  r.FormValue("name"),
+		Name: r.FormValue("name"),
 		Surname: r.FormValue("surname"),
-		DOB: r.FormValue("DOB"),
+		DOB: r.FormValue("dob"),
 	}
 	passwd := r.FormValue("passwd")
 
@@ -68,59 +70,54 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 	defer storageAcc.mu.Unlock()
 
 	if _, ok := storageAcc.data[user.Nickname]; ok {
+		w.WriteHeader(http.StatusConflict)
 		err := errors.New("This user already exists!")
 		return err
 	}
 
-	// toDo сделать ограничение по размеру
-	//toDo привести код в порядок
-	withPhoto := r.FormValue("with_photo")
-	if withPhoto == "yes" {
-		file, header, err := r.FormFile("photo")
-		if err != nil {
-			err := errors.New("image was failed in form!")
-			return err
-		}
-		defer file.Close()
-
-		hasher := md5.New()
-		io.Copy(hasher, file)
-		filename := string(hasher.Sum(nil))
-
-		//toDo при фейле удалить созданный фаил
-		//toDo если у 2 пользователей одинаковые изображение, обработка коллизий
-
-		filein, err := header.Open()
-		if err != nil {
-			err := errors.New("image was failed!")
-			return err
-		}
-		defer filein.Close()
-
-		fileout, err := os.OpenFile("tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
-		if err != nil {
-			//toDo тут скорее всего 500-я ошибка
-			w.WriteHeader(http.StatusInternalServerError)
-			err := errors.New("image was not saved on disk!")
-			return err
-		}
-		defer fileout.Close()
-
-		b, err := io.Copy(fileout, filein)
-		if err != nil {
-			_ = b // просто обрабатывать ошибку было нельзя
-			//toDo тут скорее всего 500-я ошибка
-			w.WriteHeader(http.StatusInternalServerError)
-			err := errors.New("image was not saved!")
-			return err
-		}
-
-		user.Photo = filename
-	} else {
-		user.Photo = defaultImg
-	}
+		//file, header, err := r.FormFile("photo")
+		//if err != nil {
+		//	err := errors.New("image was failed in form!")
+		//	return err
+		//}
+		//defer file.Close()
+		//
+		//hasher := md5.New()
+		//io.Copy(hasher, file)
+		//filename := string(hasher.Sum(nil))
+		//
+		////toDo при фейле удалить созданный фаил
+		////toDo если у 2 пользователей одинаковые изображение, обработка коллизий
+		//
+		//filein, err := header.Open()
+		//if err != nil {
+		//	err := errors.New("image was failed!")
+		//	return err
+		//}
+		//defer filein.Close()
+		//
+		//fileout, err := os.OpenFile("tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
+		//if err != nil {
+		//	//toDo тут скорее всего 500-я ошибка
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	err := errors.New("image was not saved on disk!")
+		//	return err
+		//}
+		//defer fileout.Close()
+		//
+		//b, err := io.Copy(fileout, filein)
+		//if err != nil {
+		//	_ = b // просто обрабатывать ошибку было нельзя
+		//	//toDo тут скорее всего 500-я ошибка
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//	err := errors.New("image was not saved!")
+		//	return err
+		//}
+		//
+		//user.Photo = filename
 
 	user.Id = storageAcc.count
+	user.Photo = defaultImg
 
 	storageAcc.data[user.Nickname] = passwd
 	storageProf.data[storageProf.count] = user
@@ -132,13 +129,12 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 }
 
 func LogInHandler(w http.ResponseWriter, r *http.Request) {
-	//toDo испльзовать girilla schema
 	username := r.FormValue("nickname")
 	passwd := r.FormValue("passwd")
 
-	err := LoginAcount(username, passwd)
+	token, err := LoginAcount(username, passwd)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusUnauthorized)
 		info := InfoText{Data: "Wrong nickname or password!"}
 		err := json.NewEncoder(w).Encode(info)
 		if err != nil {
@@ -154,8 +150,9 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	expiration := time.Now().Add(10 * time.Hour)
 	cookie := http.Cookie{
 		Name:    "session_id",
-		Value:   username,
+		Value:   token,
 		Expires: expiration,
+		HttpOnly: true,
 	}
 
 	http.SetCookie(w, &cookie)
@@ -171,24 +168,52 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func LoginAcount(username, passwd string) error {
+//toDo добавить в токен id
+type customClaims struct {
+	Nickname string `json:"nickname"`
+	jwt.StandardClaims
+}
+
+func LoginAcount(username, passwd string) (string, error) {
 	storageAcc.mu.Lock()
 	defer storageAcc.mu.Unlock()
 
 	if pw, ok := storageAcc.data[username]; !ok || pw != passwd {
 		err := errors.New("Wrong answer or password!")
-		return err
+		return "", err
 	}
 
-	return nil
+	claims := customClaims{
+		ServerName,
+		jwt.StandardClaims{
+			Issuer:    "theBang server",
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	ss, err := token.SignedString(SECRET)
+	if err != nil {
+		log.Println("Error with JWT tocken generation!")
+	}
+
+	return ss, nil
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie("session_id")
-	if err == nil {
-		session.Expires = time.Now().AddDate(0, 0, -1)
-		http.SetCookie(w, session)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		info := InfoText{Data: "A not logged in user cannot log out!"}
+		err := json.NewEncoder(w).Encode(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err.Error())
+
+			return
+		}
 	}
+
+	session.Expires = time.Now().AddDate(0, 0, -1)
+	http.SetCookie(w, session)
 
 	info := InfoText{Data: "You successfully logged out!"}
 	err = json.NewEncoder(w).Encode(info)
@@ -200,7 +225,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// toDo заменить структуру
+// toDo сделать погинацию
 func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 	hellowStr := GetGreeting(r)
 	info := InfoText{Data: hellowStr + ", this is leaderbord!"}
@@ -274,7 +299,22 @@ func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		err := json.NewEncoder(w).Encode("Incorrect user id!")
+		info := InfoText{Data: "Incorrect user id!"}
+		err := json.NewEncoder(w).Encode(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err.Error())
+
+			return
+		}
+
+		return
+	}
+
+	if ok := CheckTocken(r); !ok {
+		w.WriteHeader(http.StatusForbidden)
+		info := InfoText{Data: "You can not change this profiles info!"}
+		err := json.NewEncoder(w).Encode(info)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			log.Println(err.Error())
@@ -287,10 +327,6 @@ func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	storageProf.mu.Lock()
 	defer storageProf.mu.Unlock()
-
-
-	// toDo добавить проверку на токен
-	// todo пока здесть просто проверка наличия id
 
 	if _, ok := storageProf.data[id]; !ok {
 		w.WriteHeader(http.StatusNotFound)
@@ -307,10 +343,12 @@ func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updateProf := Profile{
+		Id: id,
 		Nickname: r.FormValue("nickname"),
 		Name:  r.FormValue("name"),
 		Surname: r.FormValue("surname"),
 		DOB: r.FormValue("DOB"),
+		Photo: storageProf.data[id].Photo,
 	}
 
 	storageProf.data[id] = updateProf
@@ -325,6 +363,20 @@ func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func CheckTocken(r *http.Request) bool {
+	cookie, err := r.Cookie(CookieName)
+	if err != nil {
+		return false
+	}
+
+	_ = cookie
+	return true
+
+	//jwt.Parse(cookie.Value, jwt.SigningMethodHS256)
+	//cookie.Value
+}
+
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 
