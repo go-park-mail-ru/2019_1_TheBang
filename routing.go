@@ -1,13 +1,16 @@
 package main
 
 import (
+	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
@@ -74,47 +77,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 		err := errors.New("This user already exists!")
 		return err
 	}
-
-		//file, header, err := r.FormFile("photo")
-		//if err != nil {
-		//	err := errors.New("image was failed in form!")
-		//	return err
-		//}
-		//defer file.Close()
-		//
-		//hasher := md5.New()
-		//io.Copy(hasher, file)
-		//filename := string(hasher.Sum(nil))
-		//
-		////toDo при фейле удалить созданный фаил
-		////toDo если у 2 пользователей одинаковые изображение, обработка коллизий
-		//
-		//filein, err := header.Open()
-		//if err != nil {
-		//	err := errors.New("image was failed!")
-		//	return err
-		//}
-		//defer filein.Close()
-		//
-		//fileout, err := os.OpenFile("tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
-		//if err != nil {
-		//	//toDo тут скорее всего 500-я ошибка
-		//	w.WriteHeader(http.StatusInternalServerError)
-		//	err := errors.New("image was not saved on disk!")
-		//	return err
-		//}
-		//defer fileout.Close()
-		//
-		//b, err := io.Copy(fileout, filein)
-		//if err != nil {
-		//	_ = b // просто обрабатывать ошибку было нельзя
-		//	//toDo тут скорее всего 500-я ошибка
-		//	w.WriteHeader(http.StatusInternalServerError)
-		//	err := errors.New("image was not saved!")
-		//	return err
-		//}
-		//
-		//user.Photo = filename
 
 	user.Id = storageAcc.count
 	user.Photo = defaultImg
@@ -395,8 +357,144 @@ func CheckTocken(r *http.Request) bool {
 	return true
 }
 
+func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(HTML))
+}
+
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		info := InfoText{Data: "Incorrect user id!"}
+		err := json.NewEncoder(w).Encode(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err.Error())
 
+			return
+		}
+
+		return
+	}
+
+	if _, ok := storageProf.data[id]; !ok {
+		w.WriteHeader(http.StatusNotFound)
+		info := InfoText{Data: "We have not this user!"}
+		err := json.NewEncoder(w).Encode(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err.Error())
+
+			return
+		}
+
+		return
+	}
+
+	if ok := CheckTocken(r); !ok {
+		w.WriteHeader(http.StatusForbidden)
+		info := InfoText{Data: "You can not change this profiles photo!"}
+		err := json.NewEncoder(w).Encode(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err.Error())
+
+			return
+		}
+
+		return
+	}
+
+	file, header, err := r.FormFile("photo")
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		info := InfoText{Data: "image was failed in form!"}
+		err := json.NewEncoder(w).Encode(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err.Error())
+
+			return
+		}
+
+		return
+	}
+	defer file.Close()
+
+	hasher := md5.New()
+	_, err = io.Copy(hasher, file)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
+
+		return
+	}
+	filename := string(hasher.Sum(nil))
+
+	filein, err := header.Open()
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		info := InfoText{Data: "image was failed in form!"}
+		err := json.NewEncoder(w).Encode(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println(err.Error())
+
+			return
+		}
+
+		return
+	}
+	defer filein.Close()
+
+	fileout, err := os.OpenFile("tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("ChangeProfileAvatarHandler: ", "file for img was not created!")
+
+		return
+	}
+	defer fileout.Close()
+
+	b, err := io.Copy(fileout, filein)
+	if err != nil {
+		_ = b // просто обрабатывать ошибку было нельзя
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("ChangeProfileAvatarHandler: ", "img was not saved on disk!")
+
+		return
+	}
+
+	storageProf.mu.Lock()
+	defer storageProf.mu.Unlock()
+
+	updatedProf := storageProf.data[id]
+	deletePhoto(updatedProf.Photo)
+
+	updatedProf.Photo = filename
+	storageProf.data[id] = updatedProf
+
+	w.WriteHeader(http.StatusAccepted)
+	info := InfoText{Data: "Photo was updated!"}
+	err = json.NewEncoder(w).Encode(info)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
+
+		return
+	}
+}
+
+func deletePhoto(filename string) {
+	if filename == defaultImg {
+		return
+	}
+
+	err := os.Remove("tmp/" + filename)
+	if err != nil {
+		log.Printf("Can not remove file tmp/%v\n", filename)
+	}
 }
 

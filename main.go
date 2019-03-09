@@ -34,25 +34,61 @@ func main() {
 
 	SECRET = []byte(os.Getenv("SECRET"))
 	if string(SECRET) == "" {
-		//toDo  вернуть строку
 		SECRET = []byte("secret")
 		log.Println("There is no SECRET!")
 	}
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", RootHandler).Methods("GET") //ok
-	r.HandleFunc("/signup", SignupHandler).Methods("POST") //ok
+	r.HandleFunc("/", RootHandler).Methods("GET")
+	r.HandleFunc("/signup", SignupHandler).Methods("POST")
 
-	r.HandleFunc("/login", LogInHandler).Methods("POST") //ok
-	r.HandleFunc("/logout", LogoutHandler).Methods("GET") //ok
+	r.HandleFunc("/login", LogInHandler).Methods("POST")
+	r.HandleFunc("/logout", LogoutHandler).Methods("GET")
 
 	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 
-	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET") //ok
-	r.HandleFunc("/profiles/{id:[0-9]+}/details", ThisProfileHandler).Methods("GET") //ok
+	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
+	r.HandleFunc("/profiles/{id:[0-9]+}/details", ThisProfileHandler).Methods("GET")
 	r.HandleFunc("/profiles/{id:[0-9]+}/update", UpdateProfileInfoHandler).Methods("PUT")
+	r.HandleFunc("/profiles/{id:[0-9]+}/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
 	r.HandleFunc("/profiles/{id:[0-9]+}/avatar", ChangeProfileAvatarHandler).Methods("POST")
 
 	http.ListenAndServe(":" + port, r)
 }
+
+var HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        form {
+            width: 400px;
+            height: 500px;
+            background-color: lightblue;
+            display: flex;
+            flex-direction: column;
+            padding: 50px;
+            box-sizing: border-box;
+        }
+        form div {
+            flex-grow: 13;
+        }
+    </style>
+</head>
+<body>
+<form action="/profiles/0/avatar" method="post" enctype="multipart/form-data">
+    <div>photo:</div>
+    <input type="file" name="photo">
+    <br>
+    <br>
+    <input type="submit" value="Upload">
+</form>
+</body>
+</html>`
