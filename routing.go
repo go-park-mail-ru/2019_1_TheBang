@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"strconv"
@@ -192,7 +192,7 @@ func LoginAcount(username, passwd string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	ss, err := token.SignedString(SECRET)
 	if err != nil {
-		log.Println("Error with JWT tocken generation!")
+		log.Printf("Error with JWT tocken generation: %v\n", err.Error())
 	}
 
 	return ss, nil
@@ -210,6 +210,8 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 			return
 		}
+
+		return
 	}
 
 	session.Expires = time.Now().AddDate(0, 0, -1)
@@ -294,6 +296,7 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//toDo вместе с базами проверка на принадлежность пользователя
 func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -347,7 +350,7 @@ func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 		Nickname: r.FormValue("nickname"),
 		Name:  r.FormValue("name"),
 		Surname: r.FormValue("surname"),
-		DOB: r.FormValue("DOB"),
+		DOB: r.FormValue("dob"),
 		Photo: storageProf.data[id].Photo,
 	}
 
@@ -370,11 +373,26 @@ func CheckTocken(r *http.Request) bool {
 		return false
 	}
 
-	_ = cookie
-	return true
+	tokenStr := cookie.Value
 
-	//jwt.Parse(cookie.Value, jwt.SigningMethodHS256)
-	//cookie.Value
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return SECRET, nil
+	})
+	if err != nil {
+		log.Printf("Error with check tocken: %v", err.Error())
+		return false
+	}
+
+	if !token.Valid {
+		log.Println("%v use faked cookie: %v", r.RemoteAddr, err)
+		return false
+	}
+
+	return true
 }
 
 

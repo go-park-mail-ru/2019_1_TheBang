@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"os"
 )
@@ -10,31 +11,32 @@ import (
 var (
 	storageAcc = CreateAccountStorage()
 	storageProf = CreateProfileStorage()
-	SECRET string
+	SECRET []byte
 	CookieName string = "session_id"
 	ServerName = "TheBang server"
 )
 
+//заглушка
 func GetGreeting(r *http.Request) string{
-	cookie, err := r.Cookie("session_id")
+	_, err := r.Cookie("session_id")
 	if err == http.ErrNoCookie {
 		return "Hellow, unknown"
 	}
 
-	name := cookie.Value
-	return fmt.Sprintf("Hellow, %v", name)
+	return fmt.Sprintf("Hellow, my friend")
 }
 
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "5000"
+		port = "8080"
 	}
 
-	SECRET = os.Getenv("SECRET")
-	if SECRET == "" {
+	SECRET = []byte(os.Getenv("SECRET"))
+	if string(SECRET) == "" {
 		//toDo  вернуть строку
-		//log.Fatal("There is no SECRET!")
+		SECRET = []byte("secret")
+		log.Println("There is no SECRET!")
 	}
 
 	r := mux.NewRouter()
