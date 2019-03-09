@@ -34,16 +34,16 @@
 					"response": []
 				},
 				{
-					"name": "get /login",
+					"name": "post /signup",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": ""
+							"mode": "file",
+							"file": {}
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/login",
+							"raw": "127.0.0.1:8080/signup?nickname=surfingbird&name=Andrey&surname=Baronskiy&dob=03.11.1998&passwd=qwerty",
 							"host": [
 								"127",
 								"0",
@@ -52,7 +52,39 @@
 							],
 							"port": "8080",
 							"path": [
-								"login"
+								"signup"
+							],
+							"query": [
+								{
+									"key": "nickname",
+									"value": "surfingbird"
+								},
+								{
+									"key": "name",
+									"value": "Andrey"
+								},
+								{
+									"key": "surname",
+									"value": "Baronskiy"
+								},
+								{
+									"key": "dob",
+									"value": "03.11.1998"
+								},
+								{
+									"key": "passwd",
+									"value": "qwerty"
+								},
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -94,7 +126,7 @@
 					"response": []
 				},
 				{
-					"name": "get /signup",
+					"name": "get /logout",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -103,7 +135,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/signup",
+							"raw": "127.0.0.1:8080/logout",
 							"host": [
 								"127",
 								"0",
@@ -112,142 +144,7 @@
 							],
 							"port": "8080",
 							"path": [
-								"signup"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "post /signup",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "127.0.0.1:8080/signup?nickname=surfingbird&name=Andrey&surname=Baronskiy&DOB=03.11.1998&passwd=qwertys&=",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8080",
-							"path": [
-								"signup"
-							],
-							"query": [
-								{
-									"key": "nickname",
-									"value": "surfingbird"
-								},
-								{
-									"key": "name",
-									"value": "Andrey"
-								},
-								{
-									"key": "surname",
-									"value": "Baronskiy"
-								},
-								{
-									"key": "DOB",
-									"value": "03.11.1998"
-								},
-								{
-									"key": "passwd",
-									"value": "qwertys"
-								},
-								{
-									"key": "",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get /profiles",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "127.0.0.1:8080/profiles",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8080",
-							"path": [
-								"profiles"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get /profiles/{id:[0-9]+}",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "127.0.0.1:8080/profiles/0",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8080",
-							"path": [
-								"profiles",
-								"0"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "put /profiles/{id:[0-9]+}",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "?nickname=surfingbird&name=Ivan&surname=Ivanov&DOB=03.11.1998",
-							"query": [
-								{
-									"key": "nickname",
-									"value": "surfingbird"
-								},
-								{
-									"key": "name",
-									"value": "Ivan"
-								},
-								{
-									"key": "surname",
-									"value": "Ivanov"
-								},
-								{
-									"key": "DOB",
-									"value": "03.11.1998"
-								}
+								"logout"
 							]
 						}
 					},
@@ -279,7 +176,7 @@
 					"response": []
 				},
 				{
-					"name": "get /logout",
+					"name": "get /profiles",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -288,7 +185,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/logout",
+							"raw": "127.0.0.1:8080/profiles",
 							"host": [
 								"127",
 								"0",
@@ -297,7 +194,106 @@
 							],
 							"port": "8080",
 							"path": [
-								"logout"
+								"profiles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get /profiles/{id:[0-9]+}/details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/profiles/0/details",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"profiles",
+								"0",
+								"details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "put /profiles/{id:[0-9]+}/update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/profiles/0/update?nickname=surfingbird&name=Ivan&surname=Ivanov&dob=03.11.1998",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"profiles",
+								"0",
+								"update"
+							],
+							"query": [
+								{
+									"key": "nickname",
+									"value": "surfingbird"
+								},
+								{
+									"key": "name",
+									"value": "Ivan"
+								},
+								{
+									"key": "surname",
+									"value": "Ivanov"
+								},
+								{
+									"key": "dob",
+									"value": "03.11.1998"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post  /profiles/{id:[0-9]+}/avatar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/profiles/0/avatar",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"profiles",
+								"0",
+								"avatar"
 							]
 						}
 					},
