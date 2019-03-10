@@ -44,6 +44,7 @@ func CreateProfileStorage() ProfileStorage {
 		Photo:    defaultImg,
 	}
 	prof.data[0] = admin
+	prof.count++
 
 	return prof
 }
