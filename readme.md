@@ -1,6 +1,8 @@
 # TheBang
 ![Dancing Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/dancing-gopher.gif) 
 ![Party Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/party-gopher.gif)
+![Party Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/party-gopher.gif)
+![Dancing Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/dancing-gopher.gif) 
 
 
 
