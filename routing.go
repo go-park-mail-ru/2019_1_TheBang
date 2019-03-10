@@ -329,14 +329,15 @@ func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateProf := Profile{
-		Id: id,
-		Nickname: r.FormValue("nickname"),
-		Name:  r.FormValue("name"),
-		Surname: r.FormValue("surname"),
-		DOB: r.FormValue("dob"),
-		Photo: storageProf.data[id].Photo,
-	}
+	//toDo обработка ошибок
+	update := Update{}
+	body, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &update)
+
+	updateProf := storageProf.data[id]
+	updateProf.DOB = update.DOB
+	updateProf.Surname = update.Surname
+	updateProf.Name = update.Name
 
 	storageProf.data[id] = updateProf
 

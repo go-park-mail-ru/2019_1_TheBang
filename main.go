@@ -14,6 +14,7 @@ var (
 	SECRET []byte
 	CookieName string = "session_id"
 	ServerName = "TheBang server"
+	FrontentDst = "localhost:3000"
 )
 
 //заглушка
