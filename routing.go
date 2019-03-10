@@ -8,6 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -39,8 +40,8 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	err := CreateAccount(w, r)
 		if err != nil {
 			log.Println(err.Error())
-
-			err := json.NewEncoder(w).Encode(err.Error())
+			info := InfoText{Data: err.Error()}
+			err := json.NewEncoder(w).Encode(info)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				log.Println(err.Error())
@@ -64,14 +65,20 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAccount(w http.ResponseWriter, r *http.Request) error {
-	//toDo валидация формы
-	var user = Profile{
-		Nickname: r.FormValue("nickname"),
-		Name: r.FormValue("name"),
-		Surname: r.FormValue("surname"),
-		DOB: r.FormValue("dob"),
+	//toDo обработка ошибок
+	signup := Signup{}
+	body, _ := ioutil.ReadAll(r.Body)
+	err := json.Unmarshal(body, &signup)
+	_ = err
+
+	user := Profile{
+			Nickname: signup.Nickname,
+			Name: signup.Name,
+			Surname: signup.Surname,
+			DOB: signup.DOB,
 	}
-	passwd := r.FormValue("passwd")
+	passwd := signup.Passwd
+
 
 	storageAcc.mu.Lock()
 	defer storageAcc.mu.Unlock()
@@ -95,10 +102,14 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 }
 
 func LogInHandler(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("nickname")
-	passwd := r.FormValue("passwd")
+	w.Header().Set("Content-Type", "application/json")
 
-	token, err := LoginAcount(username, passwd)
+	login := Login{}
+	//toDo обработать эту ошибку
+	body, _ := ioutil.ReadAll(r.Body)
+	err := json.Unmarshal(body, &login)
+
+	token, err := LoginAcount(login.Nickname, login.Passwd)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		info := InfoText{Data: "Wrong nickname or password!"}
@@ -123,7 +134,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &cookie)
 
-	answer := fmt.Sprintf("User %v was login!", username)
+	answer := fmt.Sprintf("User %v was login!", login.Nickname)
 	info := InfoText{Data: answer}
 	err = json.NewEncoder(w).Encode(info)
 	if err != nil {
@@ -195,9 +206,10 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 // toDo сделать погинацию
 func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
-	hellowStr := GetGreeting(r)
-	info := InfoText{Data: hellowStr + ", this is leaderbord!"}
-	err := json.NewEncoder(w).Encode(info)
+	w.Header().Set("Content-Type", "application/json")
+
+	//toDo убрать заглушку лидерборда
+	_, err := w.Write([]byte(Leaderboard))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())
@@ -207,6 +219,8 @@ func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	hellowStr := GetGreeting(r)
 	info := InfoText{Data: hellowStr + ", this is profiles!"}
 	err := json.NewEncoder(w).Encode(info)
@@ -219,6 +233,8 @@ func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -264,6 +280,8 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 //toDo вместе с базами проверка на принадлежность пользователя
 func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -311,14 +329,15 @@ func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateProf := Profile{
-		Id: id,
-		Nickname: r.FormValue("nickname"),
-		Name:  r.FormValue("name"),
-		Surname: r.FormValue("surname"),
-		DOB: r.FormValue("dob"),
-		Photo: storageProf.data[id].Photo,
-	}
+	//toDo обработка ошибок
+	update := Update{}
+	body, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &update)
+
+	updateProf := storageProf.data[id]
+	updateProf.DOB = update.DOB
+	updateProf.Surname = update.Surname
+	updateProf.Name = update.Name
 
 	storageProf.data[id] = updateProf
 
@@ -361,12 +380,15 @@ func CheckTocken(r *http.Request) bool {
 	return true
 }
 
+//toDo избавиться
 func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(HTML))
 }
 
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -501,4 +523,39 @@ func deletePhoto(filename string) {
 		log.Printf("Can not remove file tmp/%v\n", filename)
 	}
 }
+
+var Leaderboard = `{
+  "leaderbord": [
+    {
+      "position": 1,
+      "nickname": "Andrey",
+      "score": 10000,
+      "photo": "default_img"
+    },
+    {
+      "position": 2,
+      "nickname": "Bob",
+      "score": 5000,
+      "photo": "default_img"
+    },
+    {
+      "position": 3,
+      "nickname": "Nick",
+      "score": 2500,
+      "photo": "default_img"
+    },
+    {
+      "position": 4,
+      "nickname": "Tom",
+      "score": 1000,
+      "photo": "default_img"
+    },
+    {
+      "position": 5,
+      "nickname": "Liza",
+      "score": 10,
+      "photo": "default_img"
+    },
+    ]
+}`
 
