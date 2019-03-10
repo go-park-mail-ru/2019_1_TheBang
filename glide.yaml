@@ -1,0 +1,4 @@
+package: github.com/go-park-mail-ru/2019_1_TheBang
+import:
+- package: github.com/dgrijalva/jwt-go
+- package: github.com/gorilla/mux
