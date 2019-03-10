@@ -38,30 +38,30 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	err := CreateAccount(w, r)
-		if err != nil {
-			log.Println(err.Error())
-			info := InfoText{Data: err.Error()}
-			err := json.NewEncoder(w).Encode(info)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				log.Println(err.Error())
-
-				return
-			}
-
-			return
-		}
-
-		w.WriteHeader(http.StatusCreated)
-		info := InfoText{Data: "User was created!"}
-
-		err = json.NewEncoder(w).Encode(info)
+	if err != nil {
+		log.Println(err.Error())
+		info := InfoText{Data: err.Error()}
+		err := json.NewEncoder(w).Encode(info)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			log.Println(err.Error())
 
 			return
 		}
+
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	info := InfoText{Data: "User was created!"}
+
+	err = json.NewEncoder(w).Encode(info)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
+
+		return
+	}
 }
 
 func CreateAccount(w http.ResponseWriter, r *http.Request) error {
@@ -72,13 +72,12 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 	_ = err
 
 	user := Profile{
-			Nickname: signup.Nickname,
-			Name: signup.Name,
-			Surname: signup.Surname,
-			DOB: signup.DOB,
+		Nickname: signup.Nickname,
+		Name:     signup.Name,
+		Surname:  signup.Surname,
+		DOB:      signup.DOB,
 	}
 	passwd := signup.Passwd
-
 
 	storageAcc.mu.Lock()
 	defer storageAcc.mu.Unlock()
@@ -126,9 +125,9 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 
 	expiration := time.Now().Add(10 * time.Hour)
 	cookie := http.Cookie{
-		Name:    "session_id",
-		Value:   token,
-		Expires: expiration,
+		Name:     "session_id",
+		Value:    token,
+		Expires:  expiration,
 		HttpOnly: true,
 	}
 
@@ -163,7 +162,7 @@ func LoginAcount(username, passwd string) (string, error) {
 	claims := customClaims{
 		ServerName,
 		jwt.StandardClaims{
-			Issuer:    "theBang server",
+			Issuer: "theBang server",
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -385,7 +384,6 @@ func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(HTML))
 }
 
-
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -475,7 +473,7 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer filein.Close()
 
-	fileout, err := os.OpenFile("tmp/" + filename, os.O_WRONLY|os.O_CREATE, 0644)
+	fileout, err := os.OpenFile("tmp/"+filename, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println("ChangeProfileAvatarHandler: ", "file for img was not created!")
@@ -555,7 +553,6 @@ var Leaderboard = `{
       "nickname": "Liza",
       "score": 10,
       "photo": "default_img"
-    },
+    }
     ]
 }`
-

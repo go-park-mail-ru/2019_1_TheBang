@@ -6,8 +6,8 @@ import (
 
 // toDO заменить на бд
 type AccountStorage struct {
-	data map[string]string
-	mu sync.Mutex
+	data  map[string]string
+	mu    sync.Mutex
 	count int // костыль для id
 }
 
@@ -24,11 +24,10 @@ func CreateAccountStorage() AccountStorage {
 
 // toDO заменить на бд
 type ProfileStorage struct {
-	data map[int]Profile
-	mu sync.Mutex
+	data  map[int]Profile
+	mu    sync.Mutex
 	count int // костыль для id
 }
-
 
 // toDO заменить на бд
 func CreateProfileStorage() ProfileStorage {
@@ -37,12 +36,12 @@ func CreateProfileStorage() ProfileStorage {
 
 	//toDO убрать чудо админа
 	admin := Profile{
-		Id: 0,
+		Id:       0,
 		Nickname: "admin",
-		Name: "admin",
-		Surname: "admin",
-		DOB: "0.0.0.0",
-		Photo: defaultImg,
+		Name:     "admin",
+		Surname:  "admin",
+		DOB:      "0.0.0.0",
+		Photo:    defaultImg,
 	}
 	prof.data[0] = admin
 
@@ -50,31 +49,31 @@ func CreateProfileStorage() ProfileStorage {
 }
 
 type Profile struct {
-	Id int `json:"id"`
+	Id       int    `json:"id"`
 	Nickname string `json:"nickname"`
-	Name string `json:"name"`
-	Surname string `json:"surname"`
-	DOB string `json:"dob"`
-	Photo string `json:"photo"`
+	Name     string `json:"name"`
+	Surname  string `json:"surname"`
+	DOB      string `json:"dob"`
+	Photo    string `json:"photo"`
 }
 
 type Login struct {
 	Nickname string `json:"nickname"`
-	Passwd string `json:"passwd"`
+	Passwd   string `json:"passwd"`
 }
 
 type Signup struct {
 	Nickname string `json:"nickname"`
-	Name string `json:"name"`
-	Surname string `json:"surname"`
-	DOB string `json:"dob"`
-	Passwd string `json:"passwd"`
+	Name     string `json:"name"`
+	Surname  string `json:"surname"`
+	DOB      string `json:"dob"`
+	Passwd   string `json:"passwd"`
 }
 
 type Update struct {
-	Name string `json:"name"`
+	Name    string `json:"name"`
 	Surname string `json:"surname"`
-	DOB string `json:"dob"`
+	DOB     string `json:"dob"`
 }
 
 type InfoText struct {

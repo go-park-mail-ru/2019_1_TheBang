@@ -9,16 +9,16 @@ import (
 )
 
 var (
-	storageAcc = CreateAccountStorage()
+	storageAcc  = CreateAccountStorage()
 	storageProf = CreateProfileStorage()
-	SECRET []byte
-	CookieName string = "session_id"
-	ServerName = "TheBang server"
-	FrontentDst = "localhost:3000"
+	SECRET      []byte
+	CookieName  string = "session_id"
+	ServerName         = "TheBang server"
+	FrontentDst        = "localhost:3000"
 )
 
 //заглушка
-func GetGreeting(r *http.Request) string{
+func GetGreeting(r *http.Request) string {
 	_, err := r.Cookie("session_id")
 	if err == http.ErrNoCookie {
 		return "Hellow, unknown"
@@ -55,7 +55,7 @@ func main() {
 	r.HandleFunc("/profiles/{id:[0-9]+}/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
 	r.HandleFunc("/profiles/{id:[0-9]+}/avatar", ChangeProfileAvatarHandler).Methods("POST")
 
-	http.ListenAndServe(":" + port, r)
+	http.ListenAndServe(":"+port, r)
 }
 
 var HTML = `<!DOCTYPE html>
