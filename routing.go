@@ -40,8 +40,8 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	err := CreateAccount(w, r)
 		if err != nil {
 			log.Println(err.Error())
-
-			err := json.NewEncoder(w).Encode(err.Error())
+			info := InfoText{Data: err.Error()}
+			err := json.NewEncoder(w).Encode(info)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				log.Println(err.Error())
@@ -65,14 +65,20 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAccount(w http.ResponseWriter, r *http.Request) error {
-	//toDo валидация формы
-	var user = Profile{
-		Nickname: r.FormValue("nickname"),
-		Name: r.FormValue("name"),
-		Surname: r.FormValue("surname"),
-		DOB: r.FormValue("dob"),
+	//toDo обработка ошибок
+	signup := Signup{}
+	body, _ := ioutil.ReadAll(r.Body)
+	err := json.Unmarshal(body, &signup)
+	_ = err
+
+	user := Profile{
+			Nickname: signup.Nickname,
+			Name: signup.Name,
+			Surname: signup.Surname,
+			DOB: signup.DOB,
 	}
-	passwd := r.FormValue("passwd")
+	passwd := signup.Passwd
+
 
 	storageAcc.mu.Lock()
 	defer storageAcc.mu.Unlock()
@@ -99,6 +105,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	login := Login{}
+	//toDo обработать эту ошибку
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &login)
 
