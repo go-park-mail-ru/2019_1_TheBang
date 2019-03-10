@@ -16,6 +16,9 @@ func CreateAccountStorage() AccountStorage {
 	acc := AccountStorage{}
 	acc.data = make(map[string]string)
 
+	//toDo убрать эту чудо запись
+	acc.data["admin"] = "admin"
+
 	return acc
 }
 
@@ -26,12 +29,22 @@ type ProfileStorage struct {
 	count int // костыль для id
 }
 
-//func (p *ProfileStorage)
 
 // toDO заменить на бд
 func CreateProfileStorage() ProfileStorage {
 	prof := ProfileStorage{}
 	prof.data = make(map[int]Profile)
+
+	//toDO убрать чудо админа
+	admin := Profile{
+		Id: 0,
+		Nickname: "admin",
+		Name: "admin",
+		Surname: "admin",
+		DOB: "0.0.0.0",
+		Photo: defaultImg,
+	}
+	prof.data[0] = admin
 
 	return prof
 }

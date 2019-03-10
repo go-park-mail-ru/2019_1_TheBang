@@ -20,6 +20,8 @@ var (
 )
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	hellowStr := GetGreeting(r)
 	info := InfoText{Data: hellowStr + ", this is root!"}
 	err := json.NewEncoder(w).Encode(info)
@@ -32,7 +34,9 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
-		err := CreateAccount(w, r)
+	w.Header().Set("Content-Type", "application/json")
+
+	err := CreateAccount(w, r)
 		if err != nil {
 			log.Println(err.Error())
 
