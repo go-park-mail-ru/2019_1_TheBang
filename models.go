@@ -58,6 +58,11 @@ type Profile struct {
 	Photo string `json:"photo"`
 }
 
+type Login struct {
+	Nickname string `json:"nickname"`
+	Passwd string `json:"passwd"`
+}
+
 type InfoText struct {
 	Data string `json:"data"`
 }

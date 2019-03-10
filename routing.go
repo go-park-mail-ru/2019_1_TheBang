@@ -8,6 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -95,10 +96,13 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 }
 
 func LogInHandler(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("nickname")
-	passwd := r.FormValue("passwd")
+	w.Header().Set("Content-Type", "application/json")
 
-	token, err := LoginAcount(username, passwd)
+	login := Login{}
+	body, _ := ioutil.ReadAll(r.Body)
+	err := json.Unmarshal(body, &login)
+
+	token, err := LoginAcount(login.Nickname, login.Passwd)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		info := InfoText{Data: "Wrong nickname or password!"}
@@ -123,7 +127,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &cookie)
 
-	answer := fmt.Sprintf("User %v was login!", username)
+	answer := fmt.Sprintf("User %v was login!", login.Nickname)
 	info := InfoText{Data: answer}
 	err = json.NewEncoder(w).Encode(info)
 	if err != nil {
