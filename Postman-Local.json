@@ -37,13 +37,20 @@
 					"name": "post /signup",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
 						"body": {
-							"mode": "file",
-							"file": {}
+							"mode": "raw",
+							"raw": "{\n\t\"nickname\": \"Surfingbird\",\n\t\"name\": \"Ivan\",\n\t\"surname\": \"Ivanov\",\n\t\"dob\": \"01.11.1968\",\n\t\"passwd\": \"tvoe_kakoe_delo\"\n}"
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/signup?nickname=surfingbird&name=Andrey&surname=Baronskiy&dob=03.11.1998&passwd=qwerty",
+							"raw": "127.0.0.1:8080/signup",
 							"host": [
 								"127",
 								"0",
@@ -53,38 +60,6 @@
 							"port": "8080",
 							"path": [
 								"signup"
-							],
-							"query": [
-								{
-									"key": "nickname",
-									"value": "surfingbird"
-								},
-								{
-									"key": "name",
-									"value": "Andrey"
-								},
-								{
-									"key": "surname",
-									"value": "Baronskiy"
-								},
-								{
-									"key": "dob",
-									"value": "03.11.1998"
-								},
-								{
-									"key": "passwd",
-									"value": "qwerty"
-								},
-								{
-									"key": "",
-									"value": "",
-									"disabled": true
-								},
-								{
-									"key": "",
-									"value": "",
-									"disabled": true
-								}
 							]
 						}
 					},
@@ -94,13 +69,20 @@
 					"name": "post /login",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n  \"nickname\": \"admin\",\n  \"passwd\": \"admin\"\n}"
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/login?nickname=surfingbird&passwd=qwerty",
+							"raw": "127.0.0.1:8080/login",
 							"host": [
 								"127",
 								"0",
@@ -110,16 +92,6 @@
 							"port": "8080",
 							"path": [
 								"login"
-							],
-							"query": [
-								{
-									"key": "nickname",
-									"value": "surfingbird"
-								},
-								{
-									"key": "passwd",
-									"value": "qwerty"
-								}
 							]
 						}
 					},
@@ -231,13 +203,20 @@
 					"name": "put /profiles/{id:[0-9]+}/update",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n\t\"name\": \"admin\",\n\t\"surname\": \"POP\",\n\t\"dob\": \"01.11.1968\"\n}"
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/profiles/0/update?nickname=surfingbird&name=Ivan&surname=Ivanov&dob=03.11.1998",
+							"raw": "127.0.0.1:8080/profiles/0/update",
 							"host": [
 								"127",
 								"0",
@@ -249,24 +228,6 @@
 								"profiles",
 								"0",
 								"update"
-							],
-							"query": [
-								{
-									"key": "nickname",
-									"value": "surfingbird"
-								},
-								{
-									"key": "name",
-									"value": "Ivan"
-								},
-								{
-									"key": "surname",
-									"value": "Ivanov"
-								},
-								{
-									"key": "dob",
-									"value": "03.11.1998"
-								}
 							]
 						}
 					},
