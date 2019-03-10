@@ -206,9 +206,10 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 // toDo сделать погинацию
 func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
-	hellowStr := GetGreeting(r)
-	info := InfoText{Data: hellowStr + ", this is leaderbord!"}
-	err := json.NewEncoder(w).Encode(info)
+	w.Header().Set("Content-Type", "application/json")
+
+	//toDo убрать заглушку лидерборда
+	_, err := w.Write([]byte(Leaderboard))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())
@@ -218,6 +219,8 @@ func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	hellowStr := GetGreeting(r)
 	info := InfoText{Data: hellowStr + ", this is profiles!"}
 	err := json.NewEncoder(w).Encode(info)
@@ -230,6 +233,8 @@ func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -275,6 +280,8 @@ func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 //toDo вместе с базами проверка на принадлежность пользователя
 func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -372,12 +379,15 @@ func CheckTocken(r *http.Request) bool {
 	return true
 }
 
+//toDo избавиться
 func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(HTML))
 }
 
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -512,4 +522,39 @@ func deletePhoto(filename string) {
 		log.Printf("Can not remove file tmp/%v\n", filename)
 	}
 }
+
+var Leaderboard = `{
+  "leaderbord": [
+    {
+      "position": 1,
+      "nickname": "Andrey",
+      "score": 10000,
+      "photo": "default_img"
+    },
+    {
+      "position": 2,
+      "nickname": "Bob",
+      "score": 5000,
+      "photo": "default_img"
+    },
+    {
+      "position": 3,
+      "nickname": "Nick",
+      "score": 2500,
+      "photo": "default_img"
+    },
+    {
+      "position": 4,
+      "nickname": "Tom",
+      "score": 1000,
+      "photo": "default_img"
+    },
+    {
+      "position": 5,
+      "nickname": "Liza",
+      "score": 10,
+      "photo": "default_img"
+    },
+    ]
+}`
 
