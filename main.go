@@ -42,12 +42,14 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", RootHandler).Methods("GET")
-	r.HandleFunc("/signup", SignupHandler).Methods("POST")
-
 	r.HandleFunc("/login", LogInHandler).Methods("POST")
 	r.HandleFunc("/logout", LogoutHandler).Methods("GET")
 
 	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
+
+	r.HandleFunc("/user", MyProfileInfoCreateHandler).Methods("POST")
+	r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")
+	r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT")
 
 	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
 	r.HandleFunc("/profiles/{id:[0-9]+}/details", ThisProfileHandler).Methods("GET")

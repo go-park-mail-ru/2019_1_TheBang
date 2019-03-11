@@ -34,10 +34,10 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func SignupHandler(w http.ResponseWriter, r *http.Request) {
+func MyProfileInfoCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	err := CreateAccount(w, r)
+	profile, err := CreateAccount(w, r)
 	if err != nil {
 		log.Println(err.Error())
 		info := InfoText{Data: err.Error()}
@@ -53,9 +53,8 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	info := InfoText{Data: "User was created!"}
 
-	err = json.NewEncoder(w).Encode(info)
+	err = json.NewEncoder(w).Encode(profile)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())
@@ -64,14 +63,23 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateAccount(w http.ResponseWriter, r *http.Request) error {
-	//toDo обработка ошибок
+func CreateAccount(w http.ResponseWriter, r *http.Request) (prof Profile, err error) {
 	signup := Signup{}
-	body, _ := ioutil.ReadAll(r.Body)
-	err := json.Unmarshal(body, &signup)
-	_ = err
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 
-	user := Profile{
+		return  prof, err
+	}
+
+	err = json.Unmarshal(body, &signup)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return prof, err
+	}
+
+	prof = Profile{
 		Nickname: signup.Nickname,
 		Name:     signup.Name,
 		Surname:  signup.Surname,
@@ -82,22 +90,25 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) error {
 	storageAcc.mu.Lock()
 	defer storageAcc.mu.Unlock()
 
-	if _, ok := storageAcc.data[user.Nickname]; ok {
+	storageProf.mu.Lock()
+	defer storageProf.mu.Unlock()
+
+	if _, ok := storageAcc.data[prof.Nickname]; ok {
 		w.WriteHeader(http.StatusConflict)
 		err := errors.New("This user already exists!")
-		return err
+		return prof, err
 	}
 
-	user.Id = storageAcc.count
-	user.Photo = defaultImg
+	prof.Id = storageAcc.count
+	prof.Photo = defaultImg
 
-	storageAcc.data[user.Nickname] = passwd
-	storageProf.data[storageProf.count] = user
+	storageAcc.data[prof.Nickname] = passwd
+	storageProf.data[storageProf.count] = prof
 
 	storageAcc.count += 1
 	storageProf.count += 1
 
-	return nil
+	return
 }
 
 func LogInHandler(w http.ResponseWriter, r *http.Request) {
@@ -229,6 +240,20 @@ func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+}
+
+func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+
 }
 
 func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
