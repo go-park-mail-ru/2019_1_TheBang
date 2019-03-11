@@ -52,6 +52,30 @@ func MyProfileInfoCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	claims := customClaims{
+		profile.Nickname,
+		jwt.StandardClaims{
+			Issuer: ServerName,
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	ss, err := token.SignedString(SECRET)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("Error with JWT tocken generation: %v\n", err.Error())
+
+		return
+	}
+
+	expiration := time.Now().Add(10 * time.Hour)
+	cookie := http.Cookie{
+		Name:     "bang_token",
+		Value:    ss,
+		Expires:  expiration,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
 	w.WriteHeader(http.StatusCreated)
 
 	err = json.NewEncoder(w).Encode(profile)
@@ -136,7 +160,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 
 	expiration := time.Now().Add(10 * time.Hour)
 	cookie := http.Cookie{
-		Name:     "session_id",
+		Name:     "bang_token",
 		Value:    token,
 		Expires:  expiration,
 		HttpOnly: true,
@@ -171,11 +195,12 @@ func LoginAcount(username, passwd string) (string, error) {
 	}
 
 	claims := customClaims{
-		ServerName,
+		username,
 		jwt.StandardClaims{
-			Issuer: "theBang server",
+			Issuer: ServerName,
 		},
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	ss, err := token.SignedString(SECRET)
 	if err != nil {
@@ -186,7 +211,7 @@ func LoginAcount(username, passwd string) (string, error) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie("session_id")
+	session, err := r.Cookie("bang_token")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		info := InfoText{Data: "A not logged in user cannot log out!"}
