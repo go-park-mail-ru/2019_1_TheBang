@@ -41,7 +41,7 @@ func CreateProfileStorage() ProfileStorage {
 		Name:     "admin",
 		Surname:  "admin",
 		DOB:      "0.0.0.0",
-		Photo:    defaultImg,
+		Photo:    DefaultImg,
 	}
 	prof.data[0] = admin
 	prof.count++

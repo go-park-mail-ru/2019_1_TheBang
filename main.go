@@ -9,12 +9,13 @@ import (
 )
 
 var (
-	storageAcc  = CreateAccountStorage()
-	storageProf = CreateProfileStorage()
+	storageAcc    = CreateAccountStorage()
+	storageProf  = CreateProfileStorage()
 	SECRET      []byte
-	CookieName  string = "session_id"
+	CookieName   = "bang_token"
 	ServerName         = "TheBang server"
 	FrontentDst        = "localhost:3000"
+	DefaultImg         = "default_img"
 )
 
 //заглушка
@@ -47,15 +48,12 @@ func main() {
 
 	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 
-	r.HandleFunc("/user", MyProfileInfoCreateHandler).Methods("POST")
+	r.HandleFunc("/user", MyProfileCreateHandler).Methods("POST")
 	r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")
 	r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT")
 
 	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
 	r.HandleFunc("/profiles/{id:[0-9]+}/details", ThisProfileHandler).Methods("GET")
-	r.HandleFunc("/profiles/{id:[0-9]+}/update", UpdateProfileInfoHandler).Methods("PUT")
-	r.HandleFunc("/profiles/{id:[0-9]+}/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
-	r.HandleFunc("/profiles/{id:[0-9]+}/avatar", ChangeProfileAvatarHandler).Methods("POST")
 
 	http.ListenAndServe(":"+port, r)
 }

@@ -16,10 +16,6 @@ import (
 	"time"
 )
 
-var (
-	defaultImg = "default_img"
-)
-
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -34,7 +30,7 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func MyProfileInfoCreateHandler(w http.ResponseWriter, r *http.Request) {
+func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	profile, err := CreateAccount(w, r)
@@ -70,7 +66,7 @@ func MyProfileInfoCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	expiration := time.Now().Add(10 * time.Hour)
 	cookie := http.Cookie{
-		Name:     "bang_token",
+		Name:     CookieName,
 		Value:    ss,
 		Expires:  expiration,
 		HttpOnly: true,
@@ -124,7 +120,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) (prof Profile, err er
 	}
 
 	prof.Id = storageAcc.count
-	prof.Photo = defaultImg
+	prof.Photo = DefaultImg
 
 	storageAcc.data[prof.Nickname] = passwd
 	storageProf.data[storageProf.count] = prof
@@ -160,7 +156,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 
 	expiration := time.Now().Add(10 * time.Hour)
 	cookie := http.Cookie{
-		Name:     "bang_token",
+		Name:     CookieName,
 		Value:    token,
 		Expires:  expiration,
 		HttpOnly: true,
@@ -211,7 +207,7 @@ func LoginAcount(username, passwd string) (string, error) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie("bang_token")
+	session, err := r.Cookie(CookieName)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		info := InfoText{Data: "A not logged in user cannot log out!"}
@@ -272,12 +268,6 @@ func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 
 }
 
@@ -418,11 +408,13 @@ func CheckTocken(r *http.Request) bool {
 	})
 	if err != nil {
 		log.Printf("Error with check tocken: %v", err.Error())
+
 		return false
 	}
 
 	if !token.Valid {
 		log.Println("%v use faked cookie: %v", r.RemoteAddr, err)
+
 		return false
 	}
 
@@ -562,7 +554,7 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deletePhoto(filename string) {
-	if filename == defaultImg {
+	if filename == DefaultImg {
 		return
 	}
 
