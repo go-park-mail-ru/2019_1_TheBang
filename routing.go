@@ -1,18 +1,18 @@
 package main
 
 import (
-	_"crypto/md5"
+	_ "crypto/md5"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	_"github.com/gorilla/mux"
-	_"io"
+	"github.com/gorilla/mux"
+	_ "github.com/gorilla/mux"
+	_ "io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	_"os"
-	_"strconv"
+	_ "os"
+	_ "strconv"
 	"time"
 )
 
@@ -83,77 +83,89 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateAccount(w http.ResponseWriter, r *http.Request) (prof Profile, err error) {
-	signup := Signup{}
+func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	nickname, err := NicknameFromCookie(w, r)
+	if err != nil {
+		info := InfoText{Data: err.Error()}
+		err = json.NewEncoder(w).Encode(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Printf("MyProfileInfoHandler: %v\n", err.Error())
+
+			return
+		}
+
+		return
+	}
+
+	storageProf.mu.Lock()
+	defer storageProf.mu.Unlock()
+
+	profile, ok := storageProf.data[nickname]
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("MyProfileInfoHandler: can not find user with valid token")
+
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(profile)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("MyProfileInfoHandler: %v\n", err.Error())
+
+		return
+	}
+}
+
+func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	nickname, err := NicknameFromCookie(w, r)
+	if err != nil {
+
+		return
+	}
+
+	update := Update{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())
 
-		return  prof, err
+		return
 	}
 
-	err = json.Unmarshal(body, &signup)
+	err = json.Unmarshal(body, &update)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())
 
-		return prof, err
+		return
 	}
-
-	prof = Profile{
-		Nickname: signup.Nickname,
-		Name:     signup.Name,
-		Surname:  signup.Surname,
-		DOB:      signup.DOB,
-	}
-	passwd := signup.Passwd
-
-	storageAcc.mu.Lock()
-	defer storageAcc.mu.Unlock()
 
 	storageProf.mu.Lock()
 	defer storageProf.mu.Unlock()
 
-	if _, ok := storageAcc.data[prof.Nickname]; ok {
-		w.WriteHeader(http.StatusConflict)
-		err := errors.New("This user already exists!")
+	prof := storageProf.data[nickname]
 
-		return prof, err
+	prof.Name = update.Name
+	prof.Surname = update.Surname
+	prof.DOB = update.DOB
+
+	storageProf.data[nickname] = prof
+
+	err = json.NewEncoder(w).Encode(prof)
+	w.WriteHeader(http.StatusAccepted)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
+
+		return
 	}
-
-	prof.Photo = DefaultImg
-
-	storageAcc.data[prof.Nickname] = passwd
-	storageProf.data[prof.Nickname] = prof
-
-	return prof, nil
 }
-
-func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-
-}
-
-
-//func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
-//	cookie, err := r.Cookie(CookieName)
-//	if err != nil {
-//		w.WriteHeader(http.StatusForbidden)
-//		info := InfoText{Data: "A not logged in users have not profile!"}
-//		err := json.NewEncoder(w).Encode(info)
-//		if err != nil {
-//			w.WriteHeader(http.StatusInternalServerError)
-//			log.Println(err.Error())
-//
-//			return
-//		}
-//
-//		return
-//	}
-//
-//
-//}
-
 
 func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -204,38 +216,9 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//toDo добавить в токен id
-type customClaims struct {
-	Nickname string `json:"nickname"`
-	jwt.StandardClaims
-}
-
-func LoginAcount(username, passwd string) (string, error) {
-	storageAcc.mu.Lock()
-	defer storageAcc.mu.Unlock()
-
-	if pw, ok := storageAcc.data[username]; !ok || pw != passwd {
-		err := errors.New("Wrong answer or password!")
-		return "", err
-	}
-
-	claims := customClaims{
-		username,
-		jwt.StandardClaims{
-			Issuer: ServerName,
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(SECRET)
-	if err != nil {
-		log.Printf("Error with JWT tocken generation: %v\n", err.Error())
-	}
-
-	return ss, nil
-}
-
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	session, err := r.Cookie(CookieName)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -264,12 +247,19 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// toDo сделать погинацию
 func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	//toDo убрать заглушку лидерборда
-	_, err := w.Write([]byte(Leaderboard))
+	profSlice := []Profile{}
+
+	storageProf.mu.Lock()
+	defer  storageProf.mu.Unlock()
+
+	for _, prof := range storageProf.data {
+		profSlice = append(profSlice, prof)
+	}
+
+	err := json.NewEncoder(w).Encode(profSlice)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())
@@ -278,174 +268,9 @@ func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	hellowStr := GetGreeting(r)
-	info := InfoText{Data: hellowStr + ", this is profiles!"}
-	err := json.NewEncoder(w).Encode(info)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return
-	}
+func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(HTML))
 }
-
-//func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
-//	w.Header().Set("Content-Type", "application/json")
-//
-//	vars := mux.Vars(r)
-//	id, err := strconv.Atoi(vars["id"])
-//	if err != nil {
-//		w.WriteHeader(http.StatusBadRequest)
-//		info := InfoText{Data: "Incorrect user id!"}
-//		err := json.NewEncoder(w).Encode(info)
-//		if err != nil {
-//			w.WriteHeader(http.StatusInternalServerError)
-//			log.Println(err.Error())
-//
-//			return
-//		}
-//
-//		return
-//	}
-//
-//	storageProf.mu.Lock()
-//	defer storageProf.mu.Unlock()
-//
-//	profile, ok := storageProf.data[id]
-//	if !ok {
-//		w.WriteHeader(http.StatusNotFound)
-//		info := InfoText{Data: "We have not this user!"}
-//		err := json.NewEncoder(w).Encode(info)
-//		if err != nil {
-//			w.WriteHeader(http.StatusInternalServerError)
-//			log.Println(err.Error())
-//
-//			return
-//		}
-//
-//		return
-//	}
-//
-//	err = json.NewEncoder(w).Encode(profile)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println(err.Error())
-//
-//		return
-//	}
-//}
-
-//toDo вместе с базами проверка на принадлежность пользователя
-//func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-//	w.Header().Set("Content-Type", "application/json")
-//
-//	vars := mux.Vars(r)
-//	id, err := strconv.Atoi(vars["id"])
-//	if err != nil {
-//		w.WriteHeader(http.StatusBadRequest)
-//		info := InfoText{Data: "Incorrect user id!"}
-//		err := json.NewEncoder(w).Encode(info)
-//		if err != nil {
-//			w.WriteHeader(http.StatusInternalServerError)
-//			log.Println(err.Error())
-//
-//			return
-//		}
-//
-//		return
-//	}
-//
-//	if ok := CheckTocken(r); !ok {
-//		w.WriteHeader(http.StatusForbidden)
-//		info := InfoText{Data: "You can not change this profiles info!"}
-//		err := json.NewEncoder(w).Encode(info)
-//		if err != nil {
-//			w.WriteHeader(http.StatusInternalServerError)
-//			log.Println(err.Error())
-//
-//			return
-//		}
-//
-//		return
-//	}
-//
-//	storageProf.mu.Lock()
-//	defer storageProf.mu.Unlock()
-//
-//	if _, ok := storageProf.data[id]; !ok {
-//		w.WriteHeader(http.StatusNotFound)
-//		info := InfoText{Data: "We have not this user!"}
-//		err := json.NewEncoder(w).Encode(info)
-//		if err != nil {
-//			w.WriteHeader(http.StatusInternalServerError)
-//			log.Println(err.Error())
-//
-//			return
-//		}
-//
-//		return
-//	}
-//
-//	//toDo обработка ошибок
-//	update := Update{}
-//	body, _ := ioutil.ReadAll(r.Body)
-//	err = json.Unmarshal(body, &update)
-//
-//	updateProf := storageProf.data[id]
-//	updateProf.DOB = update.DOB
-//	updateProf.Surname = update.Surname
-//	updateProf.Name = update.Name
-//
-//	storageProf.data[id] = updateProf
-//
-//	w.WriteHeader(http.StatusAccepted)
-//	info := InfoText{Data: "User was updated!"}
-//	err = json.NewEncoder(w).Encode(info)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println(err.Error())
-//
-//		return
-//	}
-//}
-//
-//func CheckTocken(r *http.Request) bool {
-//	cookie, err := r.Cookie(CookieName)
-//	if err != nil {
-//		return false
-//	}
-//
-//	tokenStr := cookie.Value
-//
-//	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-//		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-//			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-//		}
-//
-//		return SECRET, nil
-//	})
-//	if err != nil {
-//		log.Printf("Error with check tocken: %v", err.Error())
-//
-//		return false
-//	}
-//
-//	if !token.Valid {
-//		log.Println("%v use faked cookie: %v", r.RemoteAddr, err)
-//
-//		return false
-//	}
-//
-//	return true
-//}
-
-//toDo избавиться
-//func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
-//	w.Write([]byte(HTML))
-//}
 
 //func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 //	w.Header().Set("Content-Type", "application/json")
@@ -573,49 +398,10 @@ func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
 //		return
 //	}
 //}
-//
-//func deletePhoto(filename string) {
-//	if filename == DefaultImg {
-//		return
-//	}
-//
-//	err := os.Remove("tmp/" + filename)
-//	if err != nil {
-//		log.Printf("Can not remove file tmp/%v\n", filename)
-//	}
-//}
 
-var Leaderboard = `{
-  "leaderbord": [
-    {
-      "position": 1,
-      "nickname": "Andrey",
-      "score": 10000,
-      "photo": "default_img"
-    },
-    {
-      "position": 2,
-      "nickname": "Bob",
-      "score": 5000,
-      "photo": "default_img"
-    },
-    {
-      "position": 3,
-      "nickname": "Nick",
-      "score": 2500,
-      "photo": "default_img"
-    },
-    {
-      "position": 4,
-      "nickname": "Tom",
-      "score": 1000,
-      "photo": "default_img"
-    },
-    {
-      "position": 5,
-      "nickname": "Liza",
-      "score": 10,
-      "photo": "default_img"
-    }
-    ]
-}`
+func GetIconHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	filename := vars["filename"]
+
+
+}

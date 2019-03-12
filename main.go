@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -9,24 +8,14 @@ import (
 )
 
 var (
-	storageAcc    = CreateAccountStorage()
-	storageProf  = CreateProfileStorage()
+	storageAcc  = CreateAccountStorage()
+	storageProf = CreateProfileStorage()
 	SECRET      []byte
-	CookieName   = "bang_token"
-	ServerName         = "TheBang server"
-	FrontentDst        = "localhost:3000"
-	DefaultImg         = "default_img"
+	CookieName  = "bang_token"
+	ServerName  = "TheBang server"
+	FrontentDst = "localhost:3000"
+	DefaultImg  = "default_img"
 )
-
-//заглушка
-func GetGreeting(r *http.Request) string {
-	_, err := r.Cookie("session_id")
-	if err == http.ErrNoCookie {
-		return "Hellow, unknown"
-	}
-
-	return fmt.Sprintf("Hellow, my friend")
-}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -51,10 +40,13 @@ func main() {
 
 	r.HandleFunc("/user", MyProfileCreateHandler).Methods("POST")
 	r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")
-	//r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT")
+	r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT")
 
-	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
-	//r.HandleFunc("/profiles/{id:[0-9]+}/details", ThisProfileHandler).Methods("GET")
+	r.HandleFunc("/user/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
+	r.HandleFunc("/user/avatar", MyProfileInfoUpdateHandler).Methods("PUT")
+
+	r.HandleFunc("/icon/{filename}", GetIconHandler).Methods("GET")
+
 
 	http.ListenAndServe(":"+port, r)
 }
