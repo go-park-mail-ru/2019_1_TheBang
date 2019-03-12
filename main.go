@@ -31,8 +31,6 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", RootHandler).Methods("GET")
-
 	r.HandleFunc("/auth", LogInHandler).Methods("POST")
 	r.HandleFunc("/auth", LogoutHandler).Methods("DELETE")
 
