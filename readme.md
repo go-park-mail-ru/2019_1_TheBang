@@ -16,4 +16,4 @@
 - Сергей Барсуков
 
 ## Мы тут
-- https://the-bang-fork.herokuapp.com
+- https://the-bang.herokuapp.com
