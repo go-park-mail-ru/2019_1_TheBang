@@ -124,7 +124,7 @@ func CheckTocken(r *http.Request) (token *jwt.Token, ok bool) {
 	}
 
 	if !token.Valid {
-		log.Println("%v use faked cookie: %v", r.RemoteAddr, err)
+		log.Printf("%v use faked cookie: %v\n", r.RemoteAddr, err.Error())
 
 		return nil, false
 	}
