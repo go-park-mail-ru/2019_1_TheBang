@@ -1,0 +1,8 @@
+hash: 2cbac988af4d1d08c22a591d60571b457b6c4064fc2bd37024a3792a81d2d088
+updated: 2019-03-13T00:46:33.785872+03:00
+imports:
+- name: github.com/dgrijalva/jwt-go
+  version: 3af4c746e1c248ee8491a3e0c6f7a9cd831e95f8
+- name: github.com/gorilla/mux
+  version: 15a353a636720571d19e37b34a14499c3afa9991
+testImports: []
