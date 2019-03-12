@@ -43,17 +43,18 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", RootHandler).Methods("GET")
-	r.HandleFunc("/login", LogInHandler).Methods("POST")
-	r.HandleFunc("/logout", LogoutHandler).Methods("GET")
+
+	r.HandleFunc("/auth", LogInHandler).Methods("POST")
+	r.HandleFunc("/auth", LogoutHandler).Methods("DELETE")
 
 	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 
 	r.HandleFunc("/user", MyProfileCreateHandler).Methods("POST")
 	r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")
-	r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT")
+	//r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT")
 
 	r.HandleFunc("/profiles", ProfilesHandler).Methods("GET")
-	r.HandleFunc("/profiles/{id:[0-9]+}/details", ThisProfileHandler).Methods("GET")
+	//r.HandleFunc("/profiles/{id:[0-9]+}/details", ThisProfileHandler).Methods("GET")
 
 	http.ListenAndServe(":"+port, r)
 }

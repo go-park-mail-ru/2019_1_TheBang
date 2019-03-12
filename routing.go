@@ -1,18 +1,18 @@
 package main
 
 import (
-	"crypto/md5"
+	_"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/mux"
-	"io"
+	_"github.com/gorilla/mux"
+	_"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"strconv"
+	_"os"
+	_"strconv"
 	"time"
 )
 
@@ -88,6 +88,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) (prof Profile, err er
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
 
 		return  prof, err
 	}
@@ -95,6 +96,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) (prof Profile, err er
 	err = json.Unmarshal(body, &signup)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
 
 		return prof, err
 	}
@@ -116,28 +118,55 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) (prof Profile, err er
 	if _, ok := storageAcc.data[prof.Nickname]; ok {
 		w.WriteHeader(http.StatusConflict)
 		err := errors.New("This user already exists!")
+
 		return prof, err
 	}
 
-	prof.Id = storageAcc.count
 	prof.Photo = DefaultImg
 
 	storageAcc.data[prof.Nickname] = passwd
-	storageProf.data[storageProf.count] = prof
+	storageProf.data[prof.Nickname] = prof
 
-	storageAcc.count += 1
-	storageProf.count += 1
-
-	return
+	return prof, nil
 }
+
+func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+
+//func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
+//	cookie, err := r.Cookie(CookieName)
+//	if err != nil {
+//		w.WriteHeader(http.StatusForbidden)
+//		info := InfoText{Data: "A not logged in users have not profile!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//
+//
+//}
+
 
 func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	login := Login{}
-	//toDo обработать эту ошибку
-	body, _ := ioutil.ReadAll(r.Body)
-	err := json.Unmarshal(body, &login)
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
+
+		return
+	}
+	err = json.Unmarshal(body, &login)
 
 	token, err := LoginAcount(login.Nickname, login.Passwd)
 	if err != nil {
@@ -263,306 +292,298 @@ func ProfilesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		info := InfoText{Data: "Incorrect user id!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	storageProf.mu.Lock()
-	defer storageProf.mu.Unlock()
-
-	profile, ok := storageProf.data[id]
-	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		info := InfoText{Data: "We have not this user!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	err = json.NewEncoder(w).Encode(profile)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return
-	}
-}
+//func ThisProfileHandler(w http.ResponseWriter, r *http.Request) {
+//	w.Header().Set("Content-Type", "application/json")
+//
+//	vars := mux.Vars(r)
+//	id, err := strconv.Atoi(vars["id"])
+//	if err != nil {
+//		w.WriteHeader(http.StatusBadRequest)
+//		info := InfoText{Data: "Incorrect user id!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//
+//	storageProf.mu.Lock()
+//	defer storageProf.mu.Unlock()
+//
+//	profile, ok := storageProf.data[id]
+//	if !ok {
+//		w.WriteHeader(http.StatusNotFound)
+//		info := InfoText{Data: "We have not this user!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//
+//	err = json.NewEncoder(w).Encode(profile)
+//	if err != nil {
+//		w.WriteHeader(http.StatusInternalServerError)
+//		log.Println(err.Error())
+//
+//		return
+//	}
+//}
 
 //toDo вместе с базами проверка на принадлежность пользователя
-func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		info := InfoText{Data: "Incorrect user id!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	if ok := CheckTocken(r); !ok {
-		w.WriteHeader(http.StatusForbidden)
-		info := InfoText{Data: "You can not change this profiles info!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	storageProf.mu.Lock()
-	defer storageProf.mu.Unlock()
-
-	if _, ok := storageProf.data[id]; !ok {
-		w.WriteHeader(http.StatusNotFound)
-		info := InfoText{Data: "We have not this user!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	//toDo обработка ошибок
-	update := Update{}
-	body, _ := ioutil.ReadAll(r.Body)
-	err = json.Unmarshal(body, &update)
-
-	updateProf := storageProf.data[id]
-	updateProf.DOB = update.DOB
-	updateProf.Surname = update.Surname
-	updateProf.Name = update.Name
-
-	storageProf.data[id] = updateProf
-
-	w.WriteHeader(http.StatusAccepted)
-	info := InfoText{Data: "User was updated!"}
-	err = json.NewEncoder(w).Encode(info)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return
-	}
-}
-
-func CheckTocken(r *http.Request) bool {
-	cookie, err := r.Cookie(CookieName)
-	if err != nil {
-		return false
-	}
-
-	tokenStr := cookie.Value
-
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return SECRET, nil
-	})
-	if err != nil {
-		log.Printf("Error with check tocken: %v", err.Error())
-
-		return false
-	}
-
-	if !token.Valid {
-		log.Println("%v use faked cookie: %v", r.RemoteAddr, err)
-
-		return false
-	}
-
-	return true
-}
+//func UpdateProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
+//	w.Header().Set("Content-Type", "application/json")
+//
+//	vars := mux.Vars(r)
+//	id, err := strconv.Atoi(vars["id"])
+//	if err != nil {
+//		w.WriteHeader(http.StatusBadRequest)
+//		info := InfoText{Data: "Incorrect user id!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//
+//	if ok := CheckTocken(r); !ok {
+//		w.WriteHeader(http.StatusForbidden)
+//		info := InfoText{Data: "You can not change this profiles info!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//
+//	storageProf.mu.Lock()
+//	defer storageProf.mu.Unlock()
+//
+//	if _, ok := storageProf.data[id]; !ok {
+//		w.WriteHeader(http.StatusNotFound)
+//		info := InfoText{Data: "We have not this user!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//
+//	//toDo обработка ошибок
+//	update := Update{}
+//	body, _ := ioutil.ReadAll(r.Body)
+//	err = json.Unmarshal(body, &update)
+//
+//	updateProf := storageProf.data[id]
+//	updateProf.DOB = update.DOB
+//	updateProf.Surname = update.Surname
+//	updateProf.Name = update.Name
+//
+//	storageProf.data[id] = updateProf
+//
+//	w.WriteHeader(http.StatusAccepted)
+//	info := InfoText{Data: "User was updated!"}
+//	err = json.NewEncoder(w).Encode(info)
+//	if err != nil {
+//		w.WriteHeader(http.StatusInternalServerError)
+//		log.Println(err.Error())
+//
+//		return
+//	}
+//}
+//
+//func CheckTocken(r *http.Request) bool {
+//	cookie, err := r.Cookie(CookieName)
+//	if err != nil {
+//		return false
+//	}
+//
+//	tokenStr := cookie.Value
+//
+//	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+//		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+//			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+//		}
+//
+//		return SECRET, nil
+//	})
+//	if err != nil {
+//		log.Printf("Error with check tocken: %v", err.Error())
+//
+//		return false
+//	}
+//
+//	if !token.Valid {
+//		log.Println("%v use faked cookie: %v", r.RemoteAddr, err)
+//
+//		return false
+//	}
+//
+//	return true
+//}
 
 //toDo избавиться
-func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(HTML))
-}
+//func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
+//	w.Write([]byte(HTML))
+//}
 
-func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		info := InfoText{Data: "Incorrect user id!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	if _, ok := storageProf.data[id]; !ok {
-		w.WriteHeader(http.StatusNotFound)
-		info := InfoText{Data: "We have not this user!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	if ok := CheckTocken(r); !ok {
-		w.WriteHeader(http.StatusForbidden)
-		info := InfoText{Data: "You can not change this profiles photo!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	file, header, err := r.FormFile("photo")
-	if err != nil {
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		info := InfoText{Data: "image was failed in form!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-	defer file.Close()
-
-	hasher := md5.New()
-	_, err = io.Copy(hasher, file)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return
-	}
-	filename := string(hasher.Sum(nil))
-
-	filein, err := header.Open()
-	if err != nil {
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		info := InfoText{Data: "image was failed in form!"}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-	defer filein.Close()
-
-	fileout, err := os.OpenFile("tmp/"+filename, os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("ChangeProfileAvatarHandler: ", "file for img was not created!")
-
-		return
-	}
-	defer fileout.Close()
-
-	b, err := io.Copy(fileout, filein)
-	if err != nil {
-		_ = b // просто обрабатывать ошибку было нельзя
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("ChangeProfileAvatarHandler: ", "img was not saved on disk!")
-
-		return
-	}
-
-	storageProf.mu.Lock()
-	defer storageProf.mu.Unlock()
-
-	updatedProf := storageProf.data[id]
-	deletePhoto(updatedProf.Photo)
-
-	updatedProf.Photo = filename
-	storageProf.data[id] = updatedProf
-
-	w.WriteHeader(http.StatusAccepted)
-	info := InfoText{Data: "Photo was updated!"}
-	err = json.NewEncoder(w).Encode(info)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return
-	}
-}
-
-func deletePhoto(filename string) {
-	if filename == DefaultImg {
-		return
-	}
-
-	err := os.Remove("tmp/" + filename)
-	if err != nil {
-		log.Printf("Can not remove file tmp/%v\n", filename)
-	}
-}
+//func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
+//	w.Header().Set("Content-Type", "application/json")
+//
+//	vars := mux.Vars(r)
+//	id, err := strconv.Atoi(vars["id"])
+//	if err != nil {
+//		w.WriteHeader(http.StatusBadRequest)
+//		info := InfoText{Data: "Incorrect user id!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//
+//	if _, ok := storageProf.data[id]; !ok {
+//		w.WriteHeader(http.StatusNotFound)
+//		info := InfoText{Data: "We have not this user!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//
+//	if ok := CheckTocken(r); !ok {
+//		w.WriteHeader(http.StatusForbidden)
+//		info := InfoText{Data: "You can not change this profiles photo!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//
+//	file, header, err := r.FormFile("photo")
+//	if err != nil {
+//		w.WriteHeader(http.StatusUnprocessableEntity)
+//		info := InfoText{Data: "image was failed in form!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//	defer file.Close()
+//
+//	hasher := md5.New()
+//	_, err = io.Copy(hasher, file)
+//	if err != nil {
+//		w.WriteHeader(http.StatusInternalServerError)
+//		log.Println(err.Error())
+//
+//		return
+//	}
+//	filename := string(hasher.Sum(nil))
+//
+//	filein, err := header.Open()
+//	if err != nil {
+//		w.WriteHeader(http.StatusUnprocessableEntity)
+//		info := InfoText{Data: "image was failed in form!"}
+//		err := json.NewEncoder(w).Encode(info)
+//		if err != nil {
+//			w.WriteHeader(http.StatusInternalServerError)
+//			log.Println(err.Error())
+//
+//			return
+//		}
+//
+//		return
+//	}
+//	defer filein.Close()
+//
+//	fileout, err := os.OpenFile("tmp/"+filename, os.O_WRONLY|os.O_CREATE, 0644)
+//	if err != nil {
+//		w.WriteHeader(http.StatusInternalServerError)
+//		log.Println("ChangeProfileAvatarHandler: ", "file for img was not created!")
+//
+//		return
+//	}
+//	defer fileout.Close()
+//
+//	b, err := io.Copy(fileout, filein)
+//	if err != nil {
+//		_ = b // просто обрабатывать ошибку было нельзя
+//		w.WriteHeader(http.StatusInternalServerError)
+//		log.Println("ChangeProfileAvatarHandler: ", "img was not saved on disk!")
+//
+//		return
+//	}
+//
+//	storageProf.mu.Lock()
+//	defer storageProf.mu.Unlock()
+//
+//	updatedProf := storageProf.data[id]
+//	deletePhoto(updatedProf.Photo)
+//
+//	updatedProf.Photo = filename
+//	storageProf.data[id] = updatedProf
+//
+//	w.WriteHeader(http.StatusAccepted)
+//	info := InfoText{Data: "Photo was updated!"}
+//	err = json.NewEncoder(w).Encode(info)
+//	if err != nil {
+//		w.WriteHeader(http.StatusInternalServerError)
+//		log.Println(err.Error())
+//
+//		return
+//	}
+//}
+//
+//func deletePhoto(filename string) {
+//	if filename == DefaultImg {
+//		return
+//	}
+//
+//	err := os.Remove("tmp/" + filename)
+//	if err != nil {
+//		log.Printf("Can not remove file tmp/%v\n", filename)
+//	}
+//}
 
 var Leaderboard = `{
   "leaderbord": [

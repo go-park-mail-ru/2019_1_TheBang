@@ -24,7 +24,7 @@ func CreateAccountStorage() AccountStorage {
 
 // toDO заменить на бд
 type ProfileStorage struct {
-	data  map[int]Profile
+	data  map[string]Profile
 	mu    sync.Mutex
 	count int // костыль для id
 }
@@ -32,25 +32,22 @@ type ProfileStorage struct {
 // toDO заменить на бд
 func CreateProfileStorage() ProfileStorage {
 	prof := ProfileStorage{}
-	prof.data = make(map[int]Profile)
+	prof.data = make(map[string]Profile)
 
 	//toDO убрать чудо админа
 	admin := Profile{
-		Id:       0,
 		Nickname: "admin",
 		Name:     "admin",
 		Surname:  "admin",
 		DOB:      "0.0.0.0",
 		Photo:    DefaultImg,
 	}
-	prof.data[0] = admin
-	prof.count++
+	prof.data[admin.Nickname] = admin
 
 	return prof
 }
 
 type Profile struct {
-	Id       int    `json:"id"`
 	Nickname string `json:"nickname"`
 	Name     string `json:"name"`
 	Surname  string `json:"surname"`
