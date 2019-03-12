@@ -42,8 +42,9 @@ func main() {
 	r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")
 	r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT")
 
+	//toDo зашлушка для ручного естирования
 	r.HandleFunc("/user/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
-	r.HandleFunc("/user/avatar", MyProfileInfoUpdateHandler).Methods("PUT")
+	r.HandleFunc("/user/avatar", ChangeProfileAvatarHandler).Methods("POST")
 
 	r.HandleFunc("/icon/{filename}", GetIconHandler).Methods("GET")
 
@@ -77,7 +78,7 @@ var HTML = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-<form action="/profiles/0/avatar" method="post" enctype="multipart/form-data">
+<form action="/user/avatar" method="post" enctype="multipart/form-data">
     <div>photo:</div>
     <input type="file" name="photo">
     <br>
