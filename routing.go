@@ -19,20 +19,6 @@ import (
 	"time"
 )
 
-func RootHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	hellowStr := GetGreeting(r)
-	info := InfoText{Data: hellowStr + ", this is root!"}
-	err := json.NewEncoder(w).Encode(info)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return
-	}
-}
-
 func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -160,8 +146,8 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	storageProf.data[nickname] = prof
 
-	err = json.NewEncoder(w).Encode(prof)
 	w.WriteHeader(http.StatusAccepted)
+	err = json.NewEncoder(w).Encode(prof)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())

@@ -12,15 +12,6 @@ import (
 	"sync"
 )
 
-func GetGreeting(r *http.Request) string {
-	_, err := r.Cookie(CookieName)
-	if err == http.ErrNoCookie {
-		return "Hellow, unknown"
-	}
-
-	return fmt.Sprintf("Hellow, my friend")
-}
-
 // toDO заменить на бд
 type AccountStorage struct {
 	data  map[string]string
