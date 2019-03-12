@@ -6,19 +6,58 @@
 	},
 	"item": [
 		{
-			"name": "v1",
+			"name": "user",
 			"item": [
 				{
-					"name": "get '/'",
+					"name": "user/avatar",
+					"item": [
+						{
+							"name": "get user/avatar",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "127.0.0.1:8080/user/avatar",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										"avatar"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "post /user",
 					"request": {
-						"method": "GET",
-						"header": [],
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n\t\"nickname\": \"Nikita\",\n\t\"name\": \"Ivan\",\n\t\"surname\": \"Ivanov\",\n\t\"dob\": \"01.11.1968\",\n\t\"passwd\": \"tvoe_kakoe_delo\"\n}"
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/",
+							"raw": "127.0.0.1:8080/user",
 							"host": [
 								"127",
 								"0",
@@ -27,14 +66,104 @@
 							],
 							"port": "8080",
 							"path": [
-								""
+								"user"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "post /signup",
+					"name": "put  /user",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Bob\",\n\t\"surname\": \"Bobov\",\n\t\"dob\": \"01.11.1968\"\n}"
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/user",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get /user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/user",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "get /auth",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "127.0.0.1:8080/auth",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post /auth",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -47,10 +176,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"nickname\": \"Surfingbird\",\n\t\"name\": \"Ivan\",\n\t\"surname\": \"Ivanov\",\n\t\"dob\": \"01.11.1968\",\n\t\"passwd\": \"tvoe_kakoe_delo\"\n}"
+							"raw": "{\n  \"nickname\": \"Surfingbird\",\n  \"passwd\": \"tvoe_kakoe_delo\"\n}"
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/signup",
+							"raw": "127.0.0.1:8080/auth",
 							"host": [
 								"127",
 								"0",
@@ -59,46 +188,19 @@
 							],
 							"port": "8080",
 							"path": [
-								"signup"
+								"auth"
 							]
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "avatar",
+			"item": [
 				{
-					"name": "post /login",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"nickname\": \"admin\",\n  \"passwd\": \"admin\"\n}"
-						},
-						"url": {
-							"raw": "127.0.0.1:8080/login",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8080",
-							"path": [
-								"login"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get /logout",
+					"name": "get icon/{avatar_name}",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -107,7 +209,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "127.0.0.1:8080/logout",
+							"raw": "127.0.0.1:8080/avatar/default_img",
 							"host": [
 								"127",
 								"0",
@@ -116,12 +218,18 @@
 							],
 							"port": "8080",
 							"path": [
-								"logout"
+								"avatar",
+								"default_img"
 							]
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "leaderboard",
+			"item": [
 				{
 					"name": "get /leaderbord",
 					"request": {
@@ -142,119 +250,6 @@
 							"port": "8080",
 							"path": [
 								"leaderbord"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get /profiles",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "127.0.0.1:8080/profiles",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8080",
-							"path": [
-								"profiles"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get /profiles/{id:[0-9]+}/details",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "127.0.0.1:8080/profiles/0/details",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8080",
-							"path": [
-								"profiles",
-								"0",
-								"details"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "put /profiles/{id:[0-9]+}/update",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"name": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"name\": \"admin\",\n\t\"surname\": \"POP\",\n\t\"dob\": \"01.11.1968\"\n}"
-						},
-						"url": {
-							"raw": "127.0.0.1:8080/profiles/0/update",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8080",
-							"path": [
-								"profiles",
-								"0",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "post  /profiles/{id:[0-9]+}/avatar",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "127.0.0.1:8080/profiles/0/avatar",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8080",
-							"path": [
-								"profiles",
-								"0",
-								"avatar"
 							]
 						}
 					},
