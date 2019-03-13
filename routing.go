@@ -106,6 +106,11 @@ func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == "OPTIONS" {
+		return
+	}
+
 	nickname, err := NicknameFromCookie(w, r)
 	if err != nil {
 
@@ -199,6 +204,11 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie(CookieName)
+
+	if r.Method == "OPTIONS" {
+		return
+	}
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		info := InfoText{Data: "A not logged in user cannot log out!"}
@@ -230,7 +240,7 @@ func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 	profSlice := []Profile{}
 
 	storageProf.mu.Lock()
-	defer  storageProf.mu.Unlock()
+	defer storageProf.mu.Unlock()
 
 	for _, prof := range storageProf.data {
 		profSlice = append(profSlice, prof)
