@@ -20,8 +20,6 @@ import (
 )
 
 func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	profile, err := CreateAccount(w, r)
 	if err != nil {
 		log.Println(err.Error())
@@ -73,8 +71,6 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	nickname, err := NicknameFromCookie(w, r)
 	if err != nil {
 		info := InfoText{Data: err.Error()}
@@ -110,8 +106,6 @@ func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	nickname, err := NicknameFromCookie(w, r)
 	if err != nil {
 
@@ -157,8 +151,6 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogInHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	login := Login{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -206,8 +198,6 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	session, err := r.Cookie(CookieName)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -237,8 +227,6 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	profSlice := []Profile{}
 
 	storageProf.mu.Lock()

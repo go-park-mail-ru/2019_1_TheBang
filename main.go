@@ -30,6 +30,7 @@ func main() {
 	}
 
 	r := mux.NewRouter()
+	r.Use(commonMiddleware)
 
 	r.HandleFunc("/auth", LogInHandler).Methods("POST")
 	r.HandleFunc("/auth", LogoutHandler).Methods("DELETE")
@@ -47,7 +48,16 @@ func main() {
 	r.HandleFunc("/icon/{filename}", GetIconHandler).Methods("GET")
 
 
-	http.ListenAndServe(":"+port, r)
+	log.Fatal(http.ListenAndServe(":"+port, r))
+}
+
+func commonMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		next.ServeHTTP(w, r)
+
+
+	})
 }
 
 var HTML = `<!DOCTYPE html>
