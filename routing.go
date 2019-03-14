@@ -5,7 +5,6 @@ import (
 	_ "crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	_ "github.com/gorilla/mux"
 	"io"
@@ -18,57 +17,6 @@ import (
 	_ "strconv"
 	"time"
 )
-
-func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
-	profile, err := CreateAccount(w, r)
-	if err != nil {
-		log.Println(err.Error())
-		info := InfoText{Data: err.Error()}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	claims := customClaims{
-		profile.Nickname,
-		jwt.StandardClaims{
-			Issuer: ServerName,
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(SECRET)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("Error with JWT tocken generation: %v\n", err.Error())
-
-		return
-	}
-
-	expiration := time.Now().Add(10 * time.Hour)
-	cookie := http.Cookie{
-		Name:     CookieName,
-		Value:    ss,
-		Expires:  expiration,
-		HttpOnly: true,
-	}
-	http.SetCookie(w, &cookie)
-	w.WriteHeader(http.StatusCreated)
-
-	err = json.NewEncoder(w).Encode(profile)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return
-	}
-}
 
 func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 	nickname, err := NicknameFromCookie(w, r)
