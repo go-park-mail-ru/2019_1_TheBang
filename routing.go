@@ -275,9 +275,14 @@ func LeaderbordPageHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if page == 1 {
 		w.Write([]byte(p1))
+
+		return
 	} else if page == 2 {
 		w.Write([]byte(p2))
+
+		return
 	}
+	w.WriteHeader(404)
 }
 
 func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
