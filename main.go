@@ -20,7 +20,7 @@ var (
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8090"
 	}
 
 	SECRET = []byte(os.Getenv("SECRET"))
@@ -36,6 +36,7 @@ func main() {
 	r.HandleFunc("/auth", LogoutHandler).Methods("DELETE", "OPTIONS")
 
 	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
+	r.HandleFunc("/leaderbord/{id:[0-9]+}", LeaderbordPageHandler).Methods("GET")
 
 	r.HandleFunc("/user", MyProfileCreateHandler).Methods("POST")
 	r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")

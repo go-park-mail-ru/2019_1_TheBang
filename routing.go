@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	_ "os"
+	"strconv"
 	_ "strconv"
 	"time"
 )
@@ -255,6 +256,30 @@ func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func LeaderbordPageHandler(w http.ResponseWriter, r *http.Request) {
+	///
+	///
+	///
+	///
+	///
+	///
+	///
+	vars := mux.Vars(r)
+	page, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if page == 1 {
+		w.Write([]byte(p1))
+	} else if page == 2 {
+		w.Write([]byte(p2))
+	}
+}
+
 func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(HTML))
 }
@@ -379,3 +404,95 @@ func GetIconHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+var p1 = `[
+    {
+        "nickname": "admin1",
+        "name": "admin1",
+        "surname": "admin1",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 10000
+    },{
+        "nickname": "admin2",
+        "name": "admin2",
+        "surname": "admin2",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 1000
+    }, {
+        "nickname": "admin3",
+        "name": "admin3",
+        "surname": "admin3",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 900
+    },  {
+        "nickname": "admin4",
+        "name": "admin4",
+        "surname": "admin4",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 800
+    },  {
+        "nickname": "admin5",
+        "name": "admin5",
+        "surname": "admin5",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 700
+    },  {
+        "nickname": "admin6",
+        "name": "admin6",
+        "surname": "admin6",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 600
+    }
+]`
+
+var p2 = `[
+    {
+        "nickname": "admin7",
+        "name": "admin7",
+        "surname": "admin7",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 500
+    },{
+        "nickname": "admin8",
+        "name": "admin8",
+        "surname": "admin8",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 400
+    }, {
+        "nickname": "admin9",
+        "name": "admin9",
+        "surname": "admin9",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 300
+    },  {
+        "nickname": "admin10",
+        "name": "admin10",
+        "surname": "admin10",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 200
+    },  {
+        "nickname": "admin11",
+        "name": "admin11",
+        "surname": "admin11",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 100
+    },  {
+        "nickname": "admin12",
+        "name": "admin12",
+        "surname": "admin12",
+        "dob": "0.0.0.0",
+        "photo": "default_img",
+        "score": 90
+    }
+]`
