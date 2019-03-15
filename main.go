@@ -1,21 +1,14 @@
 package main
 
 import (
+	"github.com/go-park-mail-ru/2019_1_TheBang/config"
+	"github.com/go-park-mail-ru/2019_1_TheBang/handlers"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
 )
 
-var (
-	storageAcc  = CreateAccountStorage()
-	storageProf = CreateProfileStorage()
-	SECRET      []byte
-	CookieName  = "bang_token"
-	ServerName  = "TheBang server"
-	FrontentDst = "localhost:3000"
-	DefaultImg  = "default_img"
-)
 
 func main() {
 	port := os.Getenv("PORT")
@@ -23,9 +16,9 @@ func main() {
 		port = "8080"
 	}
 
-	SECRET = []byte(os.Getenv("SECRET"))
-	if string(SECRET) == "" {
-		SECRET = []byte("secret")
+	config.SECRET = []byte(os.Getenv("SECRET"))
+	if string(config.SECRET) == "" {
+		config.SECRET = []byte("secret")
 		log.Println("There is no SECRET!")
 	}
 
@@ -37,7 +30,7 @@ func main() {
 
 	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 
-	r.HandleFunc("/user", MyProfileCreateHandler).Methods("POST")
+	r.HandleFunc("/user", handlers.MyProfileCreateHandler).Methods("POST")
 	r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")
 	r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
 
@@ -47,13 +40,13 @@ func main() {
 
 	r.HandleFunc("/icon/{filename}", GetIconHandler).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	log.Fatal(http.ListenAndServe(":" + port, r))
 }
 
 func commonMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", FrontentDst)
+		w.Header().Set("Access-Control-Allow-Origin", config.FrontentDst)
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 

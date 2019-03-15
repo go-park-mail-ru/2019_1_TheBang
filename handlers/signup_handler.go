@@ -89,12 +89,6 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) (prof models.Profile,
 	}
 	passwd := signup.Passwd
 
-	//storageAcc.mu.Lock()
-	//defer storageAcc.mu.Unlock()
-
-	//storageProf.mu.Lock()
-	//defer storageProf.mu.Unlock()
-
 	if _, ok := storageAcc.data[prof.Nickname]; ok {
 		w.WriteHeader(http.StatusConflict)
 		err := errors.New("This user already exists!")

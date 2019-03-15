@@ -1,3 +1,5 @@
 package handlers
 
-var Name  = "smth"
+/*
+		Big model's discription
+ */
