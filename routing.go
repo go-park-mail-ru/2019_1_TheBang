@@ -1,4 +1,5 @@
 package main
+
 //
 //import (
 //	_ "crypto/md5"
@@ -7,52 +8,6 @@ package main
 //	_ "os"
 //	_ "strconv"
 //)
-//
-//func LogInHandler(w http.ResponseWriter, r *http.Request) {
-//	answer := fmt.Sprintf("User %v was login!", login.Nickname)
-//	info := InfoText{Data: answer}
-//	err = json.NewEncoder(w).Encode(info)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println(err.Error())
-//
-//		return
-//	}
-//}
-//
-//func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-//	session, err := r.Cookie(CookieName)
-//
-//	if r.Method == "OPTIONS" {
-//		return
-//	}
-//
-//	if err != nil {
-//		w.WriteHeader(http.StatusBadRequest)
-//		info := InfoText{Data: "A not logged in user cannot log out!"}
-//		err := json.NewEncoder(w).Encode(info)
-//		if err != nil {
-//			w.WriteHeader(http.StatusInternalServerError)
-//			log.Println(err.Error())
-//
-//			return
-//		}
-//
-//		return
-//	}
-//
-//	session.Expires = time.Now().AddDate(0, 0, -1)
-//	http.SetCookie(w, session)
-//
-//	info := InfoText{Data: "You successfully logged out!"}
-//	err = json.NewEncoder(w).Encode(info)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println(err.Error())
-//
-//		return
-//	}
-//}
 //
 //func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 //	profSlice := []Profile{}

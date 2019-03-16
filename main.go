@@ -26,7 +26,7 @@ func main() {
 	r.Use(commonMiddleware)
 
 	r.HandleFunc("/auth", handlers.LogInHandler).Methods("POST")
-	//r.HandleFunc("/auth", LogoutHandler).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/auth", handlers.LogoutHandler).Methods("DELETE", "OPTIONS")
 
 	//r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 
