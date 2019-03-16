@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/go-park-mail-ru/2019_1_TheBang/api"
 	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/auth"
 	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
 	"io/ioutil"
@@ -23,7 +24,7 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	update := models.Update{}
+	update := api.Update{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

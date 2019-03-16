@@ -25,11 +25,11 @@ func main() {
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 
-	//r.HandleFunc("/auth", LogInHandler).Methods("POST")
+	r.HandleFunc("/auth", handlers.LogInHandler).Methods("POST")
 	//r.HandleFunc("/auth", LogoutHandler).Methods("DELETE", "OPTIONS")
 
 	//r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
-	//
+
 	r.HandleFunc("/user", handlers.MyProfileCreateHandler).Methods("POST")
 	r.HandleFunc("/user", handlers.MyProfileInfoHandler).Methods("GET")
 	r.HandleFunc("/user", handlers.MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")

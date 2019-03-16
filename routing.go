@@ -1,49 +1,14 @@
 package main
-
-import (
-	_ "crypto/md5"
-	_ "github.com/gorilla/mux"
-	_ "io"
-	_ "os"
-	_ "strconv"
-)
-
+//
+//import (
+//	_ "crypto/md5"
+//	_ "github.com/gorilla/mux"
+//	_ "io"
+//	_ "os"
+//	_ "strconv"
+//)
+//
 //func LogInHandler(w http.ResponseWriter, r *http.Request) {
-//	login := Login{}
-//	body, err := ioutil.ReadAll(r.Body)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println(err.Error())
-//
-//		return
-//	}
-//	err = json.Unmarshal(body, &login)
-//
-//	token, err := LoginAcount(login.Nickname, login.Passwd)
-//	if err != nil {
-//		w.WriteHeader(http.StatusUnauthorized)
-//		info := InfoText{Data: "Wrong nickname or password!"}
-//		err := json.NewEncoder(w).Encode(info)
-//		if err != nil {
-//			w.WriteHeader(http.StatusInternalServerError)
-//			log.Println(err.Error())
-//
-//			return
-//		}
-//
-//		return
-//	}
-//
-//	expiration := time.Now().Add(10 * time.Hour)
-//	cookie := http.Cookie{
-//		Name:     CookieName,
-//		Value:    token,
-//		Expires:  expiration,
-//		HttpOnly: true,
-//	}
-//
-//	http.SetCookie(w, &cookie)
-//
 //	answer := fmt.Sprintf("User %v was login!", login.Nickname)
 //	info := InfoText{Data: answer}
 //	err = json.NewEncoder(w).Encode(info)

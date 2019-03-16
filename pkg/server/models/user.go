@@ -1,35 +1,13 @@
 package models
 
 import (
+	"github.com/go-park-mail-ru/2019_1_TheBang/api"
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 	"log"
 	"net/http"
 )
 
-type Profile struct {
-	Nickname string `json:"nickname"`
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
-	DOB      string `json:"dob"`
-	Photo    string `json:"photo"`
-	Score    int    `json:"score"`
-}
-
-type Signup struct {
-	Nickname string `json:"nickname"`
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
-	DOB      string `json:"dob"`
-	Passwd   string `json:"passwd"`
-}
-
-type Update struct {
-	Name    string `json:"name"`
-	Surname string `json:"surname"`
-	DOB     string `json:"dob"`
-}
-
-func CreateUser(s *Signup) (profile Profile, status int) {
+func CreateUser(s *api.Signup) (profile api.Profile, status int) {
 	_, err := config.DB.Query(SQLInsertUser,
 		s.Nickname,
 		s.Name,
@@ -40,7 +18,7 @@ func CreateUser(s *Signup) (profile Profile, status int) {
 		return profile, http.StatusConflict
 	}
 
-	profile = Profile{
+	profile = api.Profile{
 		Nickname: s.Nickname,
 		Name:     s.Name,
 		Surname:  s.Surname,
@@ -51,7 +29,7 @@ func CreateUser(s *Signup) (profile Profile, status int) {
 	return profile, http.StatusCreated
 }
 
-func SelectUser(nickname string) (p Profile, status int) {
+func SelectUser(nickname string) (p api.Profile, status int) {
 	rows, err := config.DB.Query(SQLSeletUser,
 		nickname)
 	if err != nil {
@@ -75,7 +53,7 @@ func SelectUser(nickname string) (p Profile, status int) {
 	return p, http.StatusOK
 }
 
-func UpdateUser(nickname string, u Update) (p Profile, status int) {
+func UpdateUser(nickname string, u api.Update) (p api.Profile, status int) {
 	_, err := config.DB.Query(SQLUpdateUser,
 		u.Name,
 		u.Surname,
@@ -93,6 +71,20 @@ func UpdateUser(nickname string, u Update) (p Profile, status int) {
 	return p, http.StatusOK
 }
 
+func CheckUser(nickname, passwd string) bool {
+	row, err := config.DB.Query(SQLCheckUser,
+		nickname, passwd)
+	if err != nil {
+		return false
+	}
+
+	if !row.Next() {
+		return false
+	}
+
+	return true
+}
+
 var SQLInsertUser = `insert into project_bang.users
  						(nickname, name, surname, dob, passwd)
     					values ($1, $2, $3, $4, $5)`
@@ -105,3 +97,8 @@ var SQLSeletUser = `select
 var SQLUpdateUser = `update project_bang.users 
 						set (name, surname, dob) = ($1, $2, $3)
 						where nickname = $4`
+
+var SQLCheckUser = `select 
+					nickname, name, surname, dob, photo, score	
+					from project_bang.users
+					where nickname = $1 and passwd = $2`
