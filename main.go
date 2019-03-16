@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
-	"github.com/go-park-mail-ru/2019_1_TheBang/handlers"
+	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/handlers"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
