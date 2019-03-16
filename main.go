@@ -25,20 +25,19 @@ func main() {
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 
-	r.HandleFunc("/auth", LogInHandler).Methods("POST")
-	r.HandleFunc("/auth", LogoutHandler).Methods("DELETE", "OPTIONS")
+	//r.HandleFunc("/auth", LogInHandler).Methods("POST")
+	//r.HandleFunc("/auth", LogoutHandler).Methods("DELETE", "OPTIONS")
 
-	r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
-
+	//r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
+	//
 	r.HandleFunc("/user", handlers.MyProfileCreateHandler).Methods("POST")
-	r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")
-	r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
+	//r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")
+	//r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
 
-	//toDo зашлушка для ручного естирования
-	r.HandleFunc("/user/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
-	r.HandleFunc("/user/avatar", ChangeProfileAvatarHandler).Methods("POST")
-
-	r.HandleFunc("/icon/{filename}", GetIconHandler).Methods("GET")
+	//r.HandleFunc("/user/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
+	//r.HandleFunc("/user/avatar", ChangeProfileAvatarHandler).Methods("POST")
+	//
+	//r.HandleFunc("/icon/{filename}", GetIconHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":" + port, r))
 }

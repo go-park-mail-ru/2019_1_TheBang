@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
-	"github.com/go-park-mail-ru/2019_1_TheBang/models"
+	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,6 +13,24 @@ import (
 )
 
 func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
+	signup := models.Signup{}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
+
+		return
+	}
+
+	err = json.Unmarshal(body, &signup)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
+
+		return
+	}
+
+
 	profile, err := CreateAccount(w, r)
 	if err != nil {
 		log.Println(err.Error())
@@ -64,23 +82,6 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateAccount(w http.ResponseWriter, r *http.Request) (prof models.Profile, err error) {
-	signup := models.Signup{}
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return prof, err
-	}
-
-	err = json.Unmarshal(body, &signup)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return prof, err
-	}
-
 	prof = models.Profile{
 		Nickname: signup.Nickname,
 		Name:     signup.Name,
