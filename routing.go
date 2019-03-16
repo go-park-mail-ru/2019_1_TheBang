@@ -2,89 +2,12 @@ package main
 
 import (
 	_ "crypto/md5"
-	"encoding/json"
 	_ "github.com/gorilla/mux"
 	_ "io"
-	"log"
-	"net/http"
 	_ "os"
 	_ "strconv"
 )
 
-func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-	nickname, err := NicknameFromCookie(w, r)
-	if err != nil {
-		info := InfoText{Data: err.Error()}
-		err = json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Printf("MyProfileInfoHandler: %v\n", err.Error())
-
-			return
-		}
-
-		return
-	}
-
-	err = json.NewEncoder(w).Encode(profile)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("MyProfileInfoHandler: %v\n", err.Error())
-
-		return
-	}
-}
-
-//func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
-//
-//	if r.Method == "OPTIONS" {
-//		return
-//	}
-//
-//	nickname, err := NicknameFromCookie(w, r)
-//	if err != nil {
-//
-//		return
-//	}
-//
-//	update := Update{}
-//	body, err := ioutil.ReadAll(r.Body)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println(err.Error())
-//
-//		return
-//	}
-//
-//	err = json.Unmarshal(body, &update)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println(err.Error())
-//
-//		return
-//	}
-//
-//	storageProf.mu.Lock()
-//	defer storageProf.mu.Unlock()
-//
-//	prof := storageProf.data[nickname]
-//
-//	prof.Name = update.Name
-//	prof.Surname = update.Surname
-//	prof.DOB = update.DOB
-//
-//	storageProf.data[nickname] = prof
-//
-//	w.WriteHeader(http.StatusAccepted)
-//	err = json.NewEncoder(w).Encode(prof)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println(err.Error())
-//
-//		return
-//	}
-//}
-//
 //func LogInHandler(w http.ResponseWriter, r *http.Request) {
 //	login := Login{}
 //	body, err := ioutil.ReadAll(r.Body)

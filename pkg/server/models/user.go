@@ -23,6 +23,12 @@ type Signup struct {
 	Passwd   string `json:"passwd"`
 }
 
+type Update struct {
+	Name    string `json:"name"`
+	Surname string `json:"surname"`
+	DOB     string `json:"dob"`
+}
+
 func CreateUser(s *Signup) (profile Profile, status int) {
 	_, err := config.DB.Query(SQLInsertUser,
 		s.Nickname,
@@ -68,6 +74,30 @@ func SelectUser(nickname string) (p Profile, status int) {
 	return p, http.StatusOK
 }
 
+func UpdateUser(nickname string, u Update) (p Profile, status int) {
+	rows, err := config.DB.Query(SQLUpdateUser,
+		nickname)
+	if err != nil {
+		return p, http.StatusBadRequest
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&p.Nickname,
+			&p.Name,
+			&p.Surname,
+			&p.DOB,
+			&p.Photo,
+			&p.Score);
+			err != nil {
+			log.Printf("ProfileHandler: %v\n", err.Error())
+
+			return p, http.StatusInternalServerError
+		}
+	}
+
+	return p, http.StatusOK
+}
+
 var SQLInsertUser = `insert into project_bang.users
  						(nickname, name, surname, dob, passwd)
     					values ($1, $2, $3, $4, $5)`
@@ -76,3 +106,7 @@ var SQLSeletUser = `select
 					nickname, name, surname, dob, photo, score	
 					from project_bang.users
 					where nickname = $1`
+
+var SQLUpdateUser = `update project_bang.users 
+						set (name, surname, dob) = ($1, $2, $3)
+						where nickname = $4`
