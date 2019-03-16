@@ -46,6 +46,7 @@ func CreateUser(s *Signup) (profile Profile, status int) {
 		Surname:  s.Surname,
 		DOB:      s.DOB,
 	}
+	profile.Photo = config.DefaultImg
 
 	return profile, http.StatusCreated
 }
@@ -75,24 +76,18 @@ func SelectUser(nickname string) (p Profile, status int) {
 }
 
 func UpdateUser(nickname string, u Update) (p Profile, status int) {
-	rows, err := config.DB.Query(SQLUpdateUser,
+	_, err := config.DB.Query(SQLUpdateUser,
+		u.Name,
+		u.Surname,
+		u.DOB,
 		nickname)
 	if err != nil {
 		return p, http.StatusBadRequest
 	}
 
-	for rows.Next() {
-		if err := rows.Scan(&p.Nickname,
-			&p.Name,
-			&p.Surname,
-			&p.DOB,
-			&p.Photo,
-			&p.Score);
-			err != nil {
-			log.Printf("ProfileHandler: %v\n", err.Error())
-
-			return p, http.StatusInternalServerError
-		}
+	p, status = SelectUser(nickname)
+	if status != http.StatusOK {
+		return p, http.StatusInternalServerError
 	}
 
 	return p, http.StatusOK

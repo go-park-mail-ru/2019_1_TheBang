@@ -29,7 +29,6 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	profile, status := models.CreateUser(&signup)
 	if status != http.StatusCreated {
 		w.WriteHeader(status)
