@@ -3,8 +3,8 @@ package main
 import (
 	"crypto/md5"
 	_ "crypto/md5"
+	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	_ "github.com/gorilla/mux"
@@ -192,9 +192,15 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &cookie)
 
-	answer := fmt.Sprintf("User %v was login!", login.Nickname)
-	info := InfoText{Data: answer}
-	err = json.NewEncoder(w).Encode(info)
+	profile, ok := storageProf.data[login.Nickname]
+	if !ok {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("MyProfileInfoHandler: can not find user with valid token")
+
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(profile)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err.Error())
@@ -292,6 +298,10 @@ func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	if r.Method == "OPTIONS" {
+		return
+	}
+
 	nickname, err := NicknameFromCookie(w, r)
 	if err != nil {
 		info := InfoText{Data: err.Error()}
@@ -330,7 +340,8 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	filename := string(hasher.Sum(nil))
+
+	filename := hex.EncodeToString(hasher.Sum(nil))
 
 	filein, err := header.Open()
 	if err != nil {
@@ -349,6 +360,7 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	defer filein.Close()
 
 	fileout, err := os.OpenFile("tmp/"+filename, os.O_WRONLY|os.O_CREATE, 0644)
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println("ChangeProfileAvatarHandler: ", "file for img was not created!")
@@ -417,87 +429,97 @@ var p1 = `[
         "surname": "admin1",
         "dob": "0.0.0.0",
         "photo": "default_img",
-        "score": 10000
+        "score": 10000,
+		"posintion": 1
     },{
         "nickname": "admin2",
         "name": "admin2",
         "surname": "admin2",
         "dob": "0.0.0.0",
         "photo": "default_img",
-        "score": 1000
+        "score": 1000,
+		"posintion": 2
     }, {
         "nickname": "admin3",
         "name": "admin3",
         "surname": "admin3",
         "dob": "0.0.0.0",
         "photo": "default_img",
-        "score": 900
+        "score": 900,
+		"posintion": 3
     },  {
         "nickname": "admin4",
         "name": "admin4",
         "surname": "admin4",
         "dob": "0.0.0.0",
         "photo": "default_img",
-        "score": 800
+        "score": 800,
+		"posintion": 4
     },  {
         "nickname": "admin5",
         "name": "admin5",
         "surname": "admin5",
         "dob": "0.0.0.0",
         "photo": "default_img",
-        "score": 700
+        "score": 700,
+		"posintion": 5
     },  {
         "nickname": "admin6",
         "name": "admin6",
         "surname": "admin6",
         "dob": "0.0.0.0",
         "photo": "default_img",
-        "score": 600
+        "score": 600,
+		"posintion": 6
     }
 ]`
 
-var p2 = `[
-    {
-        "nickname": "admin7",
-        "name": "admin7",
-        "surname": "admin7",
-        "dob": "0.0.0.0",
-        "photo": "default_img",
-        "score": 500
-    },{
-        "nickname": "admin8",
-        "name": "admin8",
-        "surname": "admin8",
-        "dob": "0.0.0.0",
-        "photo": "default_img",
-        "score": 400
-    }, {
-        "nickname": "admin9",
-        "name": "admin9",
-        "surname": "admin9",
-        "dob": "0.0.0.0",
-        "photo": "default_img",
-        "score": 300
-    },  {
-        "nickname": "admin10",
-        "name": "admin10",
-        "surname": "admin10",
-        "dob": "0.0.0.0",
-        "photo": "default_img",
-        "score": 200
-    },  {
-        "nickname": "admin11",
-        "name": "admin11",
-        "surname": "admin11",
-        "dob": "0.0.0.0",
-        "photo": "default_img",
-        "score": 100
-    },  {
-        "nickname": "admin12",
-        "name": "admin12",
-        "surname": "admin12",
-        "dob": "0.0.0.0",
-        "photo": "default_img",
-        "score": 90
-    }
-]`
+var p2 = `[{
+	"nickname": "admin7",
+	"name": "admin7",
+	"surname": "admin7",
+	"dob": "0.0.0.0",
+	"photo": "default_img",
+	"score": 500,
+	"posintion": 7
+}, {
+	"nickname": "admin8",
+	"name": "admin8",
+	"surname": "admin8",
+	"dob": "0.0.0.0",
+	"photo": "default_img",
+	"score": 400,
+	"posintion": 8
+}, {
+	"nickname": "admin9",
+	"name": "admin9",
+	"surname": "admin9",
+	"dob": "0.0.0.0",
+	"photo": "default_img",
+	"score": 300,
+	"posintion": 9
+}, {
+	"nickname": "admin10",
+	"name": "admin10",
+	"surname": "admin10",
+	"dob": "0.0.0.0",
+	"photo": "default_img",
+	"score": 200,
+	"posintion": 10
+}, {
+	"nickname": "admin11",
+	"name": "admin11",
+	"surname": "admin11",
+	"dob": "0.0.0.0",
+	"photo": "default_img",
+	"score": 100,
+	"posintion": 11
+}, {
+	"nickname": "admin12",
+	"name": "admin12",
+	"surname": "admin12",
+	"dob": "0.0.0.0",
+	"photo": "default_img",
+	"score": 90,
+	"posintion": 12
+}]`

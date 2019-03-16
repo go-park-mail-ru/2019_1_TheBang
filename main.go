@@ -44,7 +44,7 @@ func main() {
 
 	//toDo зашлушка для ручного естирования
 	r.HandleFunc("/user/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
-	r.HandleFunc("/user/avatar", ChangeProfileAvatarHandler).Methods("POST")
+	r.HandleFunc("/user/avatar", ChangeProfileAvatarHandler).Methods("POST", "OPTIONS")
 
 	r.HandleFunc("/icon/{filename}", GetIconHandler).Methods("GET")
 
