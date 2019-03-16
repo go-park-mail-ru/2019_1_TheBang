@@ -31,7 +31,7 @@ func main() {
 	//r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
 	//
 	r.HandleFunc("/user", handlers.MyProfileCreateHandler).Methods("POST")
-	//r.HandleFunc("/user", MyProfileInfoHandler).Methods("GET")
+	r.HandleFunc("/user", handlers.MyProfileInfoHandler).Methods("GET")
 	//r.HandleFunc("/user", MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
 
 	//r.HandleFunc("/user/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")

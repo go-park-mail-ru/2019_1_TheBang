@@ -11,35 +11,6 @@ type Update struct {
 	DOB     string `json:"dob"`
 }
 //
-//func CheckTocken(r *http.Request) (token *jwt.Token, ok bool) {
-//	cookie, err := r.Cookie(CookieName)
-//	if err != nil {
-//		return nil, false
-//	}
-//
-//	tokenStr := cookie.Value
-//
-//	token, err = jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-//		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-//			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-//		}
-//
-//		return SECRET, nil
-//	})
-//	if err != nil {
-//		log.Printf("Error with check tocken: %v", err.Error())
-//
-//		return nil, false
-//	}
-//
-//	if !token.Valid {
-//		log.Printf("%v use faked cookie: %v\n", r.RemoteAddr, err.Error())
-//
-//		return nil, false
-//	}
-//
-//	return token, true
-//}
 //
 //func CreateAccount(w http.ResponseWriter, r *http.Request) (prof Profile, err error) {
 //	signup := Signup{}
@@ -87,28 +58,7 @@ type Update struct {
 //
 //	return prof, nil
 //}
-//
-//func NicknameFromCookie(w http.ResponseWriter, r *http.Request) (nickname string, err error) {
-//	token, ok := CheckTocken(r)
-//	if !ok {
-//		w.WriteHeader(http.StatusForbidden)
-//		err := errors.New("You can not get profile info!")
-//
-//		return "", err
-//	}
-//
-//	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-//		nickname = claims["nickname"].(string)
-//	} else {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println("MyProfileInfoHandler: Error with parsing token's claims")
-//
-//		return "", err
-//	}
-//
-//	return nickname, err
-//}
-//
+////
 //func LoginAcount(username, passwd string) (string, error) {
 //	storageAcc.mu.Lock()
 //	defer storageAcc.mu.Unlock()

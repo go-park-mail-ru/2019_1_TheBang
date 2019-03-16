@@ -2,47 +2,39 @@ package main
 
 import (
 	_ "crypto/md5"
+	"encoding/json"
 	_ "github.com/gorilla/mux"
 	_ "io"
+	"log"
+	"net/http"
 	_ "os"
 	_ "strconv"
 )
-//
-//func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-//	nickname, err := NicknameFromCookie(w, r)
-//	if err != nil {
-//		info := InfoText{Data: err.Error()}
-//		err = json.NewEncoder(w).Encode(info)
-//		if err != nil {
-//			w.WriteHeader(http.StatusInternalServerError)
-//			log.Printf("MyProfileInfoHandler: %v\n", err.Error())
-//
-//			return
-//		}
-//
-//		return
-//	}
-//
-//	storageProf.mu.Lock()
-//	defer storageProf.mu.Unlock()
-//
-//	profile, ok := storageProf.data[nickname]
-//	if !ok {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println("MyProfileInfoHandler: can not find user with valid token")
-//
-//		return
-//	}
-//
-//	err = json.NewEncoder(w).Encode(profile)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Printf("MyProfileInfoHandler: %v\n", err.Error())
-//
-//		return
-//	}
-//}
-//
+
+func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
+	nickname, err := NicknameFromCookie(w, r)
+	if err != nil {
+		info := InfoText{Data: err.Error()}
+		err = json.NewEncoder(w).Encode(info)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Printf("MyProfileInfoHandler: %v\n", err.Error())
+
+			return
+		}
+
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(profile)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("MyProfileInfoHandler: %v\n", err.Error())
+
+		return
+	}
+}
+
 //func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 //
 //	if r.Method == "OPTIONS" {

@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
+	"log"
 	"net/http"
 )
 
@@ -41,6 +42,30 @@ func CreateUser(s *Signup) (profile Profile, status int) {
 	}
 
 	return profile, http.StatusCreated
+}
+
+func SelectUser(nickname string) (p Profile, status int) {
+	rows, err := config.DB.Query(SQLSeletUser,
+		nickname)
+	if err != nil {
+		return p, http.StatusBadRequest
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&p.Nickname,
+			&p.Name,
+			&p.Surname,
+			&p.DOB,
+			&p.Photo,
+			&p.Score);
+		err != nil {
+			log.Printf("ProfileHandler: %v\n", err.Error())
+
+			return p, http.StatusInternalServerError
+		}
+	}
+
+	return p, http.StatusOK
 }
 
 var SQLInsertUser = `insert into project_bang.users
