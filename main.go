@@ -13,7 +13,7 @@ import (
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8090"
 	}
 
 	config.SECRET = []byte(os.Getenv("SECRET"))

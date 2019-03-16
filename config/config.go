@@ -3,6 +3,7 @@ package config
 import (
 	"database/sql"
 	"log"
+	_ "github.com/lib/pq"
 )
 
 var (
@@ -12,7 +13,7 @@ var (
 	FrontentDst = "localhost:3000"
 	DefaultImg  = "default_img"
 	connBDStr = "user=postgres dbname=tp password=2017 sslmode=disable"
-	BD *sql.DB = connectDB(connBDStr)
+	DB *sql.DB = connectDB(connBDStr)
 )
 
 func connectDB(connStr string) *sql.DB {

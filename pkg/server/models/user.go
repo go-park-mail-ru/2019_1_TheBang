@@ -1,5 +1,10 @@
 package models
 
+import (
+	"github.com/go-park-mail-ru/2019_1_TheBang/config"
+	"net/http"
+)
+
 type Profile struct {
 	Nickname string `json:"nickname"`
 	Name     string `json:"name"`
@@ -17,20 +22,30 @@ type Signup struct {
 	Passwd   string `json:"passwd"`
 }
 
-func CreateUser(s *Signup) (Profile, int) {
+func CreateUser(s *Signup) (profile Profile, status int) {
+	_, err := config.DB.Query(SQLInsertUser,
+		s.Nickname,
+		s.Name,
+		s.Surname,
+		s.DOB,
+		s.Passwd)
+	if err != nil {
+		return profile, http.StatusConflict
+	}
 
-	prof := Profile{
+	profile = Profile{
 		Nickname: s.Nickname,
 		Name:     s.Name,
 		Surname:  s.Surname,
 		DOB:      s.DOB,
 	}
+
+	return profile, http.StatusCreated
 }
 
-func SelectUser() {}
-
-var SQLInsertUser = `insert into project_bang.users (nickname, name, surname, dob, passwd)
-    values ($1, $2, $3, $4, $5);`
+var SQLInsertUser = `insert into project_bang.users
+ 						(nickname, name, surname, dob, passwd)
+    					values ($1, $2, $3, $4, $5)`
 
 var SQLSeletUser = `select 
 					nickname, name, surname, dob, photo, score	

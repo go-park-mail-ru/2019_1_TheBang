@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
@@ -31,17 +30,9 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-	profile, err := CreateAccount(w, r)
-	if err != nil {
-		log.Println(err.Error())
-		info := models.InfoText{Data: err.Error()}
-		err := json.NewEncoder(w).Encode(info)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println(err.Error())
-
-			return
-		}
+	profile, status := models.CreateUser(&signup)
+	if status != http.StatusCreated {
+		w.WriteHeader(status)
 
 		return
 	}
@@ -79,28 +70,4 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-}
-
-func CreateAccount(w http.ResponseWriter, r *http.Request) (prof models.Profile, err error) {
-	prof = models.Profile{
-		Nickname: signup.Nickname,
-		Name:     signup.Name,
-		Surname:  signup.Surname,
-		DOB:      signup.DOB,
-	}
-	passwd := signup.Passwd
-
-	if _, ok := storageAcc.data[prof.Nickname]; ok {
-		w.WriteHeader(http.StatusConflict)
-		err := errors.New("This user already exists!")
-
-		return prof, err
-	}
-
-	prof.Photo = config.DefaultImg
-
-	storageAcc.data[prof.Nickname] = passwd
-	storageProf.data[prof.Nickname] = prof
-
-	return prof, nil
 }
