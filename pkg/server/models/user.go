@@ -132,6 +132,17 @@ func UpdateUserPhoto(nickname, photo string) bool {
 	return true
 }
 
+func DeleteUser(nickname string) bool {
+	_, err := config.DB.Query(SQLDeleteUser, nickname)
+	if err != nil {
+		log.Printf("DeleteUser: %v\n")
+
+		return false
+	}
+
+	return true
+}
+
 var SQLInsertUser = `insert into project_bang.users
  						(nickname, name, surname, dob, passwd)
     					values ($1, $2, $3, $4, $5)`
@@ -153,4 +164,7 @@ var SQLCheckUser = `select
 var SQLUpdatePhoto = `update project_bang.users 
 						set photo = $1
 						where nickname = $2`
+
+var SQLDeleteUser = `delete from project_bang.users
+						where nickname = $1`
 
