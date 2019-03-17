@@ -13,7 +13,12 @@ var (
 	ServerName  = "TheBang server"
 	FrontentDst  = getFrontDest()
 	DefaultImg  = "default_img"
-	connBDStr = "user=postgres dbname=tp password=2017 sslmode=disable"
+
+	DBUSER = getDBUser()
+	DBPASSWORD = getDBPasswd()
+	DBNAME = getDBNAme()
+
+	connBDStr = " user=" + DBUSER + " dbname="+ DBNAME +" password=" + DBPASSWORD + " sslmode=disable"
 	DB *sql.DB = connectDB(connBDStr)
 	RowsOnLeaderPage uint = 6
 	PORT = getPort()
@@ -27,6 +32,34 @@ func connectDB(connStr string) *sql.DB {
 	log.Println("Database connected!")
 
 	return DB
+}
+
+func getDBPasswd() string {
+	bdpass := os.Getenv("DBPASSWORD")
+	if bdpass == "" {
+		log.Println("There is no DBPASSWORD!")
+		bdpass = "2017"
+	}
+	return bdpass
+}
+
+func getDBNAme() string {
+	dbname := os.Getenv("DBNAME")
+	if dbname == "" {
+		log.Println("There is no DBNAME!")
+		dbname = "tp"
+	}
+	return dbname
+}
+
+
+func getDBUser() string {
+	dbuser := os.Getenv("DBUSER")
+	if dbuser == "" {
+		log.Println("There is no DBUSER!")
+		dbuser = "postgres"
+	}
+	return dbuser
 }
 
 func getFrontDest() string {
