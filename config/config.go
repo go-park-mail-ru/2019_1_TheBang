@@ -14,6 +14,7 @@ var (
 	DefaultImg  = "default_img"
 	connBDStr = "user=postgres dbname=tp password=2017 sslmode=disable"
 	DB *sql.DB = connectDB(connBDStr)
+	RowsOnLeaderPage uint = 6
 )
 
 func connectDB(connStr string) *sql.DB {

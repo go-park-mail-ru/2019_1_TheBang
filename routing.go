@@ -9,25 +9,6 @@ package main
 //	_ "strconv"
 //)
 //
-//func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
-//	profSlice := []Profile{}
-//
-//	storageProf.mu.Lock()
-//	defer storageProf.mu.Unlock()
-//
-//	for _, prof := range storageProf.data {
-//		profSlice = append(profSlice, prof)
-//	}
-//
-//	err := json.NewEncoder(w).Encode(profSlice)
-//	if err != nil {
-//		w.WriteHeader(http.StatusInternalServerError)
-//		log.Println(err.Error())
-//
-//		return
-//	}
-//}
-//
 //func ChangeProfileAvatarHMTLHandler(w http.ResponseWriter, r *http.Request) {
 //	w.Write([]byte(HTML))
 //}

@@ -28,7 +28,7 @@ func main() {
 	r.HandleFunc("/auth", handlers.LogInHandler).Methods("POST")
 	r.HandleFunc("/auth", handlers.LogoutHandler).Methods("DELETE", "OPTIONS")
 
-	//r.HandleFunc("/leaderbord", LeaderbordHandler).Methods("GET")
+	r.HandleFunc("/leaderbord/{page:[0-9]+}", handlers.LeaderbordHandler).Methods("GET")
 
 	r.HandleFunc("/user", handlers.MyProfileCreateHandler).Methods("POST")
 	r.HandleFunc("/user", handlers.MyProfileInfoHandler).Methods("GET")
