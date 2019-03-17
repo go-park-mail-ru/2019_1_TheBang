@@ -70,7 +70,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 func LoginAcount(username, passwd string) (ss string, status int) {
 	ok := models.CheckUser(username, passwd)
 	if !ok {
-		return ss, http.StatusBadRequest
+		return ss, http.StatusUnauthorized
 	}
 
 	claims := models.CustomClaims{
