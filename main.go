@@ -6,21 +6,11 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"os"
 )
 
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8090"
-	}
 
-	config.SECRET = []byte(os.Getenv("SECRET"))
-	if string(config.SECRET) == "" {
-		config.SECRET = []byte("secret")
-		log.Println("There is no SECRET!")
-	}
 
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
@@ -38,7 +28,7 @@ func main() {
 	//
 	r.HandleFunc("/icon/{filename}", handlers.GetIconHandler).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":" + port, r))
+	log.Fatal(http.ListenAndServe(":" + config.PORT, r))
 }
 
 func commonMiddleware(next http.Handler) http.Handler {
