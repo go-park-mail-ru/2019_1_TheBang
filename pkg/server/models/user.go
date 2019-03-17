@@ -3,11 +3,25 @@ package models
 import (
 	"github.com/go-park-mail-ru/2019_1_TheBang/api"
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 )
 
+func hashPasswd(passwd string) string {
+	pw := []byte(passwd)
+
+	hash, err := bcrypt.GenerateFromPassword(pw, 0)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	return string(hash)
+}
+
 func CreateUser(s *api.Signup) (profile api.Profile, status int) {
+	s.Passwd = hashPasswd(s.Passwd)
+
 	_, err := config.DB.Query(SQLInsertUser,
 		s.Nickname,
 		s.Name,
@@ -77,12 +91,29 @@ func UpdateUser(nickname string, u api.Update) (p api.Profile, status int) {
 
 func CheckUser(nickname, passwd string) bool {
 	row, err := config.DB.Query(SQLCheckUser,
-		nickname, passwd)
+		nickname)
 	if err != nil {
 		return false
 	}
 
 	if !row.Next() {
+		return false
+	}
+
+	var hash string
+
+	if err := row.Scan(
+		&hash);
+	err != nil {
+		log.Printf("ProfileHandler: %v\n", err.Error())
+
+		return false
+	}
+
+	if err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(passwd)); err != nil {
+		log.Printf("ProfileHandler: wrong passwd: %v\n", err.Error())
+
+
 		return false
 	}
 
@@ -115,10 +146,11 @@ var SQLUpdateUser = `update project_bang.users
 						where nickname = $4`
 
 var SQLCheckUser = `select 
-					nickname, name, surname, dob, photo, score	
+					passwd	
 					from project_bang.users
-					where nickname = $1 and passwd = $2`
+					where nickname = $1`
 
 var SQLUpdatePhoto = `update project_bang.users 
 						set photo = $1
 						where nickname = $2`
+
