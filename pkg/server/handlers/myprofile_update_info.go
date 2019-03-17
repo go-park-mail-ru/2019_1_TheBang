@@ -37,6 +37,7 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	//toDo жду от фронтами
 	update.DOB = "2018-01-01"
 
 	err = json.Unmarshal(body, &update)
