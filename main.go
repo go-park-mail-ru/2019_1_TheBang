@@ -37,7 +37,7 @@ func main() {
 	//r.HandleFunc("/user/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
 	//r.HandleFunc("/user/avatar", ChangeProfileAvatarHandler).Methods("POST")
 	//
-	//r.HandleFunc("/icon/{filename}", GetIconHandler).Methods("GET")
+	r.HandleFunc("/icon/{filename}", handlers.GetIconHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":" + port, r))
 }
