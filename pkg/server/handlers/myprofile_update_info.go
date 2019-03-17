@@ -11,6 +11,10 @@ import (
 )
 
 func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "OPTIONS" {
+		return
+	}
+
 	token, ok := auth.CheckTocken(r)
 	if !ok {
 		w.WriteHeader(http.StatusForbidden)
@@ -33,6 +37,7 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+	update.DOB = "2018-01-01"
 
 	err = json.Unmarshal(body, &update)
 	if err != nil {

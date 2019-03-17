@@ -64,8 +64,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-}
+	}
 
 
 func LoginAcount(username, passwd string) (ss string, status int) {

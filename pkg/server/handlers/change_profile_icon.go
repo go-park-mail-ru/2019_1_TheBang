@@ -16,6 +16,10 @@ import (
 )
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "OPTIONS" {
+		return
+	}
+
 	token, ok := auth.CheckTocken(r)
 	if !ok {
 		w.WriteHeader(http.StatusForbidden)

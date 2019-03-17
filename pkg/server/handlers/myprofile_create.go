@@ -34,49 +34,12 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	//signup.DOB = time.Now().String()
 	signup.DOB = "2018-01-01"
 
-	profile, status := models.CreateUser(&signup)
+	_, status := models.CreateUser(&signup)
 	if status != http.StatusCreated {
 		w.WriteHeader(status)
 
 		return
 	}
-	_ = profile
-
-	//toDo Логинить ли только что зарегистрированных пользователей?
-	//
-	//claims := models.CustomClaims{
-	//	profile.Nickname,
-	//	jwt.StandardClaims{
-	//		Issuer: config.ServerName,
-	//	},
-	//}
-	//
-	//token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	//ss, err := token.SignedString(config.SECRET)
-	//if err != nil {
-	//	w.WriteHeader(http.StatusInternalServerError)
-	//	log.Printf("Error with JWT tocken generation: %v\n", err.Error())
-	//
-	//	return
-	//}
-	//
-	//expiration := time.Now().Add(10 * time.Hour)
-	//cookie := http.Cookie{
-	//	Name:     config.CookieName,
-	//	Value:    ss,
-	//	Expires:  expiration,
-	//	HttpOnly: true,
-	//}
-	//http.SetCookie(w, &cookie)
-	//w.WriteHeader(http.StatusCreated)
-	//
-	//err = json.NewEncoder(w).Encode(profile)
-	//if err != nil {
-	//	w.WriteHeader(http.StatusInternalServerError)
-	//	log.Println(err.Error())
-	//
-	//	return
-	//}
 
 	w.WriteHeader(http.StatusCreated)
 }
