@@ -34,8 +34,7 @@ func main() {
 	r.HandleFunc("/user", handlers.MyProfileInfoHandler).Methods("GET")
 	r.HandleFunc("/user", handlers.MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
 
-	//r.HandleFunc("/user/avatar", ChangeProfileAvatarHMTLHandler).Methods("GET")
-	//r.HandleFunc("/user/avatar", ChangeProfileAvatarHandler).Methods("POST")
+	r.HandleFunc("/user/avatar", handlers.ChangeProfileAvatarHandler).Methods("POST")
 	//
 	r.HandleFunc("/icon/{filename}", handlers.GetIconHandler).Methods("GET")
 
@@ -52,39 +51,3 @@ func commonMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
-var HTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        form {
-            width: 400px;
-            height: 500px;
-            background-color: lightblue;
-            display: flex;
-            flex-direction: column;
-            padding: 50px;
-            box-sizing: border-box;
-        }
-        form div {
-            flex-grow: 13;
-        }
-    </style>
-</head>
-<body>
-<form action="/user/avatar" method="post" enctype="multipart/form-data">
-    <div>photo:</div>
-    <input type="file" name="photo">
-    <br>
-    <br>
-    <input type="submit" value="Upload">
-</form>
-</body>
-</html>`

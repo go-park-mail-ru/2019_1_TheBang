@@ -85,6 +85,18 @@ func CheckUser(nickname, passwd string) bool {
 	return true
 }
 
+func UpdateUserPhoto(nickname, photo string) bool {
+	_, err := config.DB.Query(SQLUpdatePhoto,
+		photo, nickname)
+	if err != nil {
+		log.Printf("UpdateUserPhoto: %v\n")
+
+		return false
+	}
+
+	return true
+}
+
 var SQLInsertUser = `insert into project_bang.users
  						(nickname, name, surname, dob, passwd)
     					values ($1, $2, $3, $4, $5)`
@@ -102,3 +114,7 @@ var SQLCheckUser = `select
 					nickname, name, surname, dob, photo, score	
 					from project_bang.users
 					where nickname = $1 and passwd = $2`
+
+var SQLUpdatePhoto = `update project_bang.users 
+						set photo = $1
+						where nickname = $2`
