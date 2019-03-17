@@ -11,6 +11,7 @@ import (
 func CheckTocken(r *http.Request) (token *jwt.Token, ok bool) {
 	cookie, err := r.Cookie(config.CookieName)
 	if err != nil {
+		log.Printf("CheckTocken: %v", err.Error())
 		return nil, false
 	}
 

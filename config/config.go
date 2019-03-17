@@ -33,7 +33,7 @@ func getFrontDest() string {
 	dst := os.Getenv("FrontentDst")
 	if dst == "" {
 		log.Println("There is no FrontentDst!")
-		dst = "localhost:3000"
+		dst = "http://localhost:3000"
 	}
 	return dst
 }

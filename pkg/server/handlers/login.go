@@ -47,6 +47,24 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &cookie)
+
+	prof, status := models.SelectUser(login.Nickname)
+	if status != http.StatusOK {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("LogInHandler, can not search loged user, statsu: %v\n", status)
+
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(prof)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err.Error())
+
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 

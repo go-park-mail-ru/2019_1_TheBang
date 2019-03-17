@@ -14,6 +14,7 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	token, ok := auth.CheckTocken(r)
 	if !ok {
 		w.WriteHeader(http.StatusForbidden)
+		log.Println("User with not valid cookie")
 
 		return
 	}

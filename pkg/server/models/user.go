@@ -15,6 +15,7 @@ func CreateUser(s *api.Signup) (profile api.Profile, status int) {
 		s.DOB,
 		s.Passwd)
 	if err != nil {
+		log.Printf("CreateUser: %v", err.Error())
 		return profile, http.StatusConflict
 	}
 
@@ -33,6 +34,7 @@ func SelectUser(nickname string) (p api.Profile, status int) {
 	rows, err := config.DB.Query(SQLSeletUser,
 		nickname)
 	if err != nil {
+		log.Printf("SelectUser: %v", err.Error())
 		return p, http.StatusBadRequest
 	}
 
@@ -60,6 +62,8 @@ func UpdateUser(nickname string, u api.Update) (p api.Profile, status int) {
 		u.DOB,
 		nickname)
 	if err != nil {
+		log.Printf("UpdateUser: %v", err.Error())
+
 		return p, http.StatusBadRequest
 	}
 

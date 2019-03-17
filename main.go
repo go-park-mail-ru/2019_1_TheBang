@@ -28,6 +28,7 @@ func main() {
 	//
 	r.HandleFunc("/icon/{filename}", handlers.GetIconHandler).Methods("GET")
 
+	log.Println(config.FrontentDst)
 	log.Fatal(http.ListenAndServe(":" + config.PORT, r))
 }
 
@@ -37,6 +38,7 @@ func commonMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", config.FrontentDst)
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		next.ServeHTTP(w, r)
 	})
