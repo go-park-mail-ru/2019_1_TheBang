@@ -7,22 +7,22 @@ import (
 	"testing"
 )
 
-//func TestLeaderbordHandlerSUCCESS(t *testing.T) {
-//	path := "/leaderbord/1"
-//	req, err := http.NewRequest("GET", path, nil)
-//	if err != nil {
-//		t.Fatal(err.Error())
-//	}
-//
-//	rr := httptest.NewRecorder()
-//	router := mux.NewRouter()
-//	router.HandleFunc(path, LeaderbordHandler)
-//	router.ServeHTTP(rr, req)
-//
-//	if rr.Code != http.StatusBadRequest {
-//		t.Errorf("TestLeaderbordHandler: expected %v, have %v!\n", http.StatusOK, rr.Code)
-//	}
-//}
+func TestLeaderbordHandlerSUCCESS(t *testing.T) {
+	req, err := http.NewRequest("GET", "/leaderbord/1", nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	req = mux.SetURLVars(req, map[string]string{
+		"page" : "1",
+	})
+
+	rr := httptest.NewRecorder()
+	LeaderbordHandler(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("TestLeaderbordHandler: expected %v, have %v!\n", http.StatusOK, rr.Code)
+	}
+}
 
 func TestLeaderbordHandlerFAIL(t *testing.T) {
 	path := "/leaderboard/0"
@@ -30,11 +30,12 @@ func TestLeaderbordHandlerFAIL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
+	req = mux.SetURLVars(req, map[string]string{
+		"page" : "0",
+	})
 
 	rr := httptest.NewRecorder()
-	router := mux.NewRouter()
-	router.HandleFunc(path, LeaderbordHandler)
-	router.ServeHTTP(rr, req)
+	LeaderbordHandler(rr, req)
 
 	if rr.Code != http.StatusBadRequest {
 		t.Errorf("TestLeaderbordHandler: expected %v, have %v!\n", http.StatusBadRequest, rr.Code)
