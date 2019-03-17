@@ -18,14 +18,14 @@ var (
 	DBPASSWORD = getDBPasswd()
 	DBNAME = getDBNAme()
 
-	connBDStr = " user=" + DBUSER + " dbname="+ DBNAME +" password=" + DBPASSWORD + " sslmode=disable"
-	DB *sql.DB = connectDB(connBDStr)
+	//connBDStr = " user=" + DBUSER + " dbname="+ DBNAME +" password=" + DBPASSWORD + " sslmode=disable"
+	DB *sql.DB = connectDB()
 	RowsOnLeaderPage uint = 6
 	PORT = getPort()
 )
 
-func connectDB(connStr string) *sql.DB {
-	DB, err := sql.Open("postgres", connStr)
+func connectDB() *sql.DB {
+	DB, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Println(err)
 	}
