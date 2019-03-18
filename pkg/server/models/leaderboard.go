@@ -49,5 +49,5 @@ func LeaderPage(number uint) (jsonData []byte, status int) {
 }
 
 var SQLGetPage = `select nickname, name, surname, dob, photo, score from project_bang.users
-					order by score
+					order by score desc
 					limit $1 offset $2`
