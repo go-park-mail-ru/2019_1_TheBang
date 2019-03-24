@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/go-park-mail-ru/2019_1_TheBang.svg?branch=develop)](https://travis-ci.org/go-park-mail-ru/2019_1_TheBang)
+
 # TheBang
 ![Dancing Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/dancing-gopher.gif) 
 ![Party Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/party-gopher.gif)
