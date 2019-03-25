@@ -120,7 +120,7 @@ func getPort() string {
 func preRunSQLliteDB(db *sql.DB) {
 	_, err := db.Exec(sqlCreateTableSQLlite)
 	if err != nil {
-		Logger.Fatal("preRunDB, table", err.Error())
+		Logger.Fatalf("preRunDB, table: %v", err.Error())
 	}
 
 }
