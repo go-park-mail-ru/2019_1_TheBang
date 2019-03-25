@@ -33,6 +33,7 @@ func connectDB() *sql.DB {
 		return connectDBHEROKU()
 	}
 
+	
 	db, err := sql.Open("sqlite3", "local_bd.db")
 	if err != nil {
 		log.Fatalln(err.Error())
