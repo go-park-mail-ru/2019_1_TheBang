@@ -24,7 +24,7 @@ func main() {
 	r.HandleFunc("/user", handlers.MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
 
 	r.HandleFunc("/user/avatar", handlers.ChangeProfileAvatarHandler).Methods("POST", "OPTIONS")
-	//
+	
 	r.HandleFunc("/icon/{filename}", handlers.GetIconHandler).Methods("GET")
 
 	log.Println(config.FrontentDst)

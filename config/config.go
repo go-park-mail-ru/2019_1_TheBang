@@ -3,31 +3,48 @@ package config
 import (
 	"database/sql"
 	"log"
-	_ "github.com/lib/pq"
 	"os"
+
+	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
-	SECRET       = getSecret()
+	SECRET      = getSecret()
 	CookieName  = "bang_token"
 	ServerName  = "TheBang server"
-	FrontentDst  = getFrontDest()
+	FrontentDst = getFrontDest()
 	DefaultImg  = "default_img"
+	// POS = "WORKPLACE" | "HEROKU"
 
-	DBUSER = getDBUser()
+	DBUSER     = getDBUser()
 	DBPASSWORD = getDBPasswd()
-	DBNAME = getDBNAme()
+	DBNAME     = getDBNAme()
 
 	//connBDStr = " user=" + DBUSER + " dbname="+ DBNAME +" password=" + DBPASSWORD + " sslmode=disable"
-	DB *sql.DB = connectDB()
-	RowsOnLeaderPage uint = 6
-	PORT = getPort()
+	DB               *sql.DB = connectDB()
+	RowsOnLeaderPage uint    = 6
+	PORT                     = getPort()
 )
 
 func connectDB() *sql.DB {
+	pos := os.Getenv("WORKPLACE")
+	if pos == "HEROKU" {
+		return connectDBHEROKU()
+	}
+
+	db, err := sql.Open("sqlite3", "local_bd.db")
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	return db
+}
+
+func connectDBHEROKU() *sql.DB {
 	DB, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err.Error())
 	}
 	log.Println("Database connected!")
 
@@ -51,7 +68,6 @@ func getDBNAme() string {
 	}
 	return dbname
 }
-
 
 func getDBUser() string {
 	dbuser := os.Getenv("DBUSER")
@@ -89,5 +105,3 @@ func getPort() string {
 	}
 	return port
 }
-
-
