@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"log"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -10,6 +9,7 @@ import (
 )
 
 var (
+	Logger      = createGlobalLogger()
 	SECRET      = getSecret()
 	CookieName  = "bang_token"
 	ServerName  = "TheBang server"
@@ -20,6 +20,7 @@ var (
 	DBUSER     = getDBUser()
 	DBPASSWORD = getDBPasswd()
 	DBNAME     = getDBNAme()
+	DBSCHEMA   = getDBschema()
 
 	//connBDStr = " user=" + DBUSER + " dbname="+ DBNAME +" password=" + DBPASSWORD + " sslmode=disable"
 	DB               *sql.DB = connectDB()
@@ -33,21 +34,30 @@ func connectDB() *sql.DB {
 		return connectDBHEROKU()
 	}
 
-	
 	db, err := sql.Open("sqlite3", "local_bd.db")
 	if err != nil {
-		log.Fatalln(err.Error())
+		Logger.Fatal(err.Error())
 	}
+	Logger.Info("SQL: SQLlite3")
+	preRunSQLliteDB(db)
 
 	return db
+}
+
+func getDBschema() string {
+	schema := os.Getenv("DBSCHEMA")
+	if schema != "" {
+		schema += `.`
+	}
+	return schema
 }
 
 func connectDBHEROKU() *sql.DB {
 	DB, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
-		log.Fatalln(err.Error())
+		Logger.Fatal(err.Error())
 	}
-	log.Println("Database connected!")
+	Logger.Info("Database connected!")
 
 	return DB
 }
@@ -55,7 +65,7 @@ func connectDBHEROKU() *sql.DB {
 func getDBPasswd() string {
 	bdpass := os.Getenv("DBPASSWORD")
 	if bdpass == "" {
-		log.Println("There is no DBPASSWORD!")
+		Logger.Warn("There is no DBPASSWORD!")
 		bdpass = "2017"
 	}
 	return bdpass
@@ -64,7 +74,7 @@ func getDBPasswd() string {
 func getDBNAme() string {
 	dbname := os.Getenv("DBNAME")
 	if dbname == "" {
-		log.Println("There is no DBNAME!")
+		Logger.Warn("There is no DBNAME!")
 		dbname = "tp"
 	}
 	return dbname
@@ -73,7 +83,7 @@ func getDBNAme() string {
 func getDBUser() string {
 	dbuser := os.Getenv("DBUSER")
 	if dbuser == "" {
-		log.Println("There is no DBUSER!")
+		Logger.Warn("There is no DBUSER!")
 		dbuser = "postgres"
 	}
 	return dbuser
@@ -82,7 +92,7 @@ func getDBUser() string {
 func getFrontDest() string {
 	dst := os.Getenv("FrontentDst")
 	if dst == "" {
-		log.Println("There is no FrontentDst!")
+		Logger.Warn("There is no FrontentDst!")
 		dst = "http://localhost:3000"
 	}
 	return dst
@@ -91,7 +101,7 @@ func getFrontDest() string {
 func getSecret() []byte {
 	secret := []byte(os.Getenv("SECRET"))
 	if string(secret) == "" {
-		log.Println("There is no SECRET!")
+		Logger.Warn("There is no SECRET!")
 		secret = []byte("secret")
 	}
 
@@ -101,8 +111,29 @@ func getSecret() []byte {
 func getPort() string {
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Println("There is no PORT!")
+		Logger.Warn("There is no PORT!")
 		port = "8090"
 	}
 	return port
 }
+
+func preRunSQLliteDB(db *sql.DB) {
+	_, err := db.Exec(sqlCreateTableSQLlite)
+	if err != nil {
+		Logger.Fatal("preRunDB, table", err.Error())
+	}
+
+}
+
+var sqlCreateTableSQLlite = `create table IF NOT EXISTS ` + DBSCHEMA + `users (
+	id bigserial primary key,
+	nickname varchar(250) unique not null,
+	name varchar(250) null,
+	surname varchar(250) null,
+	dob date null,
+	photo varchar(250) default 'default_img',
+	score bigint default 0,
+	passwd text not null
+  )`
+
+var sqlCreateSchema = `create schema project_bang`
