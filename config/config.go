@@ -17,10 +17,10 @@ var (
 	DefaultImg  = "default_img"
 	// POS = "WORKPLACE" | "HEROKU"
 
-	DBUSER     = getDBUser()
-	DBPASSWORD = getDBPasswd()
-	DBNAME     = getDBNAme()
-	DBSCHEMA   = getDBschema()
+	// DBUSER     = getDBUser()
+	// DBPASSWORD = getDBPasswd()
+	// DBNAME     = getDBNAme()
+	DBSCHEMA = getDBschema()
 
 	//connBDStr = " user=" + DBUSER + " dbname="+ DBNAME +" password=" + DBPASSWORD + " sslmode=disable"
 	DB               *sql.DB = connectDB()
@@ -31,7 +31,8 @@ var (
 func connectDB() *sql.DB {
 	pos := os.Getenv("WORKPLACE")
 	if pos == "HEROKU" {
-		return connectDBHEROKU()
+		bd := connectDBHEROKU()
+		return bd
 	}
 
 	db, err := sql.Open("sqlite3", "local_bd.db")
@@ -40,6 +41,7 @@ func connectDB() *sql.DB {
 	}
 	Logger.Info("SQL: SQLlite3")
 	preRunSQLliteDB(db)
+	Logger.Info("Database connected!")
 
 	return db
 }
@@ -48,11 +50,14 @@ func getDBschema() string {
 	schema := os.Getenv("DBSCHEMA")
 	if schema != "" {
 		schema += `.`
+		return schema
 	}
-	return schema
+	Logger.Warn("There is no DBSCHEMA!")
+	return ""
 }
 
 func connectDBHEROKU() *sql.DB {
+	Logger.Info("SQL: Postgres sql")
 	DB, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		Logger.Fatal(err.Error())
