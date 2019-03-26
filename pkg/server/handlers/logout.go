@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 	"net/http"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 )
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
@@ -14,10 +15,16 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := r.Cookie(config.CookieName)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		config.Logger.Infow("LogoutHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusBadRequest)
 
 		return
 	}
 
 	session.Expires = time.Now().AddDate(0, 0, -1)
 	http.SetCookie(w, session)
+	config.Logger.Infow("LogoutHandler",
+		"RemoteAddr", r.RemoteAddr,
+		"status", http.StatusOK)
 }

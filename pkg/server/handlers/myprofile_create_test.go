@@ -1,32 +1,19 @@
 package handlers
 
 import (
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
+	"github.com/gorilla/mux"
 )
 
 func TestMyProfileCreateHandler(t *testing.T) {
 	path := "/user"
 
-	tt := []TestCase{{`{
-			"nickname": "man",
-			"name": "Ivan",
-			"surname": "Ivanov",
-			"dob": "01.11.1968",
-			"passwd": "tvoe_kakoe_delo"
-		}`, http.StatusCreated},
-		{`{
-			"nickname": "man",
-			"name": "Ivan",
-			"surname": "Ivanov",
-			"dob": "01.11.1968",
-			"passwd": "tvoe_kakoe_delo"
-		}`, http.StatusConflict},
-	}
+	tt := []TestCase{{`{"nickname": "lil", "passwd": "man"}`, http.StatusCreated}}
 
 	for _, tc := range tt {
 		req, err := http.NewRequest("POST", path, strings.NewReader(tc.Body))
@@ -45,7 +32,7 @@ func TestMyProfileCreateHandler(t *testing.T) {
 		}
 	}
 
-	if ok := models.DeleteUser("man"); !ok {
+	if ok := models.DeleteUser("lil"); !ok {
 		t.Fatal("User was not deleted")
 	}
 }

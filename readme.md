@@ -1,12 +1,10 @@
-[![Build Status](https://travis-ci.org/go-park-mail-ru/2019_1_TheBang.svg?branch=develop)](https://travis-ci.org/go-park-mail-ru/2019_1_TheBang)
+[![Build Status](https://travis-ci.org/go-park-mail-ru/2019_1_TheBang.svg?branch=master)](https://travis-ci.org/go-park-mail-ru/2019_1_TheBang)
 
 # TheBang
 ![Dancing Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/dancing-gopher.gif) 
 ![Party Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/party-gopher.gif)
 ![Party Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/party-gopher.gif)
 ![Dancing Gopher](http://static.velvetcache.org/pages/2018/06/13/party-gopher/dancing-gopher.gif) 
-
-
 
 ## Состав:
 - Баронский Андрей - https://github.com/Surfingbird
@@ -18,4 +16,7 @@
 - Сергей Барсуков
 
 ## Мы тут
-- https://the-bang.herokuapp.com
+- https://stormy-fjord-97392.herokuapp.com
+
+## Интеграция с frontend
+- https://my-package-name-atoef01sb.now.sh

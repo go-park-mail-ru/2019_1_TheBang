@@ -1,11 +1,12 @@
 package models
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/go-park-mail-ru/2019_1_TheBang/api"
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 	"golang.org/x/crypto/bcrypt"
-	"log"
-	"net/http"
 )
 
 func hashPasswd(passwd string) string {
@@ -19,10 +20,9 @@ func hashPasswd(passwd string) string {
 	return string(hash)
 }
 
-func CreateUser(s *api.Signup) (profile api.Profile, status int) {
+func CreateUser(s *api.Signup) (status int) {
 	s.Passwd = hashPasswd(s.Passwd)
-
-	_, err := config.DB.Query(SQLInsertUser,
+	_, err := config.DB.Exec(sqlInsertUser,
 		s.Nickname,
 		s.Name,
 		s.Surname,
@@ -30,18 +30,10 @@ func CreateUser(s *api.Signup) (profile api.Profile, status int) {
 		s.Passwd)
 	if err != nil {
 		log.Printf("CreateUser: %v", err.Error())
-		return profile, http.StatusConflict
+		return http.StatusConflict
 	}
 
-	profile = api.Profile{
-		Nickname: s.Nickname,
-		Name:     s.Name,
-		Surname:  s.Surname,
-		DOB:      s.DOB,
-	}
-	profile.Photo = config.DefaultImg
-
-	return profile, http.StatusCreated
+	return http.StatusCreated
 }
 
 func SelectUser(nickname string) (p api.Profile, status int) {
@@ -51,6 +43,7 @@ func SelectUser(nickname string) (p api.Profile, status int) {
 		log.Printf("SelectUser: %v", err.Error())
 		return p, http.StatusBadRequest
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		if err := rows.Scan(&p.Nickname,
@@ -58,8 +51,7 @@ func SelectUser(nickname string) (p api.Profile, status int) {
 			&p.Surname,
 			&p.DOB,
 			&p.Photo,
-			&p.Score);
-		err != nil {
+			&p.Score); err != nil {
 			log.Printf("ProfileHandler: %v\n", err.Error())
 
 			return p, http.StatusInternalServerError
@@ -95,6 +87,7 @@ func CheckUser(nickname, passwd string) bool {
 	if err != nil {
 		return false
 	}
+	defer row.Close()
 
 	if !row.Next() {
 		return false
@@ -103,8 +96,7 @@ func CheckUser(nickname, passwd string) bool {
 	var hash string
 
 	if err := row.Scan(
-		&hash);
-	err != nil {
+		&hash); err != nil {
 		log.Printf("ProfileHandler: %v\n", err.Error())
 
 		return false
@@ -112,7 +104,6 @@ func CheckUser(nickname, passwd string) bool {
 
 	if err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(passwd)); err != nil {
 		log.Printf("ProfileHandler: wrong passwd: %v\n", err.Error())
-
 
 		return false
 	}
@@ -133,9 +124,16 @@ func UpdateUserPhoto(nickname, photo string) bool {
 }
 
 func DeleteUser(nickname string) bool {
-	_, err := config.DB.Query(SQLDeleteUser, nickname)
+	res, err := config.DB.Exec(SQLDeleteUser, nickname)
 	if err != nil {
-		log.Printf("DeleteUser: %v\n")
+		log.Printf("DeleteUser: %v\n", err.Error())
+
+		return false
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows != 1 {
+		log.Printf("DeleteUser, rows: %v\n", rows)
 
 		return false
 	}
@@ -143,28 +141,25 @@ func DeleteUser(nickname string) bool {
 	return true
 }
 
-var SQLInsertUser = `insert into project_bang.users
- 						(nickname, name, surname, dob, passwd)
-    					values ($1, $2, $3, $4, $5)`
+var sqlInsertUser = `insert into ` + config.DBSCHEMA + `users (nickname, name, surname, dob, passwd) values ($1, $2, $3, $4, $5)`
 
 var SQLSeletUser = `select 
 					nickname, name, surname, dob, photo, score	
-					from project_bang.users
+					from ` + config.DBSCHEMA + `users
 					where nickname = $1`
 
-var SQLUpdateUser = `update project_bang.users 
+var SQLUpdateUser = `update ` + config.DBSCHEMA + `users 
 						set (name, surname, dob) = ($1, $2, $3)
 						where nickname = $4`
 
 var SQLCheckUser = `select 
 					passwd	
-					from project_bang.users
+					from ` + config.DBSCHEMA + `users
 					where nickname = $1`
 
-var SQLUpdatePhoto = `update project_bang.users 
+var SQLUpdatePhoto = `update ` + config.DBSCHEMA + `users 
 						set photo = $1
 						where nickname = $2`
 
-var SQLDeleteUser = `delete from project_bang.users
+var SQLDeleteUser = `delete from ` + config.DBSCHEMA + `users
 						where nickname = $1`
-

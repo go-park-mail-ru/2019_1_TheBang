@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"github.com/gorilla/mux"
 	"io/ioutil"
-	"log"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_TheBang/config"
+	"github.com/gorilla/mux"
 )
 
 func GetIconHandler(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +18,10 @@ func GetIconHandler(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("GetIconHandler: we can not read image")
+		config.Logger.Warnw("GetIconHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", "GetIconHandler: we can not read image")
 
 		return
 	}
@@ -25,8 +29,15 @@ func GetIconHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(data)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("GetIconHandler: we can not write image")
+		config.Logger.Warnw("GetIconHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", "GetIconHandler: we can not write image")
 
 		return
 	}
+
+	config.Logger.Infow("GetIconHandler",
+		"RemoteAddr", r.RemoteAddr,
+		"status", http.StatusOK)
 }

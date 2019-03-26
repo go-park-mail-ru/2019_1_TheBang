@@ -704,7 +704,7 @@ func (cn *conn) simpleQuery(q string) (res *rows, err error) {
 			// res might be non-nil here if we received a previous
 			// CommandComplete, but that's fine; just overwrite it
 			res = &rows{cn: cn}
-			res.rowsHeader = parsePortalRowDescribe(r)
+			res.colNames, res.colFmts, res.colTyps = parsePortalRowDescribe(r)
 
 			// To work around a bug in QueryRow in Go 1.2 and earlier, wait
 			// until the first DataRow has been received.
@@ -861,15 +861,17 @@ func (cn *conn) query(query string, args []driver.Value) (_ *rows, err error) {
 		cn.readParseResponse()
 		cn.readBindResponse()
 		rows := &rows{cn: cn}
-		rows.rowsHeader = cn.readPortalDescribeResponse()
+		rows.colNames, rows.colFmts, rows.colTyps = cn.readPortalDescribeResponse()
 		cn.postExecuteWorkaround()
 		return rows, nil
 	}
 	st := cn.prepareTo(query, "")
 	st.exec(args)
 	return &rows{
-		cn:         cn,
-		rowsHeader: st.rowsHeader,
+		cn:       cn,
+		colNames: st.colNames,
+		colTyps:  st.colTyps,
+		colFmts:  st.colFmts,
 	}, nil
 }
 
@@ -1178,10 +1180,12 @@ var colFmtDataAllBinary = []byte{0, 1, 0, 1}
 var colFmtDataAllText = []byte{0, 0}
 
 type stmt struct {
-	cn   *conn
-	name string
-	rowsHeader
+	cn         *conn
+	name       string
+	colNames   []string
+	colFmts    []format
 	colFmtData []byte
+	colTyps    []fieldDesc
 	paramTyps  []oid.Oid
 	closed     bool
 }
@@ -1227,8 +1231,10 @@ func (st *stmt) Query(v []driver.Value) (r driver.Rows, err error) {
 
 	st.exec(v)
 	return &rows{
-		cn:         st.cn,
-		rowsHeader: st.rowsHeader,
+		cn:       st.cn,
+		colNames: st.colNames,
+		colTyps:  st.colTyps,
+		colFmts:  st.colFmts,
 	}, nil
 }
 
@@ -1338,22 +1344,16 @@ func (cn *conn) parseComplete(commandTag string) (driver.Result, string) {
 	return driver.RowsAffected(n), commandTag
 }
 
-type rowsHeader struct {
+type rows struct {
+	cn       *conn
+	finish   func()
 	colNames []string
 	colTyps  []fieldDesc
 	colFmts  []format
-}
-
-type rows struct {
-	cn     *conn
-	finish func()
-	rowsHeader
-	done   bool
-	rb     readBuf
-	result driver.Result
-	tag    string
-
-	next *rowsHeader
+	done     bool
+	rb       readBuf
+	result   driver.Result
+	tag      string
 }
 
 func (rs *rows) Close() error {
@@ -1440,8 +1440,7 @@ func (rs *rows) Next(dest []driver.Value) (err error) {
 			}
 			return
 		case 'T':
-			next := parsePortalRowDescribe(&rs.rb)
-			rs.next = &next
+			rs.colNames, rs.colFmts, rs.colTyps = parsePortalRowDescribe(&rs.rb)
 			return io.EOF
 		default:
 			errorf("unexpected message after execute: %q", t)
@@ -1450,16 +1449,10 @@ func (rs *rows) Next(dest []driver.Value) (err error) {
 }
 
 func (rs *rows) HasNextResultSet() bool {
-	hasNext := rs.next != nil && !rs.done
-	return hasNext
+	return !rs.done
 }
 
 func (rs *rows) NextResultSet() error {
-	if rs.next == nil {
-		return io.EOF
-	}
-	rs.rowsHeader = *rs.next
-	rs.next = nil
 	return nil
 }
 
@@ -1637,13 +1630,13 @@ func (cn *conn) readStatementDescribeResponse() (paramTyps []oid.Oid, colNames [
 	}
 }
 
-func (cn *conn) readPortalDescribeResponse() rowsHeader {
+func (cn *conn) readPortalDescribeResponse() (colNames []string, colFmts []format, colTyps []fieldDesc) {
 	t, r := cn.recv1()
 	switch t {
 	case 'T':
 		return parsePortalRowDescribe(r)
 	case 'n':
-		return rowsHeader{}
+		return nil, nil, nil
 	case 'E':
 		err := parseError(r)
 		cn.readReadyForQuery()
@@ -1749,11 +1742,11 @@ func parseStatementRowDescribe(r *readBuf) (colNames []string, colTyps []fieldDe
 	return
 }
 
-func parsePortalRowDescribe(r *readBuf) rowsHeader {
+func parsePortalRowDescribe(r *readBuf) (colNames []string, colFmts []format, colTyps []fieldDesc) {
 	n := r.int16()
-	colNames := make([]string, n)
-	colFmts := make([]format, n)
-	colTyps := make([]fieldDesc, n)
+	colNames = make([]string, n)
+	colFmts = make([]format, n)
+	colTyps = make([]fieldDesc, n)
 	for i := range colNames {
 		colNames[i] = r.string()
 		r.next(6)
@@ -1762,11 +1755,7 @@ func parsePortalRowDescribe(r *readBuf) rowsHeader {
 		colTyps[i].Mod = r.int32()
 		colFmts[i] = format(r.int16())
 	}
-	return rowsHeader{
-		colNames: colNames,
-		colFmts:  colFmts,
-		colTyps:  colTyps,
-	}
+	return
 }
 
 // parseEnviron tries to mimic some of libpq's environment handling
