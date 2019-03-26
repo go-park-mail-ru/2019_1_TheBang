@@ -18,4 +18,7 @@
 - Сергей Барсуков
 
 ## Мы тут
-- https://the-bang.herokuapp.com
+- https://stormy-fjord-97392.herokuapp.com
+
+## Интеграция с frontend
+- https://my-package-name-atoef01sb.now.sh
