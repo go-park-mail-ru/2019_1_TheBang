@@ -67,6 +67,7 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		config.Logger.Warnw("MyProfileInfoUpdateHandler",
 			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
 			"warn", "can not update valid user's info")
 
 		return

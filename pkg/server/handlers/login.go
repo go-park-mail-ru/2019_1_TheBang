@@ -2,14 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-park-mail-ru/2019_1_TheBang/api"
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"time"
 )
 
 func LogInHandler(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +18,10 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("LogInHandler: %v\n", err.Error())
+		config.Logger.Warnw("LogoutHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", err.Error())
 
 		return
 	}
@@ -26,7 +29,10 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &login)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("LogInHandler: %v\n", err.Error())
+		config.Logger.Warnw("LogoutHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", err.Error())
 
 		return
 	}
@@ -34,6 +40,9 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	ss, status := LoginAcount(login.Nickname, login.Passwd)
 	if status != http.StatusOK {
 		w.WriteHeader(status)
+		config.Logger.Warnw("LogoutHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", status)
 
 		return
 	}
@@ -51,7 +60,10 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	prof, status := models.SelectUser(login.Nickname)
 	if status != http.StatusOK {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("LogInHandler, can not search loged user, statsu: %v\n", status)
+		config.Logger.Warnw("LogoutHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", "Can not find valid user")
 
 		return
 	}
@@ -59,13 +71,15 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(prof)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
+		config.Logger.Warnw("LogoutHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", err.Error())
 
 		return
 	}
 
-	}
-
+}
 
 func LoginAcount(username, passwd string) (ss string, status int) {
 	ok := models.CheckUser(username, passwd)
@@ -83,7 +97,8 @@ func LoginAcount(username, passwd string) (ss string, status int) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	ss, err := token.SignedString(config.SECRET)
 	if err != nil {
-		log.Printf("Error with JWT tocken generation: %v\n", err.Error())
+		config.Logger.Warnw("LoginAcount",
+			"Error with JWT tocken generation:", err.Error())
 
 		return ss, http.StatusInternalServerError
 	}

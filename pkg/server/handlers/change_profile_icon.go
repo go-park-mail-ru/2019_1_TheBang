@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"os"
 
@@ -16,10 +15,6 @@ import (
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	var status = http.StatusOK
-	// toDo будет ли работать?
-	defer config.Logger.Infow("MyProfileCreateHandler",
-		"RemoteAddr", r.RemoteAddr,
-		"status", status)
 
 	if r.Method == "OPTIONS" {
 		return
@@ -48,7 +43,9 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("photo")
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		log.Println("image was failed in form!")
+		config.Logger.Infow("GetIconHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusUnprocessableEntity)
 
 		return
 	}
@@ -57,7 +54,9 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	filein, err := header.Open()
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		log.Println("image was failed in form!")
+		config.Logger.Infow("GetIconHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusUnprocessableEntity)
 
 		return
 	}
@@ -67,7 +66,10 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = io.Copy(hasher, file)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
+		config.Logger.Warnw("GetIconHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", err.Error())
 
 		return
 	}
@@ -76,7 +78,10 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	fileout, err := os.OpenFile("tmp/"+filename, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("ChangeProfileAvatarHandler: ", "file for img was not created!")
+		config.Logger.Warnw("GetIconHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", "file for img was not created!")
 
 		return
 	}
@@ -85,7 +90,10 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	_, err = io.Copy(fileout, filein)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("ChangeProfileAvatarHandler: ", "img was not saved on disk!")
+		config.Logger.Warnw("GetIconHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", "img was not saved on disk!")
 
 		return
 	}
@@ -93,7 +101,10 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	ok = models.UpdateUserPhoto(nickname, filename)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println("ChangeProfileAvatarHandler: ", "can not update photo name with sql!")
+		config.Logger.Warnw("GetIconHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", "can not update photo name with sql!")
 
 		return
 	}
@@ -104,10 +115,16 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(profile)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
+		config.Logger.Warnw("GetIconHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", err.Error())
 
 		return
 	}
+	config.Logger.Infow("GetIconHandler",
+		"RemoteAddr", r.RemoteAddr,
+		"status", http.StatusOK)
 }
 
 func deletePhoto(filename string) {
@@ -117,7 +134,9 @@ func deletePhoto(filename string) {
 
 	err := os.Remove("tmp/" + filename)
 	if err != nil {
-		log.Printf("Can not remove file tmp/%v\n", filename)
+		config.Logger.Warnw("GetIconHandler",
+			"filename", filename,
+			"warn", err.Error())
 
 		return
 	}

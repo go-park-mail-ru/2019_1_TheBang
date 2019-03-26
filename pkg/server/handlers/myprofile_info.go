@@ -24,6 +24,9 @@ func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 	nickname, status := NicknameFromCookie(token)
 	if status == http.StatusInternalServerError {
 		w.WriteHeader(status)
+		config.Logger.Warnw("MyProfileInfoHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError)
 
 		return
 	}
@@ -52,7 +55,8 @@ func NicknameFromCookie(token *jwt.Token) (nickname string, status int) {
 		nickname = claims["nickname"].(string)
 	} else {
 		status = http.StatusInternalServerError
-		log.Println("MyProfileInfoHandler: Error with parsing token's claims")
+		config.Logger.Warnw("NicknameFromCookie",
+			"warn", "Error with parsing token's claims")
 
 		return nickname, status
 	}

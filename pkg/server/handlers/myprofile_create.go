@@ -15,7 +15,10 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Fatal(err.Error())
+		config.Logger.Warnw("MyProfileCreateHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", "can not read body")
 
 		return
 	}
@@ -23,7 +26,10 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &signup)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Fatal(err.Error())
+		config.Logger.Warnw("MyProfileCreateHandler",
+			"RemoteAddr", r.RemoteAddr,
+			"status", http.StatusInternalServerError,
+			"warn", "can not marshal json")
 
 		return
 	}
