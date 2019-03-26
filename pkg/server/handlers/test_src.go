@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/go-park-mail-ru/2019_1_TheBang/api"
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"net/http/httptest"
+
+	"github.com/go-park-mail-ru/2019_1_TheBang/api"
+	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
+	"github.com/gorilla/mux"
 )
 
 type TestCase struct {
@@ -22,10 +23,10 @@ var testAdminNick = "testadmin"
 func GetTESTAdminCookie() (*http.Cookie, error) {
 	prof := api.Signup{
 		Nickname: testAdminNick,
-		Name: testAdminNick,
-		Surname: testAdminNick,
-		DOB: "2017-01-01",
-		Passwd: testAdminNick,
+		Name:     testAdminNick,
+		Surname:  testAdminNick,
+		DOB:      "2017-01-01",
+		Passwd:   testAdminNick,
 	}
 
 	body, _ := json.Marshal(prof)
@@ -44,7 +45,7 @@ func GetTESTAdminCookie() (*http.Cookie, error) {
 
 	login := api.Login{
 		Nickname: testAdminNick,
-		Passwd: testAdminNick,
+		Passwd:   testAdminNick,
 	}
 
 	body, _ = json.Marshal(login)
@@ -61,6 +62,7 @@ func GetTESTAdminCookie() (*http.Cookie, error) {
 	router.HandleFunc(path, LogInHandler)
 	router.ServeHTTP(rr, req)
 
+	// toDO сделать проверку на этот момент (есть ли кука)
 	cookie := rr.Result().Cookies()[0]
 
 	return cookie, nil
@@ -68,8 +70,7 @@ func GetTESTAdminCookie() (*http.Cookie, error) {
 
 func DeleteTESTAdmin() {
 	ok := models.DeleteUser(testAdminNick)
-	if !ok  {
+	if !ok {
 		log.Fatal("Can not delete testAdmin!")
 	}
 }
-

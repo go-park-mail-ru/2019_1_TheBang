@@ -3,18 +3,21 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_TheBang/api"
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-park-mail-ru/2019_1_TheBang/api"
+	"github.com/gorilla/mux"
 )
 
 func TestLogInHandlerFAIL(t *testing.T) {
 	path := "/auth"
+
+	fakeNick := "smbdy"
 	bodyStruct := api.Login{
-		Passwd: testAdminNick,
-		Nickname: testAdminNick,
+		Passwd:   fakeNick,
+		Nickname: fakeNick,
 	}
 	body, _ := json.Marshal(bodyStruct)
 
@@ -29,7 +32,7 @@ func TestLogInHandlerFAIL(t *testing.T) {
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusUnauthorized {
-		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n",  http.StatusUnauthorized, rr.Code)
+		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n", http.StatusUnauthorized, rr.Code)
 	}
 }
 
@@ -42,7 +45,7 @@ func TestLogInHandlerSUCCESS(t *testing.T) {
 
 	path := "/auth"
 	bodyStruct := api.Login{
-		Passwd: testAdminNick,
+		Passwd:   testAdminNick,
 		Nickname: testAdminNick,
 	}
 	body, _ := json.Marshal(bodyStruct)
@@ -59,8 +62,6 @@ func TestLogInHandlerSUCCESS(t *testing.T) {
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {
-		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n",  http.StatusOK, rr.Code)
+		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n", http.StatusOK, rr.Code)
 	}
 }
-
-

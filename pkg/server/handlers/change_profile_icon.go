@@ -4,18 +4,23 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/auth"
-
-	//"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/auth"
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/go-park-mail-ru/2019_1_TheBang/config"
+	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/auth"
+	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
 )
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
+	var status = http.StatusOK
+	// toDo будет ли работать?
+	defer config.Logger.Infow("MyProfileCreateHandler",
+		"RemoteAddr", r.RemoteAddr,
+		"status", status)
+
 	if r.Method == "OPTIONS" {
 		return
 	}

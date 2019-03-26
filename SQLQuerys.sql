@@ -1,6 +1,6 @@
-create schema project_bang;
+create IF NOT EXISTS schema project_bang;
 
-create table project_bang.users (
+create table IF NOT EXISTS project_bang.users (
   id bigserial primary key,
   nickname citext unique not null,
   name citext null,

@@ -1,15 +1,15 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/handlers"
 	"github.com/gorilla/mux"
-	"log"
-	"net/http"
 )
 
 func main() {
-
+	defer config.Logger.Sync()
 
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
@@ -24,11 +24,11 @@ func main() {
 	r.HandleFunc("/user", handlers.MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
 
 	r.HandleFunc("/user/avatar", handlers.ChangeProfileAvatarHandler).Methods("POST", "OPTIONS")
-	
+
 	r.HandleFunc("/icon/{filename}", handlers.GetIconHandler).Methods("GET")
 
-	log.Println(config.FrontentDst)
-	log.Fatal(http.ListenAndServe(":" + config.PORT, r))
+	config.Logger.Infof("FrontentDst: %v", config.FrontentDst)
+	config.Logger.Fatal(http.ListenAndServe(":"+config.PORT, r))
 }
 
 func commonMiddleware(next http.Handler) http.Handler {

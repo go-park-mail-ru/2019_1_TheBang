@@ -127,9 +127,9 @@ func preRunSQLliteDB(db *sql.DB) {
 
 var sqlCreateTableSQLlite = `create table IF NOT EXISTS ` + DBSCHEMA + `users (
 	id bigserial primary key,
-	nickname varchar(250) unique not null,
-	name varchar(250) null,
-	surname varchar(250) null,
+	nickname citext unique not null,
+	name citext null,
+	surname citext null,
 	dob date null,
 	photo varchar(250) default 'default_img',
 	score bigint default 0,
