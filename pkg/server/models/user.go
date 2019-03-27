@@ -3,6 +3,7 @@ package models
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-park-mail-ru/2019_1_TheBang/api"
 	"github.com/go-park-mail-ru/2019_1_TheBang/config"
@@ -109,6 +110,21 @@ func CheckUser(nickname, passwd string) bool {
 	}
 
 	return true
+}
+
+func DeletePhoto(filename string) {
+	if filename == config.DefaultImg {
+		return
+	}
+
+	err := os.Remove("tmp/" + filename)
+	if err != nil {
+		config.Logger.Warnw("GetIconHandler",
+			"filename", filename,
+			"warn", err.Error())
+
+		return
+	}
 }
 
 func UpdateUserPhoto(nickname, photo string) bool {

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"bytes"
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -10,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 )
 
 func TestChangeProfileAvatarHandler(t *testing.T) {

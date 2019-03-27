@@ -20,13 +20,8 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, ok := auth.CheckTocken(r)
-	if !ok {
-		w.WriteHeader(http.StatusForbidden)
-
-		return
-	}
-	nickname, status := NicknameFromCookie(token)
+	token := auth.TokenFromCookie(r)
+	nickname, status := auth.NicknameFromCookie(token)
 	if status == http.StatusInternalServerError {
 		w.WriteHeader(status)
 
@@ -92,7 +87,7 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ok = models.UpdateUserPhoto(nickname, filename)
+	ok := models.UpdateUserPhoto(nickname, filename)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		config.Logger.Warnw("GetIconHandler",
@@ -103,7 +98,7 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	deletePhoto(profile.Photo)
+	models.DeletePhoto(profile.Photo)
 	profile.Photo = filename
 
 	err = json.NewEncoder(w).Encode(profile)
@@ -112,21 +107,6 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		config.Logger.Warnw("GetIconHandler",
 			"RemoteAddr", r.RemoteAddr,
 			"status", http.StatusInternalServerError,
-			"warn", err.Error())
-
-		return
-	}
-}
-
-func deletePhoto(filename string) {
-	if filename == config.DefaultImg {
-		return
-	}
-
-	err := os.Remove("tmp/" + filename)
-	if err != nil {
-		config.Logger.Warnw("GetIconHandler",
-			"filename", filename,
 			"warn", err.Error())
 
 		return

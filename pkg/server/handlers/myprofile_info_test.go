@@ -1,10 +1,12 @@
 package handlers
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/middlewares"
+	"github.com/gorilla/mux"
 )
 
 func TestMyProfileInfoHandlerSUCCESS(t *testing.T) {
@@ -24,7 +26,7 @@ func TestMyProfileInfoHandlerSUCCESS(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, MyProfileInfoHandler)
+	router.HandleFunc(path, middlewares.AuthMiddleware(MyProfileInfoHandler))
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {
@@ -43,10 +45,10 @@ func TestMyProfileInfoHandlerFAIL(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, MyProfileInfoHandler)
+	router.HandleFunc(path, middlewares.AuthMiddleware(MyProfileInfoHandler))
 	router.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusForbidden {
+	if rr.Code != http.StatusUnauthorized {
 		t.Errorf("TestMyProfileInfoHandler: we should not get data withput cookie! have: %v, expected: %v",
 			rr.Code, http.StatusOK)
 	}

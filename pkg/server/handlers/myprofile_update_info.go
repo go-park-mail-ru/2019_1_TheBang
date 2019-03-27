@@ -16,13 +16,8 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, ok := auth.CheckTocken(r)
-	if !ok {
-		w.WriteHeader(http.StatusForbidden)
-
-		return
-	}
-	nickname, status := NicknameFromCookie(token)
+	token := auth.TokenFromCookie(r)
+	nickname, status := auth.NicknameFromCookie(token)
 	if status == http.StatusInternalServerError {
 		w.WriteHeader(status)
 		config.Logger.Warnw("MyProfileInfoUpdateHandler",
@@ -43,7 +38,7 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	//toDo жду от фронтами
+	//toDo жду от фронта
 	update.DOB = "2018-01-01"
 
 	err = json.Unmarshal(body, &update)

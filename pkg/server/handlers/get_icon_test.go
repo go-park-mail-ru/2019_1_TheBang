@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gorilla/mux"
 )
 
 func TestGetIconHandlerSuccess(t *testing.T) {
@@ -15,7 +16,7 @@ func TestGetIconHandlerSuccess(t *testing.T) {
 		t.Fatal(err)
 	}
 	req = mux.SetURLVars(req, map[string]string{
-		"filename" : "default_img",
+		"filename": "default_img",
 	})
 
 	rr := httptest.NewRecorder()
@@ -23,10 +24,9 @@ func TestGetIconHandlerSuccess(t *testing.T) {
 
 	if rr.Code != http.StatusOK {
 		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n",
-			http.StatusOK , rr.Code)
+			http.StatusOK, rr.Code)
 	}
 }
-
 
 func TestGetIconHandlerFAIL(t *testing.T) {
 	path := "/icon/blablabla"
@@ -36,7 +36,7 @@ func TestGetIconHandlerFAIL(t *testing.T) {
 		t.Fatal(err)
 	}
 	req = mux.SetURLVars(req, map[string]string{
-		"filename" : "blablabla",
+		"filename": "blablabla",
 	})
 
 	rr := httptest.NewRecorder()
@@ -44,6 +44,6 @@ func TestGetIconHandlerFAIL(t *testing.T) {
 
 	if rr.Code != http.StatusInternalServerError {
 		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n",
-			http.StatusInternalServerError , rr.Code)
+			http.StatusInternalServerError, rr.Code)
 	}
 }

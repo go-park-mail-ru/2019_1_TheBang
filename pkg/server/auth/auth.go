@@ -2,11 +2,39 @@ package auth
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 	"log"
 	"net/http"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 )
+
+func TokenFromCookie(r *http.Request) *jwt.Token {
+	cookie, _ := r.Cookie(config.CookieName)
+	tokenStr := cookie.Value
+	token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return config.SECRET, nil
+	})
+	return token
+}
+
+func NicknameFromCookie(token *jwt.Token) (nickname string, status int) {
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		nickname = claims["nickname"].(string)
+	} else {
+		status = http.StatusInternalServerError
+		config.Logger.Warnw("NicknameFromCookie",
+			"warn", "Error with parsing token's claims")
+
+		return nickname, status
+	}
+
+	return nickname, http.StatusOK
+}
 
 func CheckTocken(r *http.Request) (token *jwt.Token, ok bool) {
 	cookie, err := r.Cookie(config.CookieName)

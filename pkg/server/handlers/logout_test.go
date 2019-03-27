@@ -1,10 +1,12 @@
 package handlers
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/middlewares"
+	"github.com/gorilla/mux"
 )
 
 func TestLogoutHandlerFAIL(t *testing.T) {
@@ -16,11 +18,11 @@ func TestLogoutHandlerFAIL(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, LogoutHandler)
+	router.HandleFunc(path, middlewares.AuthMiddleware(LogoutHandler))
 	router.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusBadRequest {
-		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n",  http.StatusBadRequest, rr.Code)
+	if rr.Code != http.StatusUnauthorized {
+		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n", http.StatusUnauthorized, rr.Code)
 	}
 }
 
@@ -40,7 +42,7 @@ func TestLogoutHandlerSUCCESS(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, LogoutHandler)
+	router.HandleFunc(path, middlewares.AuthMiddleware(LogoutHandler))
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {
