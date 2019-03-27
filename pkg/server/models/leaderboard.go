@@ -25,7 +25,8 @@ func LeaderPage(number uint) (jsonData []byte, status int) {
 			&p.Surname,
 			&p.DOB,
 			&p.Photo,
-			&p.Score); err != nil {
+			&p.Score);
+		err != nil {
 			log.Printf("LeaderPage: %v\n", err.Error())
 
 			return jsonData, http.StatusInternalServerError
