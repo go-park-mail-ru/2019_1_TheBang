@@ -41,15 +41,9 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	status := models.CreateUser(&signup)
 	if status != http.StatusCreated {
 		w.WriteHeader(status)
-		config.Logger.Infow("MyProfileCreateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", status)
 
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	config.Logger.Infow("MyProfileCreateHandler",
-		"RemoteAddr", r.RemoteAddr,
-		"status", http.StatusCreated)
 }

@@ -36,8 +36,4 @@ func GetIconHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	config.Logger.Infow("GetIconHandler",
-		"RemoteAddr", r.RemoteAddr,
-		"status", http.StatusOK)
 }

@@ -19,13 +19,6 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	token, ok := auth.CheckTocken(r)
 	if !ok {
 		w.WriteHeader(http.StatusForbidden)
-		config.Logger.Infow("MyProfileInfoUpdateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusForbidden)
-
-		config.Logger.Warnw("MyProfileInfoUpdateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"warning", "User with not valid cookie")
 
 		return
 	}
@@ -45,7 +38,8 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		config.Logger.Warnw("MyProfileInfoUpdateHandler",
 			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError)
+			"status", http.StatusInternalServerError,
+			"warn", err.Error())
 
 		return
 	}

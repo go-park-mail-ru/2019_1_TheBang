@@ -15,9 +15,6 @@ func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 	token, ok := auth.CheckTocken(r)
 	if !ok {
 		w.WriteHeader(http.StatusForbidden)
-		config.Logger.Infow("MyProfileInfoUpdateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusForbidden)
 
 		return
 	}
@@ -34,9 +31,6 @@ func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 	profile, status := models.SelectUser(nickname)
 	if status != http.StatusOK {
 		w.WriteHeader(status)
-		config.Logger.Infow("MyProfileInfoUpdateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", status)
 
 		return
 	}

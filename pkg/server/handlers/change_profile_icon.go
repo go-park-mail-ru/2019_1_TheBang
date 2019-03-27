@@ -43,9 +43,6 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("photo")
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		config.Logger.Infow("GetIconHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusUnprocessableEntity)
 
 		return
 	}
@@ -54,9 +51,6 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 	filein, err := header.Open()
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		config.Logger.Infow("GetIconHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusUnprocessableEntity)
 
 		return
 	}
@@ -122,9 +116,6 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	config.Logger.Infow("GetIconHandler",
-		"RemoteAddr", r.RemoteAddr,
-		"status", http.StatusOK)
 }
 
 func deletePhoto(filename string) {

@@ -40,9 +40,6 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 	ss, status := LoginAcount(login.Nickname, login.Passwd)
 	if status != http.StatusOK {
 		w.WriteHeader(status)
-		config.Logger.Warnw("LogoutHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", status)
 
 		return
 	}
