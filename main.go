@@ -11,6 +11,10 @@ import (
 
 func main() {
 	defer config.Logger.Sync()
+	err := config.DB.Ping()
+	if err != nil {
+		config.Logger.Fatal("Can not start connection with database")
+	}
 
 	r := mux.NewRouter()
 	r.Use(middlewares.AccessLogMiddleware, middlewares.CommonMiddleware)
