@@ -30,7 +30,9 @@ func CreateUser(s *api.Signup) (status int) {
 		s.DOB,
 		s.Passwd)
 	if err != nil {
-		log.Printf("CreateUser: %v", err.Error())
+		config.Logger.Warnw("CreateUser",
+			"warn", err.Error())
+
 		return http.StatusConflict
 	}
 
@@ -41,7 +43,9 @@ func SelectUser(nickname string) (p api.Profile, status int) {
 	rows, err := config.DB.Query(SQLSeletUser,
 		nickname)
 	if err != nil {
-		log.Printf("SelectUser: %v", err.Error())
+		config.Logger.Warnw("SelectUser",
+			"warn", err.Error())
+
 		return p, http.StatusBadRequest
 	}
 	defer rows.Close()
@@ -53,7 +57,8 @@ func SelectUser(nickname string) (p api.Profile, status int) {
 			&p.DOB,
 			&p.Photo,
 			&p.Score); err != nil {
-			log.Printf("ProfileHandler: %v\n", err.Error())
+			config.Logger.Warnw("SelectUser",
+				"warn", err.Error())
 
 			return p, http.StatusInternalServerError
 		}
@@ -69,7 +74,8 @@ func UpdateUser(nickname string, u api.Update) (p api.Profile, status int) {
 		u.DOB,
 		nickname)
 	if err != nil {
-		log.Printf("UpdateUser: %v", err.Error())
+		config.Logger.Warnw("UpdateUser",
+			"warn", err.Error())
 
 		return p, http.StatusBadRequest
 	}
@@ -98,13 +104,15 @@ func CheckUser(nickname, passwd string) bool {
 
 	if err := row.Scan(
 		&hash); err != nil {
-		log.Printf("ProfileHandler: %v\n", err.Error())
+		config.Logger.Warnw("CheckUser",
+			"warn", err.Error())
 
 		return false
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(passwd)); err != nil {
-		log.Printf("ProfileHandler: wrong passwd: %v\n", err.Error())
+		config.Logger.Warnw("CheckUser",
+			"warn", err.Error())
 
 		return false
 	}
@@ -120,7 +128,6 @@ func DeletePhoto(filename string) {
 	err := os.Remove("tmp/" + filename)
 	if err != nil {
 		config.Logger.Warnw("GetIconHandler",
-			"filename", filename,
 			"warn", err.Error())
 
 		return
@@ -131,7 +138,8 @@ func UpdateUserPhoto(nickname, photo string) bool {
 	_, err := config.DB.Query(SQLUpdatePhoto,
 		photo, nickname)
 	if err != nil {
-		log.Printf("UpdateUserPhoto: %v\n")
+		config.Logger.Warnw("UpdateUserPhoto",
+			"warn", err.Error())
 
 		return false
 	}
@@ -142,14 +150,16 @@ func UpdateUserPhoto(nickname, photo string) bool {
 func DeleteUser(nickname string) bool {
 	res, err := config.DB.Exec(SQLDeleteUser, nickname)
 	if err != nil {
-		log.Printf("DeleteUser: %v\n", err.Error())
+		config.Logger.Warnw("DeleteUser",
+			"warn", err.Error())
 
 		return false
 	}
 
 	rows, _ := res.RowsAffected()
 	if rows != 1 {
-		log.Printf("DeleteUser, rows: %v\n", rows)
+		config.Logger.Warnw("DeleteUser",
+			"warn", "wrong count affected rows")
 
 		return false
 	}

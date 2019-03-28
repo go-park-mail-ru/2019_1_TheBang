@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2019_1_TheBang/api"
@@ -13,7 +12,9 @@ func LeaderPage(number uint) (jsonData []byte, status int) {
 	offset := config.RowsOnLeaderPage * (number - 1)
 	rows, err := config.DB.Query(SQLGetPage, config.RowsOnLeaderPage, offset)
 	if err != nil {
-		log.Printf("LeaderPage: %v\n")
+		config.Logger.Warnw("LeaderPage",
+			"warn", err.Error())
+
 		return jsonData, http.StatusInternalServerError
 	}
 
@@ -25,9 +26,9 @@ func LeaderPage(number uint) (jsonData []byte, status int) {
 			&p.Surname,
 			&p.DOB,
 			&p.Photo,
-			&p.Score);
-		err != nil {
-			log.Printf("LeaderPage: %v\n", err.Error())
+			&p.Score); err != nil {
+			config.Logger.Warnw("LeaderPage",
+				"warn", err.Error())
 
 			return jsonData, http.StatusInternalServerError
 		}
@@ -41,7 +42,8 @@ func LeaderPage(number uint) (jsonData []byte, status int) {
 
 	jsonData, err = json.Marshal(profs)
 	if err != nil {
-		log.Printf("LeaderPage: %v", err.Error())
+		config.Logger.Warnw("LeaderPage",
+			"warn", err.Error())
 
 		return jsonData, http.StatusInternalServerError
 	}
