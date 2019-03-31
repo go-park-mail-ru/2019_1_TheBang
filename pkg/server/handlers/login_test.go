@@ -7,7 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/api"
+	"2019_1_TheBang/api"
+
 	"github.com/gorilla/mux"
 )
 

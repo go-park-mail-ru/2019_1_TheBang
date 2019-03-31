@@ -6,7 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
+	"2019_1_TheBang/pkg/server/models"
+
 	"github.com/gorilla/mux"
 )
 

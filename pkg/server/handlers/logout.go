@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
+	"2019_1_TheBang/config"
 )
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {

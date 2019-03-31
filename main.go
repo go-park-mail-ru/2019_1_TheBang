@@ -3,9 +3,10 @@ package main
 import (
 	"net/http"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/middlewares"
+	"2019_1_TheBang/config"
+	"2019_1_TheBang/pkg/server/handlers"
+	"2019_1_TheBang/pkg/server/middlewares"
+
 	"github.com/gorilla/mux"
 )
 

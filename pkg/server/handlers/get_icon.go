@@ -4,7 +4,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
+	"2019_1_TheBang/config"
+
 	"github.com/gorilla/mux"
 )
 

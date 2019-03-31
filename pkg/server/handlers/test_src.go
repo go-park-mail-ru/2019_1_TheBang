@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/api"
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/models"
+	"2019_1_TheBang/api"
+	"2019_1_TheBang/pkg/server/models"
+
 	"github.com/gorilla/mux"
 )
 

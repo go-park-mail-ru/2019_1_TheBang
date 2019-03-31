@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/auth"
+	"2019_1_TheBang/config"
+	"2019_1_TheBang/pkg/server/auth"
 )
 
 func AccessLogMiddleware(next http.Handler) http.Handler {

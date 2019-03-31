@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
+	"2019_1_TheBang/config"
 )
 
 func TestChangeProfileAvatarHandler(t *testing.T) {

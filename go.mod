@@ -1,4 +1,4 @@
-module github.com/go-park-mail-ru/2019_1_TheBang
+module 2019_1_TheBang
 
 go 1.12
 

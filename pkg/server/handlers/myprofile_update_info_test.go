@@ -6,7 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/middlewares"
+	"2019_1_TheBang/pkg/server/middlewares"
+
 	"github.com/gorilla/mux"
 )
 

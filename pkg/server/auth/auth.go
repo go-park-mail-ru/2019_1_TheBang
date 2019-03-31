@@ -5,8 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"2019_1_TheBang/config"
+
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
 )
 
 func TokenFromCookie(r *http.Request) *jwt.Token {
