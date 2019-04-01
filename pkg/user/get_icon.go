@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"2019_1_TheBang/config"
+	"os"
+	"fmt"
 
 	"github.com/gorilla/mux"
 )
@@ -15,7 +17,10 @@ func GetIconHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	filename := vars["filename"]
 
-	filepath := "tmp/" + filename
+	root, _ := os.Getwd()
+	fmt.Println(root)
+
+	filepath := root + "/tmp/" + filename
 	data, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
