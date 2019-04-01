@@ -1,2 +1,9 @@
-.idea
 local_bd.db
+.DS_Store
+.idea/
+local_bd.db
+pkg/test/local_bd.db
+pkg/test/tmp/
+tmp/2ca04eb30c557d665822679f4798a561
+tmp/5d872eba4dbf9a0f2bec56153249f535
+tmp/5f0f19d0258f3f429023115b1a084d7e
