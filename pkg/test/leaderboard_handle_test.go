@@ -1,4 +1,4 @@
-package leaderboard
+package test
 
 import (
 	"net/http"
@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"2019_1_TheBang/api"
+	"2019_1_TheBang/pkg/leaderboard"
 	"2019_1_TheBang/pkg/user"
-	
 
 	"github.com/gorilla/mux"
 )
@@ -35,7 +35,7 @@ func TestLeaderbordHandlerSUCCESS(t *testing.T) {
 	})
 
 	rr := httptest.NewRecorder()
-	LeaderbordHandler(rr, req)
+	leaderboard.LeaderbordHandler(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Errorf("TestLeaderbordHandler: expected %v, have %v!\n", http.StatusOK, rr.Code)
@@ -53,7 +53,7 @@ func TestLeaderbordHandlerFAIL(t *testing.T) {
 	})
 
 	rr := httptest.NewRecorder()
-	LeaderbordHandler(rr, req)
+	leaderboard.LeaderbordHandler(rr, req)
 
 	if rr.Code != http.StatusBadRequest {
 		t.Errorf("TestLeaderbordHandler: expected %v, have %v!\n", http.StatusBadRequest, rr.Code)

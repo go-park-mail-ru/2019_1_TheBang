@@ -1,35 +1,25 @@
-package login
+package test
 
 import (
-	"bytes"
-	"encoding/json"
+	"2019_1_TheBang/pkg/logout"
+	"2019_1_TheBang/pkg/middleware"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"2019_1_TheBang/api"
-
 	"github.com/gorilla/mux"
 )
 
-func TestLogInHandlerFAIL(t *testing.T) {
+func TestLogoutHandlerFAIL(t *testing.T) {
 	path := "/auth"
-
-	fakeNick := "smbdy"
-	bodyStruct := api.Login{
-		Passwd:   fakeNick,
-		Nickname: fakeNick,
-	}
-	body, _ := json.Marshal(bodyStruct)
-
-	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	req, err := http.NewRequest("DELETE", path, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, LogInHandler)
+	router.HandleFunc(path, middleware.AuthMiddleware(logout.LogoutHandler))
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusUnauthorized {
@@ -37,7 +27,7 @@ func TestLogInHandlerFAIL(t *testing.T) {
 	}
 }
 
-func TestLogInHandlerSUCCESS(t *testing.T) {
+func TestLogoutHandlerSUCCESS(t *testing.T) {
 	cookie, err := GetTESTAdminCookie()
 	if err != nil {
 		t.Fatal(err.Error())
@@ -45,13 +35,7 @@ func TestLogInHandlerSUCCESS(t *testing.T) {
 	defer DeleteTESTAdmin()
 
 	path := "/auth"
-	bodyStruct := api.Login{
-		Passwd:   testAdminNick,
-		Nickname: testAdminNick,
-	}
-	body, _ := json.Marshal(bodyStruct)
-
-	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	req, err := http.NewRequest("DELETE", path, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +43,7 @@ func TestLogInHandlerSUCCESS(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, LogInHandler)
+	router.HandleFunc(path, middleware.AuthMiddleware(logout.LogoutHandler))
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {

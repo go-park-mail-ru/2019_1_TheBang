@@ -9,10 +9,11 @@ import (
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if _, ok := CheckTocken(r); !ok {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
+		// Todo решить пробелму с получением куки
+		// if _, ok := CheckTocken(r); !ok {
+		// 	w.WriteHeader(http.StatusUnauthorized)
+		// 	return
+		// }
 
 		next(w, r)
 	}
