@@ -40,7 +40,8 @@ func NicknameFromCookie(token *jwt.Token) (nickname string, status int) {
 func CheckTocken(r *http.Request) (token *jwt.Token, ok bool) {
 	cookie, err := r.Cookie(config.CookieName)
 	if err != nil {
-		log.Printf("CheckTocken: %v", err.Error())
+		config.Logger.Warnw("CheckTocken",
+			"warn", err.Error())
 		return nil, false
 	}
 
