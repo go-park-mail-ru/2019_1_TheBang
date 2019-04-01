@@ -6,8 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"2019_1_TheBang/pkg/server/middlewares"
-
 	"github.com/gorilla/mux"
 )
 
@@ -28,7 +26,7 @@ func TestMyProfileInfoUpdateHandlerSUCCESS(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, middlewares.AuthMiddleware(MyProfileInfoUpdateHandler))
+	router.HandleFunc(path, AuthMiddleware(MyProfileInfoUpdateHandler))
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {
@@ -46,7 +44,7 @@ func TestMyProfileInfoUpdateHandlerFAIL(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, middlewares.AuthMiddleware(MyProfileInfoUpdateHandler))
+	router.HandleFunc(path, AuthMiddleware(MyProfileInfoUpdateHandler))
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusUnauthorized {

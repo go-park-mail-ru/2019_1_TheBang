@@ -8,7 +8,7 @@ import (
 
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/server/auth"
+	"2019_1_TheBang/pkg/auth"
 	"2019_1_TheBang/pkg/user"
 
 	"github.com/dgrijalva/jwt-go"

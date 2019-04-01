@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"2019_1_TheBang/pkg/server/auth"
+	"2019_1_TheBang/pkg/auth"
 	"2019_1_TheBang/pkg/server/middlewares"
 
 	"github.com/gorilla/mux"

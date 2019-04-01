@@ -9,7 +9,7 @@ import (
 	"os"
 
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/server/auth"
+	"2019_1_TheBang/pkg/auth"
 )
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {

@@ -6,7 +6,8 @@ import (
 	"testing"
 
 	"2019_1_TheBang/api"
-	"2019_1_TheBang/pkg/server/models"
+	"2019_1_TheBang/pkg/user"
+	
 
 	"github.com/gorilla/mux"
 )
@@ -20,10 +21,10 @@ func TestLeaderbordHandlerSUCCESS(t *testing.T) {
 		Nickname: "bob",
 		Passwd:   "bob",
 	}
-	models.CreateUser(&tom)
-	models.CreateUser(&bob)
-	defer models.DeleteUser("bob")
-	defer models.DeleteUser("tom")
+	user.CreateUser(&tom)
+	user.CreateUser(&bob)
+	defer user.DeleteUser("bob")
+	defer user.DeleteUser("tom")
 
 	req, err := http.NewRequest("GET", "/leaderbord/1", nil)
 	if err != nil {
