@@ -1,6 +1,8 @@
-package user
+package test
 
 import (
+	"2019_1_TheBang/pkg/middleware"
+	"2019_1_TheBang/pkg/user"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -26,7 +28,7 @@ func TestMyProfileInfoUpdateHandlerSUCCESS(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, AuthMiddleware(MyProfileInfoUpdateHandler))
+	router.HandleFunc(path, middleware.AuthMiddleware(user.MyProfileInfoUpdateHandler))
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {
@@ -44,7 +46,7 @@ func TestMyProfileInfoUpdateHandlerFAIL(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, AuthMiddleware(MyProfileInfoUpdateHandler))
+	router.HandleFunc(path, middleware.AuthMiddleware(user.MyProfileInfoUpdateHandler))
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusUnauthorized {

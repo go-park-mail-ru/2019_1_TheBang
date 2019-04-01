@@ -1,6 +1,7 @@
-package user
+package test
 
 import (
+	"2019_1_TheBang/pkg/user"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -20,7 +21,7 @@ func TestGetIconHandlerSuccess(t *testing.T) {
 	})
 
 	rr := httptest.NewRecorder()
-	GetIconHandler(rr, req)
+	user.GetIconHandler(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n",
@@ -40,7 +41,7 @@ func TestGetIconHandlerFAIL(t *testing.T) {
 	})
 
 	rr := httptest.NewRecorder()
-	GetIconHandler(rr, req)
+	user.GetIconHandler(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {
 		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n",

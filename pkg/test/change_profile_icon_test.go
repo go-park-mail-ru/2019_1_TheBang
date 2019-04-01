@@ -1,4 +1,4 @@
-package user
+package test
 
 import (
 	"bytes"
@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/pkg/user"
 )
 
 func TestChangeProfileAvatarHandler(t *testing.T) {
@@ -25,7 +26,7 @@ func TestChangeProfileAvatarHandler(t *testing.T) {
 	req.AddCookie(cookie)
 
 	rr := httptest.NewRecorder()
-	ChangeProfileAvatarHandler(rr, req)
+	user.ChangeProfileAvatarHandler(rr, req)
 
 	if rr.Code != http.StatusOK {
 		t.Errorf("TestChangeProfileAvatarHandler, have not cookie: expected %v, have %v!\n",

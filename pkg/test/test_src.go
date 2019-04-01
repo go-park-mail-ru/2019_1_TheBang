@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 
 	"2019_1_TheBang/api"
+	"2019_1_TheBang/pkg/login"
 	"2019_1_TheBang/pkg/user"
 
 	"github.com/gorilla/mux"
@@ -41,15 +42,15 @@ func GetTESTAdminCookie() (*http.Cookie, error) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, MyProfileCreateHandler)
+	router.HandleFunc(path, user.MyProfileCreateHandler)
 	router.ServeHTTP(rr, req)
 
-	login := api.Login{
+	logApi := api.Login{
 		Nickname: testAdminNick,
 		Passwd:   testAdminNick,
 	}
 
-	body, _ = json.Marshal(login)
+	body, _ = json.Marshal(logApi)
 	path = "/auth"
 
 	req, err = http.NewRequest("POST", path, bytes.NewReader(body))
@@ -60,7 +61,7 @@ func GetTESTAdminCookie() (*http.Cookie, error) {
 
 	rr = httptest.NewRecorder()
 	router = mux.NewRouter()
-	router.HandleFunc(path, LogInHandler)
+	router.HandleFunc(path, login.LogInHandler)
 	router.ServeHTTP(rr, req)
 
 	// toDO сделать проверку на этот момент (есть ли кука)

@@ -1,6 +1,7 @@
-package user
+package test
 
 import (
+	"2019_1_TheBang/pkg/user"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -23,7 +24,7 @@ func TestMyProfileCreateHandler(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 		router := mux.NewRouter()
-		router.HandleFunc(path, MyProfileCreateHandler)
+		router.HandleFunc(path, user.MyProfileCreateHandler)
 		router.ServeHTTP(rr, req)
 
 		if rr.Code != tc.Status {
@@ -31,7 +32,7 @@ func TestMyProfileCreateHandler(t *testing.T) {
 		}
 	}
 
-	if ok := DeleteUser("lil"); !ok {
+	if ok := user.DeleteUser("lil"); !ok {
 		t.Fatal("User was not deleted")
 	}
 }
