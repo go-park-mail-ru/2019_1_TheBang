@@ -147,11 +147,19 @@ func DeletePhoto(filename string) {
 }
 
 func UpdateUserPhoto(nickname, photo string) bool {
-	_, err := config.DB.Query(SQLUpdatePhoto,
+	res, err := config.DB.Exec(SQLUpdatePhoto,
 		photo, nickname)
 	if err != nil {
 		config.Logger.Warnw("UpdateUserPhoto",
 			"warn", err.Error())
+
+		return false
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows != 1 {
+		config.Logger.Warnw("UpdateUserPhoto",
+			"warn", "wrong count affected rows")
 
 		return false
 	}
