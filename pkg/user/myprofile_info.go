@@ -1,4 +1,4 @@
-package handlers
+package user
 
 import (
 	"encoding/json"
@@ -7,7 +7,6 @@ import (
 
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/pkg/server/auth"
-	"2019_1_TheBang/pkg/server/models"
 )
 
 func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +21,7 @@ func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	profile, status := models.SelectUser(nickname)
+	profile, status := SelectUser(nickname)
 	if status != http.StatusOK {
 		w.WriteHeader(status)
 

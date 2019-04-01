@@ -1,4 +1,4 @@
-package handlers
+package login
 
 import (
 	"encoding/json"
@@ -8,7 +8,8 @@ import (
 
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/server/models"
+	"2019_1_TheBang/pkg/server/auth"
+	"2019_1_TheBang/pkg/user"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -55,7 +56,7 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &cookie)
 
-	prof, status := models.SelectUser(login.Nickname)
+	prof, status := user.SelectUser(login.Nickname)
 	if status != http.StatusOK {
 		w.WriteHeader(http.StatusInternalServerError)
 		config.Logger.Warnw("LogoutHandler",
@@ -80,12 +81,12 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginAcount(username, passwd string) (ss string, status int) {
-	ok := models.CheckUser(username, passwd)
+	ok := user.CheckUser(username, passwd)
 	if !ok {
 		return ss, http.StatusUnauthorized
 	}
 
-	claims := models.CustomClaims{
+	claims := auth.CustomClaims{
 		username,
 		jwt.StandardClaims{
 			Issuer: config.ServerName,

@@ -1,5 +1,9 @@
 package api
 
+type InfoText struct {
+	Data string `json:"data"`
+}
+
 type Login struct {
 	Nickname string `json:"nickname"`
 	Passwd   string `json:"passwd"`

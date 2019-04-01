@@ -1,4 +1,4 @@
-package handlers
+package test
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 
 	"2019_1_TheBang/api"
-	"2019_1_TheBang/pkg/server/models"
+	"2019_1_TheBang/pkg/user"
 
 	"github.com/gorilla/mux"
 )
@@ -70,7 +70,7 @@ func GetTESTAdminCookie() (*http.Cookie, error) {
 }
 
 func DeleteTESTAdmin() {
-	ok := models.DeleteUser(testAdminNick)
+	ok := user.DeleteUser(testAdminNick)
 	if !ok {
 		log.Fatal("Can not delete testAdmin!")
 	}

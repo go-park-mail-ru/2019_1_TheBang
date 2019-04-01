@@ -1,4 +1,4 @@
-package handlers
+package user
 
 import (
 	"encoding/json"
@@ -7,7 +7,6 @@ import (
 
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/server/models"
 )
 
 func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +37,7 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	//signup.DOB = time.Now().String()
 	signup.DOB = "2018-01-01"
 
-	status := models.CreateUser(&signup)
+	status := CreateUser(&signup)
 	if status != http.StatusCreated {
 		w.WriteHeader(status)
 

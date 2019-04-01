@@ -1,4 +1,4 @@
-package handlers
+package login
 
 import (
 	"bytes"

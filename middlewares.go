@@ -1,4 +1,4 @@
-package middlewares
+package main
 
 import (
 	"net/http"
@@ -7,6 +7,17 @@ import (
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/pkg/server/auth"
 )
+
+func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if _, ok := auth.CheckTocken(r); !ok {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		next(w, r)
+	}
+}
 
 func AccessLogMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -32,15 +43,4 @@ func CommonMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
-}
-
-func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if _, ok := auth.CheckTocken(r); !ok {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		next(w, r)
-	}
 }

@@ -1,4 +1,4 @@
-package handlers
+package logout
 
 import (
 	"net/http"

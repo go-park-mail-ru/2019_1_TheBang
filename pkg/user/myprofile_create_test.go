@@ -1,12 +1,10 @@
-package handlers
+package user
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"2019_1_TheBang/pkg/server/models"
 
 	"github.com/gorilla/mux"
 )
@@ -33,7 +31,7 @@ func TestMyProfileCreateHandler(t *testing.T) {
 		}
 	}
 
-	if ok := models.DeleteUser("lil"); !ok {
+	if ok := DeleteUser("lil"); !ok {
 		t.Fatal("User was not deleted")
 	}
 }

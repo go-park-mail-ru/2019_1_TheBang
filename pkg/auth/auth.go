@@ -10,6 +10,11 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+type CustomClaims struct {
+	Nickname string `json:"nickname"`
+	jwt.StandardClaims
+}
+
 func TokenFromCookie(r *http.Request) *jwt.Token {
 	cookie, _ := r.Cookie(config.CookieName)
 	tokenStr := cookie.Value

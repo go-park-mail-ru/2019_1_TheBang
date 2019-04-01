@@ -1,4 +1,4 @@
-package models
+package leaderboard
 
 import (
 	"encoding/json"

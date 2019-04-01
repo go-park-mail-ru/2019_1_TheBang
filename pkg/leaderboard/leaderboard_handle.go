@@ -1,10 +1,8 @@
-package handlers
+package leaderboard
 
 import (
 	"net/http"
 	"strconv"
-
-	"2019_1_TheBang/pkg/server/models"
 
 	"github.com/gorilla/mux"
 )
@@ -31,7 +29,7 @@ func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json, status := models.LeaderPage(uint(number))
+	json, status := LeaderPage(uint(number))
 	if status != http.StatusOK {
 		w.WriteHeader(status)
 

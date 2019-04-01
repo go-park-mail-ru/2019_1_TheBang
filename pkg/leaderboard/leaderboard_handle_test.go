@@ -1,4 +1,4 @@
-package handlers
+package leaderboard
 
 import (
 	"net/http"

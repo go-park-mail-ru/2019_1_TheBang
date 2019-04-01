@@ -1,4 +1,4 @@
-package handlers
+package user
 
 import (
 	"crypto/md5"
@@ -10,7 +10,6 @@ import (
 
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/pkg/server/auth"
-	"2019_1_TheBang/pkg/server/models"
 )
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +27,7 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	profile, status := models.SelectUser(nickname)
+	profile, status := SelectUser(nickname)
 	if status != http.StatusOK {
 		w.WriteHeader(status)
 
@@ -87,7 +86,7 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ok := models.UpdateUserPhoto(nickname, filename)
+	ok := UpdateUserPhoto(nickname, filename)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		config.Logger.Warnw("GetIconHandler",
@@ -98,7 +97,7 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	models.DeletePhoto(profile.Photo)
+	DeletePhoto(profile.Photo)
 	profile.Photo = filename
 
 	err = json.NewEncoder(w).Encode(profile)

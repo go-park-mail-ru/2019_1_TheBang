@@ -1,4 +1,4 @@
-package handlers
+package user
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/pkg/server/auth"
-	"2019_1_TheBang/pkg/server/models"
 )
 
 func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +50,7 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	profile, status := models.UpdateUser(nickname, update)
+	profile, status := UpdateUser(nickname, update)
 	if status != http.StatusOK {
 		w.WriteHeader(http.StatusInternalServerError)
 		config.Logger.Warnw("MyProfileInfoUpdateHandler",

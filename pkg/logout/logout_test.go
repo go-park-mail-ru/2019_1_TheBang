@@ -1,11 +1,10 @@
-package handlers
+package logout
 
 import (
+	"2019_1_TheBang/pkg/test"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"2019_1_TheBang/pkg/server/middlewares"
 
 	"github.com/gorilla/mux"
 )
@@ -19,7 +18,7 @@ func TestLogoutHandlerFAIL(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, middlewares.AuthMiddleware(LogoutHandler))
+	router.HandleFunc(path, AuthMiddleware(LogoutHandler))
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusUnauthorized {
@@ -28,7 +27,7 @@ func TestLogoutHandlerFAIL(t *testing.T) {
 }
 
 func TestLogoutHandlerSUCCESS(t *testing.T) {
-	cookie, err := GetTESTAdminCookie()
+	cookie, err := test.GetTESTAdminCookie()
 	if err != nil {
 		t.Fatal(err.Error())
 	}
