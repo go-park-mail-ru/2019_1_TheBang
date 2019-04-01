@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/pkg/chat"
 	"2019_1_TheBang/pkg/leaderboard"
 	"2019_1_TheBang/pkg/login"
 	"2019_1_TheBang/pkg/logout"
@@ -19,6 +20,9 @@ func main() {
 	if err != nil {
 		config.Logger.Fatal("Can not start connection with database")
 	}
+
+	hub := chat.NewHub()
+	go hub.Run()
 
 	r := mux.NewRouter()
 	r.Use(middleware.AccessLogMiddleware, middleware.CommonMiddleware)
@@ -36,7 +40,10 @@ func main() {
 
 	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
 
-	r.HandleFunc("/chat", middleware.AuthMiddleware(chat.(JoinChatHandler())))
+	r.HandleFunc("/smth", chat.DummyBeforeChat).Methods("GET")
+	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		chat.JoinChatHandler(hub, w, r)
+	})
 
 	config.Logger.Infof("FrontentDst: %v", config.FrontentDst)
 	config.Logger.Fatal(http.ListenAndServe(":"+config.PORT, r))
