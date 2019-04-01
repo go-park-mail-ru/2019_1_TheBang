@@ -36,6 +36,8 @@ func main() {
 
 	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
 
+	r.HandleFunc("/chat", middleware.AuthMiddleware(chat.(JoinChatHandler())))
+
 	config.Logger.Infof("FrontentDst: %v", config.FrontentDst)
 	config.Logger.Fatal(http.ListenAndServe(":"+config.PORT, r))
 }
