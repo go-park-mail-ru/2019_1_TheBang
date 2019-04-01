@@ -2,7 +2,6 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -18,9 +17,6 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	token := auth.TokenFromCookie(r)
 	nickname, status := auth.NicknameFromCookie(token)
-
-	// toDO delete
-	fmt.Println(nickname)
 
 	if status == http.StatusInternalServerError {
 		w.WriteHeader(status)
@@ -42,11 +38,6 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	//toDo жду от фронта
-	update.DOB = "2018-01-01"
-
-	// toDO delete
-	fmt.Println(update)
 
 	err = json.Unmarshal(body, &update)
 	if err != nil {
@@ -58,6 +49,9 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//toDo жду от фронта
+	update.DOB = "2018-01-01"
+
 	profile, status := UpdateUser(nickname, update)
 	if status != http.StatusOK {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -68,9 +62,6 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	// toDO delete
-	fmt.Println(profile)
 
 	err = json.NewEncoder(w).Encode(profile)
 	if err != nil {

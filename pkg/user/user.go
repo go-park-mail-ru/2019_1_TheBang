@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -69,7 +70,9 @@ func SelectUser(nickname string) (p api.Profile, status int) {
 }
 
 func UpdateUser(nickname string, u api.Update) (p api.Profile, status int) {
-	_, err := config.DB.Query(SQLUpdateUser,
+	fmt.Println(u)
+
+	res, err := config.DB.Exec(SQLUpdateUser,
 		u.Name,
 		u.Surname,
 		u.DOB,
@@ -79,6 +82,14 @@ func UpdateUser(nickname string, u api.Update) (p api.Profile, status int) {
 			"warn", err.Error())
 
 		return p, http.StatusBadRequest
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows != 1 {
+		config.Logger.Warnw("UpdateUser",
+			"warn", err.Error())
+
+		return p, http.StatusInternalServerError
 	}
 
 	p, status = SelectUser(nickname)
