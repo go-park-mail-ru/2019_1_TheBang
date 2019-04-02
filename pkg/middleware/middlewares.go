@@ -7,16 +7,32 @@ import (
 	"2019_1_TheBang/config"
 )
 
-func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Todo решить пробелму с получением куки
-		// if _, ok := CheckTocken(r); !ok {
-		// 	w.WriteHeader(http.StatusUnauthorized)
-		// 	return
-		// }
+type urlMehtod struct {
+	URL    string
+	Method string
+}
 
-		next(w, r)
-	}
+var ignorCheckAuth = map[urlMehtod]bool{
+	urlMehtod{URL: "/auth", Method: "POST"}: true,
+	urlMehtod{URL: "/user", Method: "POST"}: true,
+}
+
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		check := urlMehtod{URL: r.URL.Path, Method: r.Method}
+		if ok := ignorCheckAuth[check]; !ok {
+			if r.Method == "OPTIONS" {
+				return
+			}
+
+			if _, ok := CheckTocken(r); !ok {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 func AccessLogMiddleware(next http.Handler) http.Handler {

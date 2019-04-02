@@ -26,18 +26,20 @@ func main() {
 	go hub.Run()
 
 	r := mux.NewRouter()
-	r.Use(middleware.AccessLogMiddleware, middleware.CommonMiddleware)
+	r.Use(middleware.AccessLogMiddleware,
+		middleware.CommonMiddleware,
+		middleware.AuthMiddleware)
 
 	r.HandleFunc("/auth", login.LogInHandler).Methods("POST")
 	r.HandleFunc("/auth", logout.LogoutHandler).Methods("DELETE", "OPTIONS")
 
-	r.HandleFunc("/leaderbord/{page:[0-9]+}", middleware.AuthMiddleware(leaderboard.LeaderbordHandler)).Methods("GET")
+	r.HandleFunc("/leaderbord/{page:[0-9]+}", leaderboard.LeaderbordHandler).Methods("GET")
 
 	r.HandleFunc("/user", user.MyProfileCreateHandler).Methods("POST")
-	r.HandleFunc("/user", middleware.AuthMiddleware(user.MyProfileInfoHandler)).Methods("GET")
-	r.HandleFunc("/user", middleware.AuthMiddleware(user.MyProfileInfoUpdateHandler)).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/user", user.MyProfileInfoHandler).Methods("GET")
+	r.HandleFunc("/user", user.MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
 
-	r.HandleFunc("/user/avatar", middleware.AuthMiddleware(user.ChangeProfileAvatarHandler)).Methods("POST", "OPTIONS")
+	r.HandleFunc("/user/avatar", user.ChangeProfileAvatarHandler).Methods("POST", "OPTIONS")
 
 	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
 
@@ -51,7 +53,6 @@ func main() {
 		chat.ServeWs(hub, w, r)
 	})
 
-	
 	config.Logger.Infof("FrontentDst: %v", config.FrontentDst)
 	config.Logger.Fatal(http.ListenAndServe(":"+config.PORT, r))
 }
