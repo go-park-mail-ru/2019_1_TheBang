@@ -44,6 +44,7 @@ func main() {
 	r.HandleFunc("/rooms", room.RoomsListHandle).Methods("GET")
 	r.HandleFunc("/rooms", room.CreateRoomHandle).Methods("POST")
 	r.HandleFunc("/rooms/{room}", room.ConnectRoomHandle).Methods("GET")
+	r.HandleFunc("/rooms/{room}/chat", room.RoomChatHandle)
 
 	r.HandleFunc("/", chat.ServeHome).Methods("GET")
 	r.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
