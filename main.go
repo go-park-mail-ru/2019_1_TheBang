@@ -51,6 +51,7 @@ func main() {
 		chat.ServeWs(hub, w, r)
 	})
 
+	
 	config.Logger.Infof("FrontentDst: %v", config.FrontentDst)
 	config.Logger.Fatal(http.ListenAndServe(":"+config.PORT, r))
 }
