@@ -9,6 +9,7 @@ import (
 	"2019_1_TheBang/pkg/login"
 	"2019_1_TheBang/pkg/logout"
 	"2019_1_TheBang/pkg/middleware"
+	"2019_1_TheBang/pkg/room"
 	"2019_1_TheBang/pkg/user"
 
 	"github.com/gorilla/mux"
@@ -39,6 +40,10 @@ func main() {
 	r.HandleFunc("/user/avatar", middleware.AuthMiddleware(user.ChangeProfileAvatarHandler)).Methods("POST", "OPTIONS")
 
 	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
+
+	r.HandleFunc("/rooms", room.RoomsListHandle).Methods("GET")
+	r.HandleFunc("/rooms", room.CreateRoomHandle).Methods("POST")
+	r.HandleFunc("/rooms/{room}", room.ConnectRoomHandle).Methods("GET")
 
 	r.HandleFunc("/", chat.ServeHome).Methods("GET")
 	r.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
