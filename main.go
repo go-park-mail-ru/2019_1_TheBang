@@ -40,9 +40,9 @@ func main() {
 
 	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
 
-	r.HandleFunc("/smth", chat.DummyBeforeChat).Methods("GET")
-	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		chat.JoinChatHandler(hub, w, r)
+	r.HandleFunc("/", chat.ServeHome).Methods("GET")
+	r.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
+		chat.ServeWs(hub, w, r)
 	})
 
 	config.Logger.Infof("FrontentDst: %v", config.FrontentDst)
