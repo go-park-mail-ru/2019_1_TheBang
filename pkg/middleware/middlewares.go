@@ -27,6 +27,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 			if _, ok := CheckTocken(r); !ok {
 				w.WriteHeader(http.StatusUnauthorized)
+				
 				return
 			}
 		}
