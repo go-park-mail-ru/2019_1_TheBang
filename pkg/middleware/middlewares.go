@@ -25,11 +25,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				return
 			}
 
-			// if _, ok := CheckTocken(r); !ok {
-			// 	w.WriteHeader(http.StatusUnauthorized)
+			if _, ok := CheckTocken(r); !ok {
+				w.WriteHeader(http.StatusUnauthorized)
 
-			// 	return
-			// }
+				return
+			}
 		}
 
 		next.ServeHTTP(w, r)
