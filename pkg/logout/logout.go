@@ -8,9 +8,9 @@ import (
 )
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "OPTIONS" {
-		return
-	}
+	// if r.Method == "OPTIONS" {
+	// 	return
+	// }
 
 	session, err := r.Cookie(config.CookieName)
 	if err != nil {
