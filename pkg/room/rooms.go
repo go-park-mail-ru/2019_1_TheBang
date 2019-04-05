@@ -1,12 +1,15 @@
 package room
 
-import "github.com/manveru/faker"
+import (
+	"github.com/manveru/faker"
+)
 
 var RoomsInfo = Rooms{
 	List: map[string]Room{
 		"test": Room{
 			Name:             "test",
 			MaxPlayersInRoom: MaxPlayersInRoom,
+			Hub:              NewHubChat(),
 		},
 	},
 }
@@ -52,6 +55,7 @@ func (r *Rooms) NewRoom() (Room, error) {
 	new := Room{
 		Name:             name,
 		MaxPlayersInRoom: MaxPlayersInRoom,
+		Hub:              NewHubChat(),
 	}
 
 	r.List[name] = new
