@@ -10,6 +10,12 @@ import (
 )
 
 func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
+	if _, ok := auth.CheckTocken(r); !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+
+		return
+	}
+
 	token := auth.TokenFromCookie(r)
 	nickname, status := auth.NicknameFromCookie(token)
 	if status == http.StatusInternalServerError {
