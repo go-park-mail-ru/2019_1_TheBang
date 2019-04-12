@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"2019_1_TheBang/config"
-	"os"
 	"fmt"
+	"os"
 
 	"github.com/gorilla/mux"
 )

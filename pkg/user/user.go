@@ -12,6 +12,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type UserInfo struct {
+	Id       uint   `json:"id"`
+	Nickname string `json:"nickname"`
+	PhotoURL string `json:"photo_url"`
+}
+
 func hashPasswd(passwd string) string {
 	pw := []byte(passwd)
 

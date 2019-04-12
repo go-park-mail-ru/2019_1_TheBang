@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/auth"
 )
 
 func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,15 +18,15 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := auth.TokenFromCookie(r)
-	nickname, status := auth.NicknameFromCookie(token)
+	token := TokenFromCookie(r)
+	info, status := InfoFromCookie(token)
 	if status == http.StatusInternalServerError {
 		w.WriteHeader(status)
 
 		return
 	}
 
-	profile, status := SelectUser(nickname)
+	profile, status := SelectUser(info.Nickname)
 	if status != http.StatusOK {
 		w.WriteHeader(status)
 
@@ -86,7 +85,7 @@ func ChangeProfileAvatarHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ok := UpdateUserPhoto(nickname, filename)
+	ok := UpdateUserPhoto(info.Nickname, filename)
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
 		config.Logger.Warnw("GetIconHandler",

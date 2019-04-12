@@ -1,12 +1,9 @@
-package auth
+package user
 
 import (
-	"fmt"
-	"log"
-	"net/http"
-
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/user"
+	"fmt"
+	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -32,8 +29,8 @@ func TokenFromCookie(r *http.Request) *jwt.Token {
 	return token
 }
 
-func NicknameFromCookie(token *jwt.Token) (userInfo user.UserInfo, status int) {
-	userInfo = user.UserInfo{}
+func InfoFromCookie(token *jwt.Token) (userInfo UserInfo, status int) {
+	userInfo = UserInfo{}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
 		userInfo.Id = claims["id"].(uint)
@@ -48,36 +45,4 @@ func NicknameFromCookie(token *jwt.Token) (userInfo user.UserInfo, status int) {
 	}
 
 	return userInfo, http.StatusOK
-}
-
-func CheckTocken(r *http.Request) (token *jwt.Token, ok bool) {
-	cookie, err := r.Cookie(config.CookieName)
-	if err != nil {
-		config.Logger.Warnw("CheckTocken",
-			"warn", err.Error())
-		return nil, false
-	}
-
-	tokenStr := cookie.Value
-
-	token, err = jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return config.SECRET, nil
-	})
-	if err != nil {
-		log.Printf("Error with check tocken: %v", err.Error())
-
-		return nil, false
-	}
-
-	if !token.Valid {
-		log.Printf("%v use faked cookie: %v\n", r.RemoteAddr, err.Error())
-
-		return nil, false
-	}
-
-	return token, true
 }

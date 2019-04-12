@@ -6,18 +6,11 @@ import (
 	"net/http"
 
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/auth"
 )
 
 func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-	if _, ok := auth.CheckTocken(r); !ok {
-		w.WriteHeader(http.StatusUnauthorized)
-
-		return
-	}
-
-	token := auth.TokenFromCookie(r)
-	nickname, status := auth.NicknameFromCookie(token)
+	token := TokenFromCookie(r)
+	info, status := InfoFromCookie(token)
 	if status == http.StatusInternalServerError {
 		w.WriteHeader(status)
 		config.Logger.Warnw("MyProfileInfoHandler",
@@ -27,7 +20,7 @@ func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	profile, status := SelectUser(nickname)
+	profile, status := SelectUser(info.Nickname)
 	if status != http.StatusOK {
 		w.WriteHeader(status)
 

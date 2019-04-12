@@ -7,7 +7,6 @@ import (
 
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/auth"
 )
 
 func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,8 +14,8 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := auth.TokenFromCookie(r)
-	nickname, status := auth.NicknameFromCookie(token)
+	token := TokenFromCookie(r)
+	info, status := InfoFromCookie(token)
 
 	if status == http.StatusInternalServerError {
 		w.WriteHeader(status)
@@ -52,7 +51,7 @@ func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	//toDo жду от фронта
 	update.DOB = "2018-01-01"
 
-	profile, status := UpdateUser(nickname, update)
+	profile, status := UpdateUser(info.Nickname, update)
 	if status != http.StatusOK {
 		w.WriteHeader(http.StatusInternalServerError)
 		config.Logger.Warnw("MyProfileInfoUpdateHandler",
