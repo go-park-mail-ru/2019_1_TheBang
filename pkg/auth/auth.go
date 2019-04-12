@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/user"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -30,24 +29,6 @@ func TokenFromCookie(r *http.Request) *jwt.Token {
 		return config.SECRET, nil
 	})
 	return token
-}
-
-func NicknameFromCookie(token *jwt.Token) (userInfo user.UserInfo, status int) {
-	userInfo = user.UserInfo{}
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		userInfo.Id = claims["id"].(uint)
-		userInfo.Nickname = claims["nickname"].(string)
-		userInfo.PhotoURL = claims["photo_url"].(string)
-	} else {
-		status = http.StatusInternalServerError
-		config.Logger.Warnw("NicknameFromCookie",
-			"warn", "Error with parsing token's claims")
-
-		return userInfo, status
-	}
-
-	return userInfo, http.StatusOK
 }
 
 func CheckTocken(r *http.Request) (token *jwt.Token, ok bool) {

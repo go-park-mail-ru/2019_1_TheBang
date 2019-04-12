@@ -9,9 +9,9 @@ import (
 )
 
 type CustomClaims struct {
-	Id       uint   `json:"id"`
-	Nickname string `json:"nickname"`
-	PhotoURL string `json:"photo_url"`
+	Id       float64 `json:"id"`
+	Nickname string  `json:"nickname"`
+	PhotoURL string  `json:"photo_url"`
 
 	jwt.StandardClaims
 }
@@ -33,7 +33,7 @@ func InfoFromCookie(token *jwt.Token) (userInfo UserInfo, status int) {
 	userInfo = UserInfo{}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		userInfo.Id = claims["id"].(uint)
+		userInfo.Id = claims["id"].(float64)
 		userInfo.Nickname = claims["nickname"].(string)
 		userInfo.PhotoURL = claims["photo_url"].(string)
 	} else {

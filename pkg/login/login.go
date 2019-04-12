@@ -86,10 +86,12 @@ func LoginAcount(username, passwd string) (ss string, status int) {
 		return ss, http.StatusUnauthorized
 	}
 
+	prof, _ := user.SelectUser(username)
+
 	claims := auth.CustomClaims{
-		1,
-		username,
-		"1",
+		prof.Id,
+		prof.Nickname,
+		prof.Photo,
 		jwt.StandardClaims{
 			Issuer: config.ServerName,
 		},

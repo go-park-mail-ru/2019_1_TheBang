@@ -14,6 +14,7 @@ type Login struct {
 }
 
 type Profile struct {
+	Id       uint   `json:"id"`
 	Nickname string `json:"nickname"`
 	Name     string `json:"name"`
 	Surname  string `json:"surname"`

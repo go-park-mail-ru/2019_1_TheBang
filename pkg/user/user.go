@@ -13,9 +13,9 @@ import (
 )
 
 type UserInfo struct {
-	Id       uint   `json:"id"`
-	Nickname string `json:"nickname"`
-	PhotoURL string `json:"photo_url"`
+	Id       float64 `json:"id"`
+	Nickname string  `json:"nickname"`
+	PhotoURL string  `json:"photo_url"`
 }
 
 func hashPasswd(passwd string) string {
@@ -59,7 +59,9 @@ func SelectUser(nickname string) (p api.Profile, status int) {
 	defer rows.Close()
 
 	for rows.Next() {
-		if err := rows.Scan(&p.Nickname,
+		if err := rows.Scan(
+			&p.Id,
+			&p.Nickname,
 			&p.Name,
 			&p.Surname,
 			&p.DOB,
@@ -196,7 +198,7 @@ func DeleteUser(nickname string) bool {
 var sqlInsertUser = `insert into ` + config.DBSCHEMA + `users (nickname, name, surname, dob, passwd) values ($1, $2, $3, $4, $5)`
 
 var SQLSeletUser = `select 
-					nickname, name, surname, dob, photo, score	
+					id, nickname, name, surname, dob, photo, score	
 					from ` + config.DBSCHEMA + `users
 					where nickname = $1`
 

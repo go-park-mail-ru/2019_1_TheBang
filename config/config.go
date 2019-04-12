@@ -131,7 +131,7 @@ func preRunSQLliteDB(db *sql.DB) {
 }
 
 var sqlCreateTableSQLlite = `create table IF NOT EXISTS ` + DBSCHEMA + `users (
-	id bigserial primary key,
+	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	nickname citext unique not null,
 	name citext null,
 	surname citext null,
