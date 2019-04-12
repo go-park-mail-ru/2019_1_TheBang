@@ -87,7 +87,9 @@ func LoginAcount(username, passwd string) (ss string, status int) {
 	}
 
 	claims := auth.CustomClaims{
+		1,
 		username,
+		"1",
 		jwt.StandardClaims{
 			Issuer: config.ServerName,
 		},

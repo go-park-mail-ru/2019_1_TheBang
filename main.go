@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/chat"
 	"2019_1_TheBang/pkg/leaderboard"
 	"2019_1_TheBang/pkg/login"
 	"2019_1_TheBang/pkg/logout"
@@ -16,13 +16,13 @@ import (
 
 func main() {
 	defer config.Logger.Sync()
+	config.Logger.Info(fmt.Sprintf("FrontenDest: %v", config.FrontentDst))
+	config.Logger.Info(fmt.Sprintf("PORT: %v", config.PORT))
+
 	err := config.DB.Ping()
 	if err != nil {
 		config.Logger.Fatal("Can not start connection with database")
 	}
-
-	hub := chat.NewHub()
-	go hub.Run()
 
 	r := mux.NewRouter()
 	r.Use(middleware.AccessLogMiddleware,
@@ -42,16 +42,5 @@ func main() {
 
 	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
 
-	// r.HandleFunc("/rooms", room.RoomsListHandle).Methods("GET")
-	// r.HandleFunc("/rooms", room.CreateRoomHandle).Methods("POST")
-	// r.HandleFunc("/rooms/{room}", room.ConnectRoomHandle).Methods("GET")
-	// r.HandleFunc("/rooms/{room}/chat", rchat.RoomChatHandle)
-
-	// r.HandleFunc("/", chat.ServeHome).Methods("GET")
-	// r.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
-	// 	chat.ServeWs(hub, w, r)
-	// })
-
-	config.Logger.Infof("FrontentDst: %v", config.FrontentDst)
 	config.Logger.Fatal(http.ListenAndServe(":"+config.PORT, r))
 }

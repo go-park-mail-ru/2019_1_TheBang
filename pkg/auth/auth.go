@@ -11,7 +11,10 @@ import (
 )
 
 type CustomClaims struct {
+	Id       uint   `json:"id"`
 	Nickname string `json:"nickname"`
+	PhotoURL string `json:"photo_url"`
+
 	jwt.StandardClaims
 }
 
