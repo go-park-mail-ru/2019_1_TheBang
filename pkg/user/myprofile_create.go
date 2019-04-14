@@ -33,8 +33,6 @@ func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//toDo загулшка, пока не будет прилетать дата
-	//signup.DOB = time.Now().String()
 	signup.DOB = "2018-01-01"
 
 	status := CreateUser(&signup)

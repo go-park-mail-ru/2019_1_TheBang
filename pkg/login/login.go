@@ -2,6 +2,7 @@ package login
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -87,6 +88,9 @@ func LoginAcount(username, passwd string) (ss string, status int) {
 	}
 
 	prof, _ := user.SelectUser(username)
+
+	// логирование
+	fmt.Println(prof)
 
 	claims := auth.CustomClaims{
 		prof.Id,
