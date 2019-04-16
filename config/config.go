@@ -117,7 +117,7 @@ func getPort() string {
 	port := os.Getenv("PORT")
 	if port == "" {
 		Logger.Warn("There is no PORT!")
-		port = "8090"
+		port = "8001"
 	}
 	return port
 }
