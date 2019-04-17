@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/leaderboard"
-	"2019_1_TheBang/pkg/login"
-	"2019_1_TheBang/pkg/logout"
-	"2019_1_TheBang/pkg/middleware"
-	"2019_1_TheBang/pkg/user"
+	"2019_1_TheBang/pkg/main-serivce-pkg/leaderboard"
+	"2019_1_TheBang/pkg/main-serivce-pkg/login"
+	"2019_1_TheBang/pkg/main-serivce-pkg/logout"
+	"2019_1_TheBang/pkg/main-serivce-pkg/user"
+	"2019_1_TheBang/pkg/public/middleware"
 
 	"github.com/gorilla/mux"
 )
