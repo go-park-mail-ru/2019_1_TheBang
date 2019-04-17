@@ -98,7 +98,7 @@ func getFrontDest() string {
 	dst := os.Getenv("FrontentDst")
 	if dst == "" {
 		Logger.Warn("There is no FrontentDst!")
-		dst = "http://localhost:3000"
+		dst = "http://127.0.0.1:3000"
 	}
 	return dst
 }
@@ -107,7 +107,7 @@ func getSecret() []byte {
 	secret := []byte(os.Getenv("SECRET"))
 	if string(secret) == "" {
 		Logger.Warn("There is no SECRET!")
-		secret = []byte("secret")
+		secret = []byte("SECRET")
 	}
 
 	return secret
@@ -117,7 +117,7 @@ func getPort() string {
 	port := os.Getenv("PORT")
 	if port == "" {
 		Logger.Warn("There is no PORT!")
-		port = "8090"
+		port = "8001"
 	}
 	return port
 }
@@ -131,7 +131,7 @@ func preRunSQLliteDB(db *sql.DB) {
 }
 
 var sqlCreateTableSQLlite = `create table IF NOT EXISTS ` + DBSCHEMA + `users (
-	id bigserial primary key,
+	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	nickname citext unique not null,
 	name citext null,
 	surname citext null,

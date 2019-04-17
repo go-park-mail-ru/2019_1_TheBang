@@ -1,44 +1,46 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
-	"github.com/go-park-mail-ru/2019_1_TheBang/config"
-	"github.com/go-park-mail-ru/2019_1_TheBang/pkg/server/handlers"
+	"2019_1_TheBang/config"
+	"2019_1_TheBang/pkg/leaderboard"
+	"2019_1_TheBang/pkg/login"
+	"2019_1_TheBang/pkg/logout"
+	"2019_1_TheBang/pkg/middleware"
+	"2019_1_TheBang/pkg/user"
+
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	defer config.Logger.Sync()
+	config.Logger.Info(fmt.Sprintf("FrontenDest: %v", config.FrontentDst))
+	config.Logger.Info(fmt.Sprintf("PORT: %v", config.PORT))
+
+	err := config.DB.Ping()
+	if err != nil {
+		config.Logger.Fatal("Can not start connection with database")
+	}
 
 	r := mux.NewRouter()
-	r.Use(commonMiddleware)
+	r.Use(middleware.AccessLogMiddleware,
+		middleware.CommonMiddleware,
+		middleware.AuthMiddleware)
 
-	r.HandleFunc("/auth", handlers.LogInHandler).Methods("POST")
-	r.HandleFunc("/auth", handlers.LogoutHandler).Methods("DELETE", "OPTIONS")
+	r.HandleFunc("/auth", login.LogInHandler).Methods("POST")
+	r.HandleFunc("/auth", logout.LogoutHandler).Methods("DELETE", "OPTIONS")
 
-	r.HandleFunc("/leaderbord/{page:[0-9]+}", handlers.LeaderbordHandler).Methods("GET")
+	r.HandleFunc("/leaderbord/{page:[0-9]+}", leaderboard.LeaderbordHandler).Methods("GET")
 
-	r.HandleFunc("/user", handlers.MyProfileCreateHandler).Methods("POST")
-	r.HandleFunc("/user", handlers.MyProfileInfoHandler).Methods("GET")
-	r.HandleFunc("/user", handlers.MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
+	r.HandleFunc("/user", user.MyProfileCreateHandler).Methods("POST")
+	r.HandleFunc("/user", user.MyProfileInfoHandler).Methods("GET")
+	r.HandleFunc("/user", user.MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
 
-	r.HandleFunc("/user/avatar", handlers.ChangeProfileAvatarHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/user/avatar", user.ChangeProfileAvatarHandler).Methods("POST", "OPTIONS")
 
-	r.HandleFunc("/icon/{filename}", handlers.GetIconHandler).Methods("GET")
+	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
 
-	config.Logger.Infof("FrontentDst: %v", config.FrontentDst)
 	config.Logger.Fatal(http.ListenAndServe(":"+config.PORT, r))
-}
-
-func commonMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", config.FrontentDst)
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-
-		next.ServeHTTP(w, r)
-	})
 }
