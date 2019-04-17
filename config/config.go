@@ -107,7 +107,7 @@ func getSecret() []byte {
 	secret := []byte(os.Getenv("SECRET"))
 	if string(secret) == "" {
 		Logger.Warn("There is no SECRET!")
-		secret = []byte("secret")
+		secret = []byte("SECRET")
 	}
 
 	return secret
