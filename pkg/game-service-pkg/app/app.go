@@ -3,6 +3,7 @@ package app
 import (
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/config/gameconfig"
 	"2019_1_TheBang/pkg/game-service-pkg/room"
 	"fmt"
 	"net/http"
@@ -14,8 +15,8 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  config.SocketReadBufferSize,
-	WriteBufferSize: config.SocketWriteBufferSize,
+	ReadBufferSize:  gameconfig.SocketReadBufferSize,
+	WriteBufferSize: gameconfig.SocketWriteBufferSize,
 	CheckOrigin: func(r *http.Request) bool {
 		// todo проверять. что это локал хост
 		return true
@@ -38,7 +39,7 @@ func NewApp() *Game {
 
 	return &Game{
 		Rooms:         make(map[uint]*room.Room),
-		MaxRoomsCount: config.MaxRoomsInGame,
+		MaxRoomsCount: gameconfig.MaxRoomsInGame,
 	}
 }
 
@@ -131,7 +132,7 @@ func (g *Game) NewRoom() (room.RoomWrap, error) {
 	g.Rooms[id] = &room.Room{
 		Id:         id,
 		Name:       roomName,
-		MaxPlayers: config.MaxPlayersInRoom,
+		MaxPlayers: gameconfig.MaxPlayersInRoom,
 		Register:   make(chan *room.Player),
 		Unregister: make(chan *room.Player),
 		Players:    make(map[*room.Player]interface{}),
