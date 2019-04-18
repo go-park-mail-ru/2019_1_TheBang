@@ -17,14 +17,6 @@ const (
 
 type Cell string
 
-const (
-	gem      Cell = "gem"
-	player   Cell = "player"
-	groung   Cell = "ground"
-	box      Cell = "box"
-	teleport Cell = "teleport"
-)
-
 type Action struct {
 	Time   string `json:"time" mapstructure:"time"`
 	Player string `json:"player" mapstructure:"player"`
