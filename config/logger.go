@@ -7,16 +7,15 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+var Logger = createGlobalLogger()
+
 func createGlobalLogger() *zap.SugaredLogger {
-	config := zap.NewDevelopmentConfig()
-	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	logger, err := config.Build()
+	cfg := zap.NewDevelopmentConfig()
+	cfg.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	logger, err := cfg.Build()
 	if err != nil {
 		log.Fatalln("createLogger", err.Error)
 	}
-
-	// func ErrorOutput - определить куда летят внутренние ошибки логгера
-	// toDo сделать advance cfg c определением места логирования
 
 	return logger.Sugar()
 }
