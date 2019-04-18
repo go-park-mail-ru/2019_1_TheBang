@@ -1,7 +1,7 @@
 package test
 
 import (
-	"2019_1_TheBang/pkg/user"
+	"2019_1_TheBang/pkg/main-serivce-pkg/user"
 	"net/http"
 	"net/http/httptest"
 	"testing"

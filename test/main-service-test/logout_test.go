@@ -1,8 +1,8 @@
 package test
 
 import (
-	"2019_1_TheBang/pkg/logout"
-	"2019_1_TheBang/pkg/middleware"
+	"2019_1_TheBang/pkg/main-serivce-pkg/logout"
+	"2019_1_TheBang/pkg/public/middleware"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,7 +19,8 @@ func TestLogoutHandlerFAIL(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, middleware.AuthMiddleware(logout.LogoutHandler))
+	router.Use(middleware.AuthMiddleware)
+	router.HandleFunc(path, logout.LogoutHandler)
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusUnauthorized {
@@ -43,7 +44,8 @@ func TestLogoutHandlerSUCCESS(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	router := mux.NewRouter()
-	router.HandleFunc(path, middleware.AuthMiddleware(logout.LogoutHandler))
+	router.Use(middleware.AuthMiddleware)
+	router.HandleFunc(path, logout.LogoutHandler)
 	router.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusOK {

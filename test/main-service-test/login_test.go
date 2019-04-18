@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"2019_1_TheBang/api"
-	"2019_1_TheBang/pkg/login"
+	"2019_1_TheBang/pkg/main-serivce-pkg/login"
 
 	"github.com/gorilla/mux"
 )

@@ -2,8 +2,8 @@ package room
 
 var (
 	leftBorder  uint = 0
-	rightBorder uint = width - 1
-	upBorder    uint = height - 1
+	rightBorder uint = Width - 1
+	upBorder    uint = Height - 1
 	downBorder  uint = 0
 )
 

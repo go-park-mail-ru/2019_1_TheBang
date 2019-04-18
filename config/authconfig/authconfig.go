@@ -1,6 +1,9 @@
-package config
+package authconfig
 
-import "os"
+import (
+	"2019_1_TheBang/config"
+	"os"
+)
 
 var (
 	AUTHPORT = getAuhtPort()
@@ -9,7 +12,7 @@ var (
 func getAuhtPort() string {
 	port := os.Getenv("AUTHPORT")
 	if port == "" {
-		Logger.Warn("There is no AUTH_PORT!")
+		config.Logger.Warn("There is no AUTH_PORT!")
 		port = "50051"
 	}
 

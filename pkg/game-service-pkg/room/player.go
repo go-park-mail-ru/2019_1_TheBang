@@ -3,6 +3,7 @@ package room
 import (
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/config/gameconfig"
 	"2019_1_TheBang/pkg/public/auth"
 	"fmt"
 	"time"
@@ -28,7 +29,7 @@ type Player struct {
 }
 
 func (p *Player) Reading() {
-	ticker := time.NewTicker(config.PlayerReadingTickTime)
+	ticker := time.NewTicker(gameconfig.PlayerReadingTickTime)
 	defer func() {
 		ticker.Stop()
 		p.Conn.Close()
@@ -80,8 +81,8 @@ func PlayerFromCtx(ctx *gin.Context, conn *websocket.Conn) *Player {
 		Nickname: info.Nickname,
 		PhotoURL: info.PhotoURL,
 		Conn:     conn,
-		In:       make(chan api.SocketMsg, config.InOutBuffer),
-		Out:      make(chan api.SocketMsg, config.InOutBuffer),
+		In:       make(chan api.SocketMsg, gameconfig.InOutBuffer),
+		Out:      make(chan api.SocketMsg, gameconfig.InOutBuffer),
 	}
 
 	config.Logger.Infow("PlayerFromCtx",

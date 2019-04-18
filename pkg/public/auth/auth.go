@@ -54,12 +54,6 @@ func GetUserInfo(token string) (user *pb.UserInfo, myerr error) {
 }
 
 func CheckTocken(r *http.Request) (info *pb.UserInfo, ok bool) {
-	// дебажу
-	fmt.Println("!!!!")
-	fmt.Println("!!!!", r.Cookies(), "!!!!")
-	fmt.Println("!!!!")
-	// дебажу
-
 	cookie, err := r.Cookie(config.CookieName)
 	if err != nil {
 		config.Logger.Warnw("CheckTocken -> get cookie:",

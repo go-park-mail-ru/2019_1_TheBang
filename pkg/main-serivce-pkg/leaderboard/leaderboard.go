@@ -6,11 +6,12 @@ import (
 
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/config/mainconfig"
 )
 
 func LeaderPage(number uint) (jsonData []byte, status int) {
-	offset := config.RowsOnLeaderPage * (number - 1)
-	rows, err := config.DB.Query(SQLGetPage, config.RowsOnLeaderPage, offset)
+	offset := mainconfig.RowsOnLeaderPage * (number - 1)
+	rows, err := mainconfig.DB.Query(SQLGetPage, mainconfig.RowsOnLeaderPage, offset)
 	if err != nil {
 		config.Logger.Warnw("LeaderPage",
 			"warn", err.Error())
@@ -51,6 +52,6 @@ func LeaderPage(number uint) (jsonData []byte, status int) {
 	return jsonData, http.StatusOK
 }
 
-var SQLGetPage = `select nickname, name, surname, dob, photo, score from ` + config.DBSCHEMA + `users
+var SQLGetPage = `select nickname, name, surname, dob, photo, score from ` + mainconfig.DBSCHEMA + `users
 					order by score desc
 					limit $1 offset $2`

@@ -2,6 +2,7 @@ package main
 
 import (
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/config/gameconfig"
 	"2019_1_TheBang/pkg/game-service-pkg/app"
 	"2019_1_TheBang/pkg/public/middleware"
 	"fmt"
@@ -24,9 +25,9 @@ func setUpGameRouter() *gin.Engine {
 func main() {
 	defer config.Logger.Sync()
 	config.Logger.Info(fmt.Sprintf("FrontenDest: %v", config.FrontentDst))
-	config.Logger.Info(fmt.Sprintf("GAMEPORT: %v", config.GAMEPORT))
+	config.Logger.Info(fmt.Sprintf("GAMEPORT: %v", gameconfig.GAMEPORT))
 
 	router := setUpGameRouter()
 
-	router.Run(":" + config.GAMEPORT)
+	router.Run(":" + gameconfig.GAMEPORT)
 }

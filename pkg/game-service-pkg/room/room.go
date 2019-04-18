@@ -3,6 +3,7 @@ package room
 import (
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/config/gameconfig"
 	"fmt"
 	"sync"
 	"time"
@@ -99,7 +100,7 @@ func (r *Room) RunRoom() {
 	defer config.Logger.Infow("RunRoom",
 		"msg", fmt.Sprintf("Room [id: %v name: %v] closed", r.Id, r.Name))
 
-	ticker := time.NewTicker(config.RoomTickTime)
+	ticker := time.NewTicker(gameconfig.RoomTickTime)
 	defer ticker.Stop()
 
 	// ToDo удаление разорвавших соединение пользователей
