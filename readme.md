@@ -21,7 +21,7 @@
 - Сергей Барсуков
 
 ## Мы тут
-- https://stormy-fjord-97392.herokuapp.com (но это не точноб переезд)
+- https://stormy-fjord-97392.herokuapp.com (но это не точно, переезд)
 
 ## Интеграция с frontend
 - https://the-bang.herokuapp.com
