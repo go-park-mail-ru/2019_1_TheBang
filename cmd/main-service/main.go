@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/config/mainconfig"
 	"2019_1_TheBang/pkg/main-serivce-pkg/leaderboard"
 	"2019_1_TheBang/pkg/main-serivce-pkg/login"
 	"2019_1_TheBang/pkg/main-serivce-pkg/logout"
@@ -17,9 +18,9 @@ import (
 func main() {
 	defer config.Logger.Sync()
 	config.Logger.Info(fmt.Sprintf("FrontenDest: %v", config.FrontentDst))
-	config.Logger.Info(fmt.Sprintf("PORT: %v", config.PORT))
+	config.Logger.Info(fmt.Sprintf("PORT: %v", mainconfig.MAINPORT))
 
-	err := config.DB.Ping()
+	err := mainconfig.DB.Ping()
 	if err != nil {
 		config.Logger.Fatal("Can not start connection with database")
 	}
@@ -42,5 +43,5 @@ func main() {
 
 	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
 
-	config.Logger.Fatal(http.ListenAndServe(":"+config.PORT, r))
+	config.Logger.Fatal(http.ListenAndServe(":"+mainconfig.MAINPORT, r))
 }

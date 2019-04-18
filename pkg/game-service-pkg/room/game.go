@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	width  uint = 10
-	height uint = 10
+	Width  uint = 10
+	Height uint = 10
 
 	left  = "left"
 	right = "right"
@@ -43,7 +43,9 @@ type GameSnap struct {
 	MaxGemsCount uint            `json:"max_gems_count"`
 }
 
-type GameMap [height][width]cell
+// todo изменить на слайс слайсов
+// с возможностью генерации определенного размера карты
+type GameMap [Height][Width]cell
 
 func NewMap() GameMap {
 	config.Logger.Infow("NewMap",

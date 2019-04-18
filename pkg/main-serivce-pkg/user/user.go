@@ -8,6 +8,7 @@ import (
 
 	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/config/mainconfig"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -31,7 +32,7 @@ func hashPasswd(passwd string) string {
 
 func CreateUser(s *api.Signup) (status int) {
 	s.Passwd = hashPasswd(s.Passwd)
-	_, err := config.DB.Exec(sqlInsertUser,
+	_, err := mainconfig.DB.Exec(sqlInsertUser,
 		s.Nickname,
 		s.Name,
 		s.Surname,
@@ -48,7 +49,7 @@ func CreateUser(s *api.Signup) (status int) {
 }
 
 func SelectUser(nickname string) (p api.Profile, status int) {
-	rows, err := config.DB.Query(SQLSeletUser,
+	rows, err := mainconfig.DB.Query(SQLSeletUser,
 		nickname)
 	if err != nil {
 		config.Logger.Warnw("SelectUser",
@@ -80,7 +81,7 @@ func SelectUser(nickname string) (p api.Profile, status int) {
 func UpdateUser(nickname string, u api.Update) (p api.Profile, status int) {
 	fmt.Println(u)
 
-	res, err := config.DB.Exec(SQLUpdateUser,
+	res, err := mainconfig.DB.Exec(SQLUpdateUser,
 		u.Name,
 		u.Surname,
 		u.DOB,
@@ -109,7 +110,7 @@ func UpdateUser(nickname string, u api.Update) (p api.Profile, status int) {
 }
 
 func CheckUser(nickname, passwd string) bool {
-	row, err := config.DB.Query(SQLCheckUser,
+	row, err := mainconfig.DB.Query(SQLCheckUser,
 		nickname)
 	if err != nil {
 		return false
@@ -141,7 +142,7 @@ func CheckUser(nickname, passwd string) bool {
 }
 
 func DeletePhoto(filename string) {
-	if filename == config.DefaultImg {
+	if filename == mainconfig.DefaultImg {
 		return
 	}
 
@@ -155,7 +156,7 @@ func DeletePhoto(filename string) {
 }
 
 func UpdateUserPhoto(nickname, photo string) bool {
-	res, err := config.DB.Exec(SQLUpdatePhoto,
+	res, err := mainconfig.DB.Exec(SQLUpdatePhoto,
 		photo, nickname)
 	if err != nil {
 		config.Logger.Warnw("UpdateUserPhoto",
@@ -176,7 +177,7 @@ func UpdateUserPhoto(nickname, photo string) bool {
 }
 
 func DeleteUser(nickname string) bool {
-	res, err := config.DB.Exec(SQLDeleteUser, nickname)
+	res, err := mainconfig.DB.Exec(SQLDeleteUser, nickname)
 	if err != nil {
 		config.Logger.Warnw("DeleteUser",
 			"warn", err.Error())
@@ -195,25 +196,25 @@ func DeleteUser(nickname string) bool {
 	return true
 }
 
-var sqlInsertUser = `insert into ` + config.DBSCHEMA + `users (nickname, name, surname, dob, passwd) values ($1, $2, $3, $4, $5)`
+var sqlInsertUser = `insert into ` + mainconfig.DBSCHEMA + `users (nickname, name, surname, dob, passwd) values ($1, $2, $3, $4, $5)`
 
 var SQLSeletUser = `select 
 					id, nickname, name, surname, dob, photo, score	
-					from ` + config.DBSCHEMA + `users
+					from ` + mainconfig.DBSCHEMA + `users
 					where nickname = $1`
 
-var SQLUpdateUser = `update ` + config.DBSCHEMA + `users 
+var SQLUpdateUser = `update ` + mainconfig.DBSCHEMA + `users 
 						set (name, surname, dob) = ($1, $2, $3)
 						where nickname = $4`
 
 var SQLCheckUser = `select 
 					passwd	
-					from ` + config.DBSCHEMA + `users
+					from ` + mainconfig.DBSCHEMA + `users
 					where nickname = $1`
 
-var SQLUpdatePhoto = `update ` + config.DBSCHEMA + `users 
+var SQLUpdatePhoto = `update ` + mainconfig.DBSCHEMA + `users 
 						set photo = $1
 						where nickname = $2`
 
-var SQLDeleteUser = `delete from ` + config.DBSCHEMA + `users
+var SQLDeleteUser = `delete from ` + mainconfig.DBSCHEMA + `users
 						where nickname = $1`
