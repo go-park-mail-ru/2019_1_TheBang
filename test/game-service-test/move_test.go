@@ -45,3 +45,57 @@ func TestMoveRight(t *testing.T) {
 		t.Errorf("Error: faild %v move", right)
 	}
 }
+
+func TestMoveLeft(t *testing.T) {
+	var x uint = 0
+	var y uint = 0
+
+	game, user := preGame(x, y)
+	action := room.Action{
+		Time:   "test",
+		Player: user.Nickname,
+		Move:   left,
+	}
+
+	game.Aggregation(action)
+
+	if game.PlayersPos[user.Nickname].X != x {
+		t.Errorf("Error: faild %v move", left)
+	}
+}
+
+func TestMoveUp(t *testing.T) {
+	var x uint = 0
+	var y uint = 0
+
+	game, user := preGame(x, y)
+	action := room.Action{
+		Time:   "test",
+		Player: user.Nickname,
+		Move:   up,
+	}
+
+	game.Aggregation(action)
+
+	if game.PlayersPos[user.Nickname].Y != y {
+		t.Errorf("Error: faild %v move", up)
+	}
+}
+
+func TestMoveDown(t *testing.T) {
+	var x uint = 0
+	var y uint = 0
+
+	game, user := preGame(x, y)
+	action := room.Action{
+		Time:   "test",
+		Player: user.Nickname,
+		Move:   down,
+	}
+
+	game.Aggregation(action)
+
+	if game.PlayersPos[user.Nickname].Y != y+1 {
+		t.Errorf("Error: faild %v move", down)
+	}
+}
