@@ -15,8 +15,5 @@ func createGlobalLogger() *zap.SugaredLogger {
 		log.Fatalln("createLogger", err.Error)
 	}
 
-	// func ErrorOutput - определить куда летят внутренние ошибки логгера
-	// toDo сделать advance cfg c определением места логирования
-
 	return logger.Sugar()
 }

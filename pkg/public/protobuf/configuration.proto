@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.helloworld";
+option java_outer_classname = "HelloWorldProto";
+
+package protobuf;
+
+
+service CookieChecker {
+  rpc CheckCookie (CookieRequest) returns (UserInfoResponse) {}
+}
+
+message CookieRequest {
+  string jwt_token = 1;
+}
+
+message UserInfoResponse {
+  bool valid = 1;
+  UserInfo user = 2;
+}
+
+message UserInfo {
+  string nickname = 1;
+  string photo_url = 2;
+  double id = 3;
+}
