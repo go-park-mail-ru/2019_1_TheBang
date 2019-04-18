@@ -9,8 +9,8 @@ import (
 	"net/http/httptest"
 
 	"2019_1_TheBang/api"
-	"2019_1_TheBang/pkg/login"
-	"2019_1_TheBang/pkg/user"
+	"2019_1_TheBang/pkg/main-serivce-pkg/login"
+	"2019_1_TheBang/pkg/main-serivce-pkg/user"
 
 	"github.com/gorilla/mux"
 )

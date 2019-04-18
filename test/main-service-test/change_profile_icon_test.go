@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/user"
+	"2019_1_TheBang/pkg/main-serivce-pkg/user"
 )
 
 func TestChangeProfileAvatarHandler(t *testing.T) {
