@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"2019_1_TheBang/config"
+	"2019_1_TheBang/pkg/public/auth"
 )
 
 type urlMehtod struct {
@@ -15,6 +16,7 @@ type urlMehtod struct {
 var ignorCheckAuth = map[urlMehtod]bool{
 	urlMehtod{URL: "/auth", Method: "POST"}: true,
 	urlMehtod{URL: "/user", Method: "POST"}: true,
+	urlMehtod{URL: "/room", Method: "POST"}: true,
 }
 
 func AuthMiddleware(next http.Handler) http.Handler {
@@ -25,7 +27,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				return
 			}
 
-			if _, ok := CheckTocken(r); !ok {
+			if _, ok := auth.CheckTocken(r); !ok {
 				w.WriteHeader(http.StatusUnauthorized)
 
 				return
