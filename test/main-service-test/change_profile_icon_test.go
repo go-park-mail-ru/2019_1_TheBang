@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"2019_1_TheBang/config"
+	"2019_1_TheBang/config/mainconfig"
 	"2019_1_TheBang/pkg/main-serivce-pkg/user"
 )
 
@@ -18,7 +18,7 @@ func TestChangeProfileAvatarHandler(t *testing.T) {
 	cookie, _ := GetTESTAdminCookie()
 	defer DeleteTESTAdmin()
 
-	pathOS := "tmp/" + config.DefaultImg
+	pathOS := "tmp/" + mainconfig.DefaultImg
 	req, err := newfileUploadRequest("/user/avatar", map[string]string{}, "photo", pathOS)
 	if err != nil {
 		t.Fatal(err.Error())

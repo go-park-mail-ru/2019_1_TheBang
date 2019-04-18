@@ -15,14 +15,14 @@ const (
 	down  = "down"
 )
 
-type cell string
+type Cell string
 
 const (
-	gem      cell = "gem"
-	player   cell = "player"
-	groung   cell = "ground"
-	box      cell = "box"
-	teleport cell = "teleport"
+	gem      Cell = "gem"
+	player   Cell = "player"
+	groung   Cell = "ground"
+	box      Cell = "box"
+	teleport Cell = "teleport"
 )
 
 type Action struct {
@@ -45,7 +45,7 @@ type GameSnap struct {
 
 // todo изменить на слайс слайсов
 // с возможностью генерации определенного размера карты
-type GameMap [Height][Width]cell
+type GameMap [Height][Width]Cell
 
 func NewMap() GameMap {
 	config.Logger.Infow("NewMap",
