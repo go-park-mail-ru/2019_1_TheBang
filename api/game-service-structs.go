@@ -28,15 +28,6 @@ var ConectionMsg = SocketMsg{
 	},
 }
 
-var GameStartedMsg = SocketMsg{
-	Type: GameStarted,
-	Data: struct {
-		Msg string `json:"msg"`
-	}{
-		Msg: "Game was started",
-	},
-}
-
 var GameFinishedMsg = SocketMsg{
 	Type: GameFinish,
 	Data: struct {

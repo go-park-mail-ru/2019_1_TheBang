@@ -9,10 +9,10 @@ const (
 )
 
 type GameMap struct {
-	Map    [][]int
-	Height int
-	Width  int
-	Gems   int
+	Map    [][]int `json:"map"`
+	Height int     `json:"height"`
+	Width  int     `json:"width"`
+	Gems   int     `json:"gems"`
 }
 
 func NewMap(height, width int) GameMap {

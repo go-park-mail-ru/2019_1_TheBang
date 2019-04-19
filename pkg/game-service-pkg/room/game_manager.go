@@ -1,5 +1,9 @@
 package room
 
+import (
+	"2019_1_TheBang/config/gameconfig"
+)
+
 const (
 	left  = "left"
 	right = "right"
@@ -60,7 +64,6 @@ func (g *GameInst) AcceptAction(action Action) bool {
 			newpos.X++
 		}
 
-		// up и down инвертированы
 	case action.Move == down:
 		if newpos.Y < upBorder {
 			newpos.Y++
@@ -77,21 +80,18 @@ func (g *GameInst) AcceptAction(action Action) bool {
 		g.GemsCount--
 	}
 
-	if g.Map.Map[newpos.X][newpos.Y] == teleport {
-		g.Map.Map[pos.X][pos.Y] = Ground
-		g.Map.Map[newpos.X][newpos.Y] = player
+	//  заметка: ели телепорт отркылся, то не важно кто на него наступил, тому + 5 баллов
+	if newpos == g.Teleport && g.IsTeleport {
+		g.PlayersScore[action.Player] += gameconfig.TeleportPoints
 
 		return true
 	}
 
 	g.PlayersPos[action.Player] = newpos
 	g.Map.Map[pos.X][pos.Y] = Ground
-	g.Map.Map[newpos.X][newpos.Y] = player
 
-	if g.GemsCount == 0 && !g.Teleport {
-		// хардкод телепорта
-		g.Map[2][2] = teleport
-		g.Teleport = true
+	if g.GemsCount == 0 && !g.IsTeleport {
+		g.IsTeleport = true
 	}
 
 	return false

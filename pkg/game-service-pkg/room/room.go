@@ -163,7 +163,18 @@ Loop:
 				defer config.Logger.Infow("GameInst Run",
 					"msg", fmt.Sprintf("Game in room [id: %v, name: %v] was finished", r.Id, r.Name))
 
-				r.Distribution(api.GameStartedMsg)
+				msg := api.SocketMsg{
+					Type: api.GameStarted,
+					Data: struct {
+						Msg string  `json:"msg"`
+						Map GameMap `json:"game_map"`
+					}{
+						Msg: "Game was started",
+						Map: r.GameInst.Map,
+					},
+				}
+
+				r.Distribution(msg)
 			}
 
 		case <-r.Closer:
