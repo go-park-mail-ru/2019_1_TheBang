@@ -27,12 +27,3 @@ var ConectionMsg = SocketMsg{
 		Msg: "You was conected to the room",
 	},
 }
-
-var GameFinishedMsg = SocketMsg{
-	Type: GameFinish,
-	Data: struct {
-		Msg string `json:"msg"`
-	}{
-		Msg: "Game was finished",
-	},
-}
