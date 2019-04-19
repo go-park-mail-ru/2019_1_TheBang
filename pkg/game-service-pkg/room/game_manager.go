@@ -1,50 +1,24 @@
 package room
 
-var (
-	leftBorder  uint = 0
-	rightBorder uint = Width - 1
-	upBorder    uint = Height - 1
-	downBorder  uint = 0
+const (
+	left  = "left"
+	right = "right"
+	up    = "up"
+	down  = "down"
 )
 
-type GameInst struct {
-	Map          GameMap
-	PlayersPos   map[string]Position
-	PlayersScore map[string]uint
-	GemsCount    uint // захардкодить число гемов
-	MaxGemsCount uint
-	Room         *Room
-	Teleport     bool // наличие тп на карте
+type Action struct {
+	Time   string `json:"time" mapstructure:"time"`
+	Player string `json:"player" mapstructure:"player"`
+	Move   string `json:"move" mapstructure:"move"` // left | right | up | down
 }
 
-func NewGame(r *Room) GameInst {
-	score := make(map[string]uint)
-	pos := make(map[string]Position)
-
-	for player := range r.Players {
-		score[player.Nickname] = 0
-		pos[player.Nickname] = Position{}
-	}
-
-	return GameInst{
-		Map:          NewMap(),
-		PlayersPos:   pos,
-		PlayersScore: score,
-		GemsCount:    1, // захардкодить число гемов
-		MaxGemsCount: 1, // захардкодить число гемов
-		Room:         r,
-	}
+type Position struct {
+	X int `json:"x"`
+	Y int `json:"y"`
 }
 
-func (g *GameInst) Snap() GameSnap {
-	return GameSnap{
-		Map:          g.Map,
-		PlayersScore: g.PlayersScore,
-		GemsCount:    g.GemsCount,
-		MaxGemsCount: g.MaxGemsCount,
-	}
-}
-
+//  todo ок заменить на финиш (имя переменной)
 func (g *GameInst) Aggregation(actions ...Action) bool {
 	for _, action := range actions {
 		ok := g.AcceptAction(action)
@@ -57,6 +31,13 @@ func (g *GameInst) Aggregation(actions ...Action) bool {
 }
 
 func (g *GameInst) AcceptAction(action Action) bool {
+	var (
+		leftBorder  int = 0
+		rightBorder int = g.Map.Width - 1
+		upBorder    int = g.Map.Height - 1
+		downBorder  int = 0
+	)
+
 	var (
 		pos Position
 		ok  bool
@@ -91,21 +72,21 @@ func (g *GameInst) AcceptAction(action Action) bool {
 		}
 	}
 
-	if g.Map[newpos.X][newpos.Y] == gem {
+	if g.Map.Map[newpos.X][newpos.Y] == Gem {
 		g.PlayersScore[action.Player]++
 		g.GemsCount--
 	}
 
-	if g.Map[newpos.X][newpos.Y] == teleport {
-		g.Map[pos.X][pos.Y] = groung
-		g.Map[newpos.X][newpos.Y] = player
+	if g.Map.Map[newpos.X][newpos.Y] == teleport {
+		g.Map.Map[pos.X][pos.Y] = Ground
+		g.Map.Map[newpos.X][newpos.Y] = player
 
 		return true
 	}
 
 	g.PlayersPos[action.Player] = newpos
-	g.Map[pos.X][pos.Y] = groung
-	g.Map[newpos.X][newpos.Y] = player
+	g.Map.Map[pos.X][pos.Y] = Ground
+	g.Map.Map[newpos.X][newpos.Y] = player
 
 	if g.GemsCount == 0 && !g.Teleport {
 		// хардкод телепорта

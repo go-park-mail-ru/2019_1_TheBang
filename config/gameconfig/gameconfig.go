@@ -16,6 +16,11 @@ const (
 	WriteDeadline = 10 * time.Second
 )
 
+const (
+	GameWidth  = 12
+	GameHeight = 12
+)
+
 var (
 	SocketReadBufferSize        = 1024
 	SocketWriteBufferSize       = 1024
