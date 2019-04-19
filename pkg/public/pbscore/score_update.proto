@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.helloworld";
+option java_outer_classname = "HelloWorldProto";
+
+package pbscore;
+
+service ScoreUpdater {
+  rpc UpdateScore (ScoreRequest) returns (ScoreResponse) {}
+}
+
+message ScoreRequest {
+  int32 player_id = 1;
+  int32 point = 2;
+}
+
+message ScoreResponse {
+  bool ok = 1;
+}
