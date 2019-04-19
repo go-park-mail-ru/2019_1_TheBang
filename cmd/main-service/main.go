@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/http"
+	"sync"
 
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/config/mainconfig"
@@ -12,19 +14,13 @@ import (
 	"2019_1_TheBang/pkg/main-serivce-pkg/user"
 	"2019_1_TheBang/pkg/public/middleware"
 
+	pb "2019_1_TheBang/pkg/public/pbscore"
+
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
 )
 
-func main() {
-	defer config.Logger.Sync()
-	config.Logger.Info(fmt.Sprintf("FrontenDest: %v", config.FrontentDst))
-	config.Logger.Info(fmt.Sprintf("PORT: %v", mainconfig.MAINPORT))
-
-	err := mainconfig.DB.Ping()
-	if err != nil {
-		config.Logger.Fatal("Can not start connection with database")
-	}
-
+func setUpRouter() *mux.Router {
 	r := mux.NewRouter()
 	r.Use(middleware.AccessLogMiddleware,
 		middleware.CommonMiddleware,
@@ -43,5 +39,49 @@ func main() {
 
 	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
 
-	config.Logger.Fatal(http.ListenAndServe(":"+mainconfig.MAINPORT, r))
+	return r
+}
+
+func main() {
+	wg := sync.WaitGroup{}
+
+	defer config.Logger.Sync()
+	config.Logger.Info(fmt.Sprintf("FrontenDest: %v", config.FrontentDst))
+	config.Logger.Info(fmt.Sprintf("MAINPORT: %v", mainconfig.MAINPORT))
+	config.Logger.Info(fmt.Sprintf("POINTSPORT: %v", mainconfig.POINTSPORT))
+
+	err := mainconfig.DB.Ping()
+	if err != nil {
+		config.Logger.Fatal("Can not start connection with database")
+	}
+
+	r := setUpRouter()
+
+	wg.Add(1)
+	go http.ListenAndServe(":"+mainconfig.MAINPORT, r)
+
+	fmt.Println("HERE")
+
+	lis, err := net.Listen("tcp", ":"+mainconfig.POINTSPORT)
+	if err != nil {
+		config.Logger.Fatalw("Listen port",
+			"error:", err.Error())
+	}
+
+	s := grpc.NewServer()
+	pb.RegisterScoreUpdaterServer(s, &user.Server{})
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		if err = s.Serve(lis); err != nil {
+			config.Logger.Fatalw("serve port",
+				"error:", err.Error())
+		}
+	}()
+
+	config.Logger.Info(fmt.Sprint("ScoreSserver started!"))
+
+	wg.Wait()
 }

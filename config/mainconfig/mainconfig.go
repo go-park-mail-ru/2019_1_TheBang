@@ -17,6 +17,7 @@ var (
 	DB               *sql.DB = connectDB()
 	RowsOnLeaderPage uint    = 6
 	MAINPORT                 = getMainPort()
+	POINTSPORT               = getPointsPort()
 )
 
 func connectDB() *sql.DB {
@@ -95,6 +96,16 @@ func getMainPort() string {
 	if port == "" {
 		config.Logger.Warn("There is no MAINPORT!")
 		port = "8001"
+	}
+
+	return port
+}
+
+func getPointsPort() string {
+	port := os.Getenv("POINTSPORT")
+	if port == "" {
+		config.Logger.Warn("There is no POINTSPORT!")
+		port = "50052"
 	}
 
 	return port

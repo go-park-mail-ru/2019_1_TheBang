@@ -196,6 +196,26 @@ func DeleteUser(nickname string) bool {
 	return true
 }
 
+func UpdateUserScore(id int32, points int32) bool {
+	res, err := mainconfig.DB.Exec(SQLUpdateUserScore, points, id)
+	if err != nil {
+		config.Logger.Warnw("UpdateUserScore",
+			"warn", err.Error())
+
+		return false
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows != 1 {
+		config.Logger.Warnw("UpdateUserScore",
+			"warn", "wrong count affected rows")
+
+		return false
+	}
+
+	return true
+}
+
 var sqlInsertUser = `insert into ` + mainconfig.DBSCHEMA + `users (nickname, name, surname, dob, passwd) values ($1, $2, $3, $4, $5)`
 
 var SQLSeletUser = `select 
@@ -218,3 +238,7 @@ var SQLUpdatePhoto = `update ` + mainconfig.DBSCHEMA + `users
 
 var SQLDeleteUser = `delete from ` + mainconfig.DBSCHEMA + `users
 						where nickname = $1`
+
+var SQLUpdateUserScore = `update ` + mainconfig.DBSCHEMA + `users 
+						set score = score + $1
+						where id = $2`
