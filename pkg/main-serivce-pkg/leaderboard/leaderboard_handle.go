@@ -2,8 +2,8 @@ package leaderboard
 
 import (
 	"net/http"
-	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/mux"
 )
 
@@ -14,22 +14,15 @@ func (vh VarsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	vh(w, r, vars)
 }
 
-func LeaderbordHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	page := vars["page"]
-	number, err := strconv.Atoi(page)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-	if number == 0 {
-		w.WriteHeader(http.StatusBadRequest)
+func LeaderbordHandler(c *gin.Context) {
+	page := c.GetInt("page")
+	if page == 0 {
+		c.AbortWithStatus(http.StatusBadRequest)
 
 		return
 	}
 
-	json, status := LeaderPage(uint(number))
+	json, status := LeaderPage(uint(page))
 	if status != http.StatusOK {
 		w.WriteHeader(status)
 

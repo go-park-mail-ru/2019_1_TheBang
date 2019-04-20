@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"net"
-	"net/http"
 	"sync"
+
+	"github.com/gin-gonic/gin"
 
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/config/mainconfig"
@@ -26,9 +27,6 @@ func setUpRouter() *mux.Router {
 		middleware.CommonMiddleware,
 		middleware.AuthMiddleware)
 
-	r.HandleFunc("/auth", login.LogInHandler).Methods("POST")
-	r.HandleFunc("/auth", logout.LogoutHandler).Methods("DELETE", "OPTIONS")
-
 	r.HandleFunc("/leaderbord/{page:[0-9]+}", leaderboard.LeaderbordHandler).Methods("GET")
 
 	r.HandleFunc("/user", user.MyProfileCreateHandler).Methods("POST")
@@ -40,6 +38,23 @@ func setUpRouter() *mux.Router {
 	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
 
 	return r
+}
+
+func setUpMainRouter() *gin.Engine {
+	router := gin.Default()
+	router.Use(middleware.CorsMiddlewareGin,
+		middleware.AuthMiddlewareGin)
+
+	router.POST("/auth", login.LogInHandler)
+	router.DELETE("/auth", logout.LogoutHandler)
+
+	// router.GET("/leaderbord/{:page}", leaderboard.LeaderbordHandler)
+
+	// router.GET("/room", app.RoomsListHandle)
+	// router.POST("/room", app.CreateRoomHandle)
+	// router.GET("/room/:id", app.ConnectRoomHandle)
+
+	return router
 }
 
 func main() {
@@ -55,10 +70,11 @@ func main() {
 		config.Logger.Fatal("Can not start connection with database")
 	}
 
-	r := setUpRouter()
+	r := setUpMainRouter()
 
 	wg.Add(1)
-	go http.ListenAndServe(":"+mainconfig.MAINPORT, r)
+	// go http.ListenAndServe(":"+mainconfig.MAINPORT, r)
+	go r.Run(":" + mainconfig.MAINPORT)
 
 	fmt.Println("HERE")
 
