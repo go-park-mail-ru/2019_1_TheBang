@@ -127,7 +127,7 @@ Loop:
 
 				ok := r.GameInst.Aggregation(action)
 				if ok {
-					r.Distribution(api.GameFinishedMsg)
+					r.Distribution(GameFinishedMsg)
 
 					break Loop
 				}

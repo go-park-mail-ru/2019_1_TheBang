@@ -8,7 +8,7 @@ import (
 type Server struct{}
 
 func (s *Server) UpdateScore(ctx context.Context, in *pb.ScoreRequest) (*pb.ScoreResponse, error) {
-	ok := UpdateScore(in.PlayerId, in.Point)
+	ok := UpdateUserScore(in.PlayerId, in.Point)
 	return &pb.ScoreResponse{
 			Ok: ok,
 		},
