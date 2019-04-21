@@ -17,28 +17,8 @@ import (
 
 	pb "2019_1_TheBang/pkg/public/pbscore"
 
-	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 )
-
-func setUpRouter() *mux.Router {
-	r := mux.NewRouter()
-	r.Use(middleware.AccessLogMiddleware,
-		middleware.CommonMiddleware,
-		middleware.AuthMiddleware)
-
-	r.HandleFunc("/leaderbord/{page:[0-9]+}", leaderboard.LeaderbordHandler).Methods("GET")
-
-	r.HandleFunc("/user", user.MyProfileCreateHandler).Methods("POST")
-	r.HandleFunc("/user", user.MyProfileInfoHandler).Methods("GET")
-	r.HandleFunc("/user", user.MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
-
-	r.HandleFunc("/user/avatar", user.ChangeProfileAvatarHandler).Methods("POST", "OPTIONS")
-
-	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
-
-	return r
-}
 
 func setUpMainRouter() *gin.Engine {
 	router := gin.Default()
@@ -48,11 +28,15 @@ func setUpMainRouter() *gin.Engine {
 	router.POST("/auth", login.LogInHandler)
 	router.DELETE("/auth", logout.LogoutHandler)
 
-	// router.GET("/leaderbord/{:page}", leaderboard.LeaderbordHandler)
+	router.GET("/leaderbord/:page", leaderboard.LeaderbordHandler)
 
-	// router.GET("/room", app.RoomsListHandle)
-	// router.POST("/room", app.CreateRoomHandle)
-	// router.GET("/room/:id", app.ConnectRoomHandle)
+	router.POST("/user", user.MyProfileCreateHandler)
+	router.GET("/user", user.MyProfileInfoHandler)
+	router.PUT("/user", user.MyProfileInfoUpdateHandler)
+
+	router.POST("/user/avatar", user.ChangeProfileAvatarHandler)
+
+	router.GET("/icon/:filename", user.GetIconHandler)
 
 	return router
 }
@@ -73,10 +57,7 @@ func main() {
 	r := setUpMainRouter()
 
 	wg.Add(1)
-	// go http.ListenAndServe(":"+mainconfig.MAINPORT, r)
 	go r.Run(":" + mainconfig.MAINPORT)
-
-	fmt.Println("HERE")
 
 	lis, err := net.Listen("tcp", ":"+mainconfig.POINTSPORT)
 	if err != nil {
