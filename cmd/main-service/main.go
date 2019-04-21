@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"net"
-	"net/http"
 	"sync"
+
+	"github.com/gin-gonic/gin"
 
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/config/mainconfig"
@@ -16,30 +17,28 @@ import (
 
 	pb "2019_1_TheBang/pkg/public/pbscore"
 
-	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 )
 
-func setUpRouter() *mux.Router {
-	r := mux.NewRouter()
-	r.Use(middleware.AccessLogMiddleware,
-		middleware.CommonMiddleware,
-		middleware.AuthMiddleware)
+func setUpMainRouter() *gin.Engine {
+	router := gin.Default()
+	router.Use(middleware.CorsMiddlewareGin,
+		middleware.AuthMiddlewareGin)
 
-	r.HandleFunc("/auth", login.LogInHandler).Methods("POST")
-	r.HandleFunc("/auth", logout.LogoutHandler).Methods("DELETE", "OPTIONS")
+	router.POST("/auth", login.LogInHandler)
+	router.DELETE("/auth", logout.LogoutHandler)
 
-	r.HandleFunc("/leaderbord/{page:[0-9]+}", leaderboard.LeaderbordHandler).Methods("GET")
+	router.GET("/leaderbord/:page", leaderboard.LeaderbordHandler)
 
-	r.HandleFunc("/user", user.MyProfileCreateHandler).Methods("POST")
-	r.HandleFunc("/user", user.MyProfileInfoHandler).Methods("GET")
-	r.HandleFunc("/user", user.MyProfileInfoUpdateHandler).Methods("PUT", "OPTIONS")
+	router.POST("/user", user.MyProfileCreateHandler)
+	router.GET("/user", user.MyProfileInfoHandler)
+	router.PUT("/user", user.MyProfileInfoUpdateHandler)
 
-	r.HandleFunc("/user/avatar", user.ChangeProfileAvatarHandler).Methods("POST", "OPTIONS")
+	router.POST("/user/avatar", user.ChangeProfileAvatarHandler)
 
-	r.HandleFunc("/icon/{filename}", user.GetIconHandler).Methods("GET")
+	router.GET("/icon/:filename", user.GetIconHandler)
 
-	return r
+	return router
 }
 
 func main() {
@@ -55,12 +54,10 @@ func main() {
 		config.Logger.Fatal("Can not start connection with database")
 	}
 
-	r := setUpRouter()
+	r := setUpMainRouter()
 
 	wg.Add(1)
-	go http.ListenAndServe(":"+mainconfig.MAINPORT, r)
-
-	fmt.Println("HERE")
+	go r.Run(":" + mainconfig.MAINPORT)
 
 	lis, err := net.Listen("tcp", ":"+mainconfig.POINTSPORT)
 	if err != nil {

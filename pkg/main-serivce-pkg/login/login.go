@@ -1,9 +1,7 @@
 package login
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -12,38 +10,24 @@ import (
 	"2019_1_TheBang/config/mainconfig"
 	"2019_1_TheBang/pkg/main-serivce-pkg/user"
 	"2019_1_TheBang/pkg/public/auth"
+	_ "encoding/json"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 )
 
-func LogInHandler(w http.ResponseWriter, r *http.Request) {
+func LogInHandler(c *gin.Context) {
 	login := api.Login{}
-
-	body, err := ioutil.ReadAll(r.Body)
+	err := c.BindJSON(&login)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("LogoutHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError,
-			"warn", err.Error())
-
-		return
-	}
-
-	err = json.Unmarshal(body, &login)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("LogoutHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError,
-			"warn", err.Error())
+		c.AbortWithStatus(http.StatusBadRequest)
 
 		return
 	}
 
 	ss, status := LoginAcount(login.Nickname, login.Passwd)
 	if status != http.StatusOK {
-		w.WriteHeader(status)
+		c.AbortWithStatus(status)
 
 		return
 	}
@@ -56,30 +40,16 @@ func LogInHandler(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	}
 
-	http.SetCookie(w, &cookie)
+	http.SetCookie(c.Writer, &cookie)
 
 	prof, status := user.SelectUser(login.Nickname)
 	if status != http.StatusOK {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("LogoutHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError,
-			"warn", "Can not find valid user")
+		c.AbortWithStatus(status)
 
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(prof)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("LogoutHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError,
-			"warn", err.Error())
-
-		return
-	}
-
+	c.JSONP(http.StatusOK, prof)
 }
 
 func LoginAcount(username, passwd string) (ss string, status int) {

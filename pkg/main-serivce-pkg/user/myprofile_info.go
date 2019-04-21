@@ -1,37 +1,26 @@
 package user
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 
-	"2019_1_TheBang/config"
+	"github.com/gin-gonic/gin"
 )
 
-func MyProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-	token := TokenFromCookie(r)
+func MyProfileInfoHandler(c *gin.Context) {
+	token := TokenFromCookie(c.Request)
 	info, status := InfoFromCookie(token)
 	if status == http.StatusInternalServerError {
-		w.WriteHeader(status)
-		config.Logger.Warnw("MyProfileInfoHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 
 		return
 	}
 
 	profile, status := SelectUser(info.Nickname)
 	if status != http.StatusOK {
-		w.WriteHeader(status)
+		c.AbortWithStatus(http.StatusInternalServerError)
 
 		return
 	}
 
-	err := json.NewEncoder(w).Encode(profile)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err.Error())
-
-		return
-	}
+	c.JSONP(http.StatusOK, profile)
 }

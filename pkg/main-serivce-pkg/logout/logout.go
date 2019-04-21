@@ -5,17 +5,22 @@ import (
 	"time"
 
 	"2019_1_TheBang/config"
+
+	"github.com/gin-gonic/gin"
 )
 
-func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := r.Cookie(config.CookieName)
+func LogoutHandler(c *gin.Context) {
+	token, err := c.Cookie(config.CookieName)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusBadRequest)
 
 		return
 	}
 
-	session.Expires = time.Now().AddDate(0, 0, -1)
-	http.SetCookie(w, session)
-
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     config.CookieName,
+		Value:    token,
+		Expires:  time.Now().AddDate(0, 0, -1),
+		HttpOnly: true,
+	})
 }

@@ -1,74 +1,38 @@
 package user
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"2019_1_TheBang/api"
-	"2019_1_TheBang/config"
+
+	"github.com/gin-gonic/gin"
 )
 
-func MyProfileInfoUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "OPTIONS" {
-		return
-	}
-
-	token := TokenFromCookie(r)
+func MyProfileInfoUpdateHandler(c *gin.Context) {
+	token := TokenFromCookie(c.Request)
 	info, status := InfoFromCookie(token)
-
 	if status == http.StatusInternalServerError {
-		w.WriteHeader(status)
-		config.Logger.Warnw("MyProfileInfoUpdateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError)
+		c.AbortWithStatus(http.StatusInternalServerError)
 
 		return
 	}
 
 	update := api.Update{}
-	body, err := ioutil.ReadAll(r.Body)
+	err := c.BindJSON(&update)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("MyProfileInfoUpdateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError,
-			"warn", err.Error())
+		c.AbortWithStatus(http.StatusBadRequest)
 
 		return
 	}
 
-	err = json.Unmarshal(body, &update)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("MyProfileInfoUpdateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError)
-
-		return
-	}
-
-	//toDo жду от фронта
 	update.DOB = "2018-01-01"
 
 	profile, status := UpdateUser(info.Nickname, update)
 	if status != http.StatusOK {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("MyProfileInfoUpdateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError,
-			"warn", "can not update valid user's info")
+		c.AbortWithStatus(status)
 
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(profile)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("MyProfileInfoUpdateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError)
-
-		return
-	}
+	c.JSON(http.StatusOK, profile)
 }

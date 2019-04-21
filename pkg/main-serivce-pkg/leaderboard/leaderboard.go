@@ -1,7 +1,6 @@
 package leaderboard
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"2019_1_TheBang/api"
@@ -9,17 +8,17 @@ import (
 	"2019_1_TheBang/config/mainconfig"
 )
 
-func LeaderPage(number uint) (jsonData []byte, status int) {
+func LeaderPage(number uint) (profs []api.Profile, status int) {
 	offset := mainconfig.RowsOnLeaderPage * (number - 1)
 	rows, err := mainconfig.DB.Query(SQLGetPage, mainconfig.RowsOnLeaderPage, offset)
 	if err != nil {
 		config.Logger.Warnw("LeaderPage",
 			"warn", err.Error())
 
-		return jsonData, http.StatusInternalServerError
+		return profs, http.StatusInternalServerError
 	}
 
-	profs := []api.Profile{}
+	profs = []api.Profile{}
 	for rows.Next() {
 		p := api.Profile{}
 		if err := rows.Scan(&p.Nickname,
@@ -31,25 +30,17 @@ func LeaderPage(number uint) (jsonData []byte, status int) {
 			config.Logger.Warnw("LeaderPage",
 				"warn", err.Error())
 
-			return jsonData, http.StatusInternalServerError
+			return profs, http.StatusInternalServerError
 		}
 
 		profs = append(profs, p)
 	}
 
 	if len(profs) == 0 {
-		return jsonData, http.StatusNotFound
+		return profs, http.StatusNotFound
 	}
 
-	jsonData, err = json.Marshal(profs)
-	if err != nil {
-		config.Logger.Warnw("LeaderPage",
-			"warn", err.Error())
-
-		return jsonData, http.StatusInternalServerError
-	}
-
-	return jsonData, http.StatusOK
+	return profs, http.StatusOK
 }
 
 var SQLGetPage = `select nickname, name, surname, dob, photo, score from ` + mainconfig.DBSCHEMA + `users

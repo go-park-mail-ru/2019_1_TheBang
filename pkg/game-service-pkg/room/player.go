@@ -93,7 +93,7 @@ func PlayerFromCtx(ctx *gin.Context, conn *websocket.Conn) *Player {
 
 func playerInfoFromCookie(ctx *gin.Context) UserInfo {
 	// todo убрать дебаг
-	info, ok := auth.CheckTocken(ctx.Request) 
+	info, ok := auth.CheckTocken(ctx.Request)
 	if !ok {
 		return UserInfo{
 			Id:       666,

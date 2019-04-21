@@ -1,46 +1,30 @@
 package user
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
 	"2019_1_TheBang/api"
-	"2019_1_TheBang/config"
+
+	"github.com/gin-gonic/gin"
 )
 
-func MyProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
-	signup := api.Signup{}
-	body, err := ioutil.ReadAll(r.Body)
+func MyProfileCreateHandler(c *gin.Context) {
+	signup := &api.Signup{}
+	err := c.BindJSON(signup)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("MyProfileCreateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError,
-			"warn", "can not read body")
-
-		return
-	}
-
-	err = json.Unmarshal(body, &signup)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		config.Logger.Warnw("MyProfileCreateHandler",
-			"RemoteAddr", r.RemoteAddr,
-			"status", http.StatusInternalServerError,
-			"warn", "can not marshal json")
+		c.AbortWithStatus(http.StatusBadRequest)
 
 		return
 	}
 
 	signup.DOB = "2018-01-01"
 
-	status := CreateUser(&signup)
+	status := CreateUser(signup)
 	if status != http.StatusCreated {
-		w.WriteHeader(status)
+		c.AbortWithStatus(status)
 
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	c.Status(http.StatusCreated)
 }
