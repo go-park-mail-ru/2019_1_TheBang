@@ -3,6 +3,7 @@ package middleware
 import (
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/pkg/public/auth"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +20,11 @@ var ignorCheckAuth = map[urlMehtod]bool{
 }
 
 func CorsMiddlewareGin(c *gin.Context) {
+	if c.Request.Method == "OPTIONS" {
+		c.AbortWithStatus(http.StatusNoContent)
+		return
+	}
+
 	c.Header("Content-Type", "application/json")
 	c.Header("Access-Control-Allow-Origin", config.FrontentDst)
 	c.Header("Access-Control-Allow-Credentials", "true")
@@ -29,10 +35,6 @@ func CorsMiddlewareGin(c *gin.Context) {
 }
 
 func AuthMiddlewareGin(c *gin.Context) {
-	if c.Request.Method == "OPTIONS" {
-		return
-	}
-
 	check := urlMehtod{URL: c.Request.URL.Path, Method: c.Request.Method}
 	if ok := ignorCheckAuth[check]; !ok {
 		if _, ok := auth.CheckTocken(c.Request); !ok {

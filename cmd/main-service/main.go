@@ -5,41 +5,14 @@ import (
 	"net"
 	"sync"
 
-	"github.com/gin-gonic/gin"
-
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/config/mainconfig"
-	"2019_1_TheBang/pkg/main-serivce-pkg/leaderboard"
-	"2019_1_TheBang/pkg/main-serivce-pkg/login"
-	"2019_1_TheBang/pkg/main-serivce-pkg/logout"
 	"2019_1_TheBang/pkg/main-serivce-pkg/user"
-	"2019_1_TheBang/pkg/public/middleware"
 
 	pb "2019_1_TheBang/pkg/public/pbscore"
 
 	"google.golang.org/grpc"
 )
-
-func setUpMainRouter() *gin.Engine {
-	router := gin.Default()
-	router.Use(middleware.CorsMiddlewareGin,
-		middleware.AuthMiddlewareGin)
-
-	router.POST("/auth", login.LogInHandler)
-	router.DELETE("/auth", logout.LogoutHandler)
-
-	router.GET("/leaderbord/:page", leaderboard.LeaderbordHandler)
-
-	router.POST("/user", user.MyProfileCreateHandler)
-	router.GET("/user", user.MyProfileInfoHandler)
-	router.PUT("/user", user.MyProfileInfoUpdateHandler)
-
-	router.POST("/user/avatar", user.ChangeProfileAvatarHandler)
-
-	router.GET("/icon/:filename", user.GetIconHandler)
-
-	return router
-}
 
 func main() {
 	wg := sync.WaitGroup{}
