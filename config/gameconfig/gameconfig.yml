@@ -1,0 +1,18 @@
+app:
+  room:
+    max_players_in_room : 2
+    game:
+      map:
+        width: 12
+        height: 12
+      teleport_points: 5
+  max_rooms_in_game: 10
+
+networt:
+  socket:
+    read: 1024
+    write: 1024
+  message:
+    size: 512
+  chan_buffer: 10
+
