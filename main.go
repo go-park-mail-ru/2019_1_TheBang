@@ -1,7 +1,6 @@
 package main
 
 import (
-	// r "2019_1_TheBang/pkg/game-service-pkg/room"
 	"fmt"
 	"math/rand"
 )

@@ -7,9 +7,9 @@ var (
 	FrontentDst = getFrontDest()
 
 	CookieName       = "bang_token"
-	AuthServerAddr   = "127.0.0.1" // убрать хардкод, заменить на переменные окружения
+	AuthServerAddr   = "127.0.0.1"
 	AuthServerPort   = "50051"
-	PointsServerAddr = "127.0.0.1" // убрать хардкод, заменить на переменные окружения
+	PointsServerAddr = "127.0.0.1"
 	PointsServerPort = "50052"
 )
 
