@@ -3,11 +3,14 @@ package config
 import "os"
 
 var (
-	SECRET       = getSecret()
-	FrontentDst  = getFrontDest()
-	CookieName   = "bang_token"
-	AuthServer   = "127.0.0.1:50051" // убрать хардкод, заменить на переменные окружения
-	PointsServer = "127.0.0.1:50052" // убрать хардкод, заменить на переменные окружения
+	SECRET      = getSecret()
+	FrontentDst = getFrontDest()
+
+	CookieName       = "bang_token"
+	AuthServerAddr   = "127.0.0.1" // убрать хардкод, заменить на переменные окружения
+	AuthServerPort   = "50051"
+	PointsServerAddr = "127.0.0.1" // убрать хардкод, заменить на переменные окружения
+	PointsServerPort = "50052"
 )
 
 func getSecret() []byte {
