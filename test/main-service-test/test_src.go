@@ -1,78 +1,78 @@
 package test
 
-import (
-	"bytes"
-	"encoding/json"
-	"errors"
-	"log"
-	"net/http"
-	"net/http/httptest"
+// import (
+// 	"bytes"
+// 	"encoding/json"
+// 	"errors"
+// 	"log"
+// 	"net/http"
+// 	"net/http/httptest"
 
-	"2019_1_TheBang/api"
-	"2019_1_TheBang/pkg/main-serivce-pkg/login"
-	"2019_1_TheBang/pkg/main-serivce-pkg/user"
+// 	"2019_1_TheBang/api"
+// 	"2019_1_TheBang/pkg/main-serivce-pkg/login"
+// 	"2019_1_TheBang/pkg/main-serivce-pkg/user"
 
-	"github.com/gorilla/mux"
-)
+// 	"github.com/gorilla/mux"
+// )
 
-type TestCase struct {
-	Body   string
-	Status int
-}
+// type TestCase struct {
+// 	Body   string
+// 	Status int
+// }
 
-var testAdminNick = "testadmin"
+// var testAdminNick = "testadmin"
 
-func GetTESTAdminCookie() (*http.Cookie, error) {
-	prof := api.Signup{
-		Nickname: testAdminNick,
-		Name:     testAdminNick,
-		Surname:  testAdminNick,
-		DOB:      "2017-01-01",
-		Passwd:   testAdminNick,
-	}
+// func GetTESTAdminCookie() (*http.Cookie, error) {
+// 	prof := api.Signup{
+// 		Nickname: testAdminNick,
+// 		Name:     testAdminNick,
+// 		Surname:  testAdminNick,
+// 		DOB:      "2017-01-01",
+// 		Passwd:   testAdminNick,
+// 	}
 
-	body, _ := json.Marshal(prof)
-	path := "/user"
+// 	body, _ := json.Marshal(prof)
+// 	path := "/user"
 
-	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
-	if err != nil {
-		return nil, errors.New("request was failed")
-	}
-	req.Header.Set("Content-Type", "application/json")
+// 	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+// 	if err != nil {
+// 		return nil, errors.New("request was failed")
+// 	}
+// 	req.Header.Set("Content-Type", "application/json")
 
-	rr := httptest.NewRecorder()
-	router := mux.NewRouter()
-	router.HandleFunc(path, user.MyProfileCreateHandler)
-	router.ServeHTTP(rr, req)
+// 	rr := httptest.NewRecorder()
+// 	router := mux.NewRouter()
+// 	router.HandleFunc(path, user.MyProfileCreateHandler)
+// 	router.ServeHTTP(rr, req)
 
-	logApi := api.Login{
-		Nickname: testAdminNick,
-		Passwd:   testAdminNick,
-	}
+// 	logApi := api.Login{
+// 		Nickname: testAdminNick,
+// 		Passwd:   testAdminNick,
+// 	}
 
-	body, _ = json.Marshal(logApi)
-	path = "/auth"
+// 	body, _ = json.Marshal(logApi)
+// 	path = "/auth"
 
-	req, err = http.NewRequest("POST", path, bytes.NewReader(body))
-	if err != nil {
-		return nil, errors.New("request was failed")
-	}
-	req.Header.Set("Content-Type", "application/json")
+// 	req, err = http.NewRequest("POST", path, bytes.NewReader(body))
+// 	if err != nil {
+// 		return nil, errors.New("request was failed")
+// 	}
+// 	req.Header.Set("Content-Type", "application/json")
 
-	rr = httptest.NewRecorder()
-	router = mux.NewRouter()
-	router.HandleFunc(path, login.LogInHandler)
-	router.ServeHTTP(rr, req)
+// 	rr = httptest.NewRecorder()
+// 	router = mux.NewRouter()
+// 	router.HandleFunc(path, login.LogInHandler)
+// 	router.ServeHTTP(rr, req)
 
-	// toDO сделать проверку на этот момент (есть ли кука)
-	cookie := rr.Result().Cookies()[0]
+// 	// toDO сделать проверку на этот момент (есть ли кука)
+// 	cookie := rr.Result().Cookies()[0]
 
-	return cookie, nil
-}
+// 	return cookie, nil
+// }
 
-func DeleteTESTAdmin() {
-	ok := user.DeleteUser(testAdminNick)
-	if !ok {
-		log.Fatal("Can not delete testAdmin!")
-	}
-}
+// func DeleteTESTAdmin() {
+// 	ok := user.DeleteUser(testAdminNick)
+// 	if !ok {
+// 		log.Fatal("Can not delete testAdmin!")
+// 	}
+// }

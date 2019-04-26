@@ -5,8 +5,9 @@ import (
 	"testing"
 )
 
-// x and y < 10
 func preGame(x, y uint) (game room.GameInst, user room.Player) {
+	width := 5
+	heith := 5
 	user = room.Player{
 		Id:       1,
 		Nickname: "test",
@@ -14,7 +15,7 @@ func preGame(x, y uint) (game room.GameInst, user room.Player) {
 	}
 
 	game = room.GameInst{
-		Map: newmap(),
+		Map: room.NewMap(width, heith),
 		PlayersScore: map[string]uint{
 			user.Nickname: 0,
 		},
