@@ -40,32 +40,35 @@ func TestLogInHandlerFAIL(t *testing.T) {
 	}
 }
 
-// func TestLogInHandlerSUCCESS(t *testing.T) {
-// 	cookie, err := GetTESTAdminCookie()
-// 	if err != nil {
-// 		t.Fatal(err.Error())
-// 	}
-// 	defer DeleteTESTAdmin()
+func TestLogInHandlerSUCCESS(t *testing.T) {
+	cookie, err := GetTESTAdminCookie()
+	if err != nil {
+		t.Fatal(err.Error())
+	}
 
-// 	path := "/auth"
-// 	bodyStruct := api.Login{
-// 		Passwd:   testAdminNick,
-// 		Nickname: testAdminNick,
-// 	}
-// 	body, _ := json.Marshal(bodyStruct)
+	defer DeleteTESTAdmin()
 
-// 	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	req.AddCookie(cookie)
+	path := "/auth"
+	bodyStruct := api.Login{
+		Passwd:   testAdminNick,
+		Nickname: testAdminNick,
+	}
+	body, _ := json.Marshal(bodyStruct)
 
-// 	rr := httptest.NewRecorder()
-// 	router := mux.NewRouter()
-// 	router.HandleFunc(path, login.LogInHandler)
-// 	router.ServeHTTP(rr, req)
+	req, err := http.NewRequest("POST", path, bytes.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.AddCookie(cookie)
 
-// 	if rr.Code != http.StatusOK {
-// 		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n", http.StatusOK, rr.Code)
-// 	}
-// }
+	rr := httptest.NewRecorder()
+
+	router := gin.Default()
+	router.POST(path, login.LogInHandler)
+	
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("TestLogoutHandler, have not cookie: expected %v, have %v!\n", http.StatusOK, rr.Code)
+	}
+}
