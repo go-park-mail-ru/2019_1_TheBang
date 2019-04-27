@@ -31,5 +31,8 @@ func setUpMainRouter() *gin.Engine {
 
 	router.GET("/leaderbord/:page", leaderboard.LeaderbordHandler)
 
+	router.GET("/oauth/vk/connect", login.VKAuthConnect)
+	router.GET("/oauth/vk/authorize", login.VKAuthAuthorize)
+
 	return router
 }

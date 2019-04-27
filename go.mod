@@ -25,6 +25,7 @@ require (
 	go.uber.org/multierr v1.1.0 // indirect
 	go.uber.org/zap v1.9.1
 	golang.org/x/crypto v0.0.0-20190417174047-f416ebab96af
+	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 	google.golang.org/grpc v1.20.0
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
