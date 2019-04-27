@@ -4,6 +4,7 @@ import (
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/pkg/public/auth"
 	"net/http"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,6 +39,11 @@ func CorsMiddlewareGin(c *gin.Context) {
 
 func AuthMiddlewareGin(c *gin.Context) {
 	check := urlMehtod{URL: c.Request.URL.Path, Method: c.Request.Method}
+	m, _ := regexp.Match(`/messages*`, []byte(`seafood`))
+	if m == true {
+		c.Next()
+	}
+
 	if ok := ignorCheckAuth[check]; !ok {
 		if _, ok := auth.CheckTocken(c.Request); !ok {
 			return
