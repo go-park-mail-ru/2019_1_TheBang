@@ -118,6 +118,7 @@ func (g *Game) NewRoom() (room.RoomWrap, error) {
 	g.locker.Lock()
 	defer g.locker.Unlock()
 
+	// todo fix in constructor
 	if g.RoomsCount == gameconfig.MaxRoomsInGame {
 		config.Logger.Warnw("NewRoom",
 			"msg", "Rooms limit")
