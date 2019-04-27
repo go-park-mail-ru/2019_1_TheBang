@@ -1,6 +1,8 @@
 package main
 
 import (
+	"2019_1_TheBang/pkg/chat-service-pkg/hub"
+	"2019_1_TheBang/pkg/chat-service-pkg/messages"
 	"2019_1_TheBang/pkg/public/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -10,11 +12,11 @@ func getChatRouter() *gin.Engine {
 	router.Use(middleware.CorsMiddlewareGin,
 		middleware.AuthMiddlewareGin)
 
-	hub := newHub()
-	go hub.run()
+	hub := hub.NewHub()
+	go hub.Run()
 
 	router.GET("/messages", func(c *gin.Context) {
-		serveWs(hub, c.Writer, c.Request)
+		messages.ServeChat(hub, c.Writer, c.Request)
 	})
 
 	return router
