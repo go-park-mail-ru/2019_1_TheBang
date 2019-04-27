@@ -19,5 +19,7 @@ func InserMessage(msg messageFromClient) {
 }
 
 func GetMessages(timestamp int) (messages []messageToClient) {
+	messages = []messageToClient{}
+
 	return
 }
