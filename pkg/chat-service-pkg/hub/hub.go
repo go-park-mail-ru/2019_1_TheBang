@@ -1,5 +1,9 @@
 package hub
 
+import (
+	"2019_1_TheBang/config"
+)
+
 type Hub struct {
 	Clients    map[*Client]bool
 	Broadcast  chan []byte
@@ -21,11 +25,16 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.Register:
 			h.Clients[client] = true
+			config.Logger.Infof("user %v connected", client.Nickname)
+
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
+				config.Logger.Infof("user %v disconnected", client.Nickname)
+
 				delete(h.Clients, client)
 				close(client.Send)
 			}
+
 		case message := <-h.Broadcast:
 			for client := range h.Clients {
 				select {
