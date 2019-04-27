@@ -1,6 +1,8 @@
 package hub
 
 import (
+	"2019_1_TheBang/config"
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"time"
 )
@@ -22,16 +24,38 @@ func (c *Client) ReadPump() {
 		c.Hub.Unregister <- c
 		c.Conn.Close()
 	}()
+
 	c.Conn.SetReadLimit(maxMessageSize)
 	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		_, msg, err := c.Conn.ReadMessage()
+		_, bytes, err := c.Conn.ReadMessage()
 		if err != nil {
 			break
 		}
 
-		c.Hub.Broadcast <- msg
+		msg := messageFromClient{}
+		if err := json.Unmarshal(bytes, &msg); err != nil {
+			config.Logger.Info("invalid msg stuct (Unmarshal)")
+
+			continue
+		}
+
+		msg.Author = c.Nickname
+		msg.PhotoURL = "http://95.163.212.32:8001/icon/" + c.PhotoURL
+
+		ok := InserMessage(msg)
+		if !ok {
+			config.Logger.Warn("msg was not saved")
+		}
+
+		if bytes, err = json.Marshal(msg); err != nil {
+			config.Logger.Info("invalid msg stuct (Marshal)")
+
+			continue
+		}
+
+		c.Hub.Broadcast <- bytes
 	}
 }
 
@@ -41,6 +65,7 @@ func (c *Client) WritePump() {
 		ticker.Stop()
 		c.Conn.Close()
 	}()
+
 	for {
 		select {
 		case message, ok := <-c.Send:
@@ -66,6 +91,7 @@ func (c *Client) WritePump() {
 			if err := w.Close(); err != nil {
 				return
 			}
+
 		case <-ticker.C:
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
