@@ -1,8 +1,8 @@
 package hub
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"log"
 	"net/http"
 )
 
@@ -14,13 +14,24 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func ServeChat(chatHub *Hub, w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
+func ServeChat(chatHub *Hub, c *gin.Context) {
+	if ok := c.IsWebsocket(); !ok {
+		c.AbortWithStatus(http.StatusBadRequest)
+
 		return
 	}
-	client := &Client{Hub: chatHub, Conn: conn, Send: make(chan []byte, 256)}
+
+	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		c.JSONP(http.StatusBadRequest, gin.H{
+			"message": "can not upgrade to websocket",
+		})
+
+		return
+	}
+
+	client := clientFromContext(c, conn)
+	client.Hub = chatHub
 	client.Hub.Register <- client
 
 	go client.WritePump()

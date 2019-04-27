@@ -11,6 +11,7 @@ var (
 	AuthServerPort   = "50051"
 	PointsServerAddr = "127.0.0.1"
 	PointsServerPort = "50052"
+	DefaultImg       = "default_img"
 )
 
 func getSecret() []byte {

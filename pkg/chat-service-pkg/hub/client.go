@@ -1,84 +1,43 @@
 package hub
 
 import (
+	"2019_1_TheBang/config"
+	"2019_1_TheBang/pkg/public/auth"
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"time"
-)
-
-const (
-	writeWait      = 10 * time.Second
-	pongWait       = 60 * time.Second
-	pingPeriod     = (pongWait * 9) / 10
-	maxMessageSize = 512
-)
-
-var (
-	newline = []byte{'\n'}
-	space   = []byte{' '}
 )
 
 type Client struct {
-	Hub *Hub
-
-	Conn *websocket.Conn
-
-	Send chan []byte
+	Nickname string
+	PhotoURL string
+	Hub      *Hub
+	Conn     *websocket.Conn
+	Send     chan []byte
 }
 
-func (c *Client) ReadPump() {
-	defer func() {
-		c.Hub.Unregister <- c
-		c.Conn.Close()
-	}()
-	c.Conn.SetReadLimit(maxMessageSize)
-	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
-	for {
-		_, msg, err := c.Conn.ReadMessage()
-		if err != nil {
-			break
+func playerInfoFromCookie(ctx *gin.Context) *Client {
+	info, ok := auth.CheckTocken(ctx.Request)
+	if !ok {
+		return &Client{
+			Nickname: "undef",
+			PhotoURL: config.DefaultImg,
 		}
+	}
 
-		c.Hub.Broadcast <- msg
+	return &Client{
+		Nickname: info.Nickname,
+		PhotoURL: info.PhotoUrl,
 	}
 }
 
-func (c *Client) WritePump() {
-	ticker := time.NewTicker(pingPeriod)
-	defer func() {
-		ticker.Stop()
-		c.Conn.Close()
-	}()
-	for {
-		select {
-		case message, ok := <-c.Send:
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if !ok {
-				// The hub closed the channel.
-				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
-				return
-			}
-
-			w, err := c.Conn.NextWriter(websocket.TextMessage)
-			if err != nil {
-				return
-			}
-			w.Write(message)
-
-			n := len(c.Send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.Send)
-			}
-
-			if err := w.Close(); err != nil {
-				return
-			}
-		case <-ticker.C:
-			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-				return
-			}
-		}
+func clientFromContext(ctx *gin.Context, conn *websocket.Conn) *Client {
+	info := playerInfoFromCookie(ctx)
+	client := &Client{
+		Nickname: info.Nickname,
+		PhotoURL: info.PhotoURL,
+		Conn:     conn,
+		Send:     make(chan []byte, 256),
 	}
+
+	return client
 }
