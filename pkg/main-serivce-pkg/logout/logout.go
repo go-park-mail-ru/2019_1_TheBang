@@ -12,7 +12,7 @@ import (
 func LogoutHandler(c *gin.Context) {
 	token, err := c.Cookie(config.CookieName)
 	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		c.AbortWithStatus(http.StatusUnauthorized)
 
 		return
 	}

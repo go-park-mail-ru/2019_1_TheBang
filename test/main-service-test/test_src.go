@@ -15,10 +15,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// type TestCase struct {
-// 	Body   string
-// 	Status int
-// }
+type TestCase struct {
+	Body   string
+	Status int
+}
 
 var testAdminNick = "testadmin"
 
