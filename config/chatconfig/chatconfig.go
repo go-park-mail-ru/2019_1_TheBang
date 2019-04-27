@@ -12,6 +12,8 @@ var (
 
 	DB       *sql.DB = connectDB()
 	DBSCHEMA         = getDBschema()
+
+	MessagesLimit = 10
 )
 
 func getPort() string {
