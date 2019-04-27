@@ -14,9 +14,10 @@ type urlMehtod struct {
 }
 
 var ignorCheckAuth = map[urlMehtod]bool{
-	urlMehtod{URL: "/auth", Method: "POST"}: true,
-	urlMehtod{URL: "/user", Method: "POST"}: true,
-	urlMehtod{URL: "/room", Method: "POST"}: true,
+	urlMehtod{URL: "/auth", Method: "POST"}:    true,
+	urlMehtod{URL: "/user", Method: "POST"}:    true,
+	urlMehtod{URL: "/room", Method: "POST"}:    true,
+	urlMehtod{URL: "/messages", Method: "GET"}: true,
 }
 
 func CorsMiddlewareGin(c *gin.Context) {

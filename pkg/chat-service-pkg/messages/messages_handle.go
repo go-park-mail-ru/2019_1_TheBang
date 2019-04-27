@@ -1,4 +1,4 @@
-package main
+package messages
 
 import (
 	"fmt"
@@ -13,7 +13,6 @@ var wsupgrader = websocket.Upgrader{
 		return true
 	},
 }
-
 
 func WsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := wsupgrader.Upgrade(w, r, nil)
