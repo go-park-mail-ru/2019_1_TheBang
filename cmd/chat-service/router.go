@@ -14,9 +14,10 @@ func getChatRouter() *gin.Engine {
 	chatHub := hub.NewHub()
 	go chatHub.Run()
 
-	router.GET("/messages", func(c *gin.Context) {
+	router.GET("/chat", func(c *gin.Context) {
 		hub.ServeChat(chatHub, c.Writer, c.Request)
 	})
+	router.GET("/messages", hub.MessagesHandle)
 
 	return router
 }

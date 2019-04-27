@@ -17,6 +17,7 @@ var ignorCheckAuth = map[urlMehtod]bool{
 	urlMehtod{URL: "/auth", Method: "POST"}:    true,
 	urlMehtod{URL: "/user", Method: "POST"}:    true,
 	urlMehtod{URL: "/room", Method: "POST"}:    true,
+	urlMehtod{URL: "/chat", Method: "GET"}:     true,
 	urlMehtod{URL: "/messages", Method: "GET"}: true,
 }
 
