@@ -23,3 +23,5 @@ func GetMessages(timestamp int) (messages []messageToClient) {
 
 	return
 }
+
+var sqlInsertMessage = `insert into messages (author, [timestamp], message, photo_url) values ($1, $2, $3, $4);`
