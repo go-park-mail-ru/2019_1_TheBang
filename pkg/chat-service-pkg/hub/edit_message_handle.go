@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-func DeleteMessageHandle(c *gin.Context) {
+func EditMessageHandle(c *gin.Context) {
 	msg := api.ChatMessage{}
 	c.BindJSON(&msg)
 
-	err := DeleteMessage(msg.Timestamp, msg.Author)
+	err := EditMessage(msg)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 

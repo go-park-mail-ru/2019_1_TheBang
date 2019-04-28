@@ -1,8 +1,10 @@
 package hub
 
 import (
+	"2019_1_TheBang/api"
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/config/chatconfig"
+	"errors"
 )
 
 type messageFromClient struct {
@@ -66,7 +68,54 @@ func GetMessages(timestamp int) (messages []messageToClient) {
 	return
 }
 
-var sqlInsertMessage = `insert into messages (author, [timestamp], message, photo_url) values ($1, $2, $3, $4);`
+func DeleteMessage(timestamp int, author string) (err error) {
+	row, err := chatconfig.DB.Exec(sqlDeleteMessage,
+		timestamp,
+		author)
+	if err != nil {
+		config.Logger.Warnw("DeleteMessage",
+			"warn", err.Error())
+
+		return err
+	}
+
+	rows, _ := row.RowsAffected()
+	if rows != 1 {
+		err = errors.New("Invalid message's deleted count")
+
+		return
+	}
+
+	return
+}
+
+func EditMessage(msg api.ChatMessage) (err error) {
+	row, err := chatconfig.DB.Exec(sqlEditMessage,
+		msg.Message,
+		msg.Author,
+		msg.Timestamp)
+	if err != nil {
+		config.Logger.Warnw("EditMessage",
+			"warn", err.Error())
+
+		return err
+	}
+
+	rows, _ := row.RowsAffected()
+	if rows != 1 {
+		err = errors.New("Invalid message's deleted count")
+
+		return
+	}
+
+	return
+}
+
+var sqlInsertMessage = `insert into messages (author, [timestamp], message, photo_url) values ($1, $2, $3, $4)`
+
+var sqlDeleteMessage = `delete from messages where timestamp = $1 and author = $2`
+
+var sqlEditMessage = `update messages set message = $1 where author = $2 and timestamp = $3`
 
 var sqlSelectMessage = `select
 							author,

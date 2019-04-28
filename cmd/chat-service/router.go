@@ -18,7 +18,7 @@ func getChatRouter() *gin.Engine {
 		hub.ServeChat(chatHub, c)
 	})
 	router.GET("/messages", hub.MessagesHandle)
-	router.PUT("/message", hub.UpdateMessageHandle)
+	router.PUT("/message", hub.EditMessageHandle)
 	router.DELETE("/message", hub.DeleteMessageHandle)
 	router.OPTIONS("/message", func (c *gin.Context) {})
 
