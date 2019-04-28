@@ -46,6 +46,8 @@ func AuthMiddlewareGin(c *gin.Context) {
 
 	if ok := ignorCheckAuth[check]; !ok {
 		if _, ok := auth.CheckTocken(c.Request); !ok {
+			c.AbortWithStatus(http.StatusUnauthorized)
+
 			return
 		}
 	}

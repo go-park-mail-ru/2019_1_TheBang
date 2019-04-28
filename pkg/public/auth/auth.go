@@ -56,8 +56,8 @@ func GetUserInfo(token string) (user *pb.UserInfo, myerr error) {
 func CheckTocken(r *http.Request) (info *pb.UserInfo, ok bool) {
 	cookie, err := r.Cookie(config.CookieName)
 	if err != nil {
-		config.Logger.Warnw("CheckTocken -> get cookie:",
-			"warn", err.Error())
+		// config.Logger.Warnw("CheckTocken -> get cookie:",
+		// 	"warn", err.Error())
 
 		return
 	}
