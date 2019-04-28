@@ -10,6 +10,7 @@
 - основной - main
 - игры - game
 - авторизации - auth
+- чата - chat
 
 ## Состав:
 - Баронский Андрей - https://github.com/Surfingbird
@@ -20,8 +21,5 @@
 ## Ментор
 - Сергей Барсуков
 
-## Мы тут
-- https://stormy-fjord-97392.herokuapp.com (но это не точно, переезд)
-
 ## Интеграция с frontend
-- https://the-bang.herokuapp.com
+- http://95.163.212.32:8010
