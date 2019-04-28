@@ -46,8 +46,6 @@ func NewApp() *App {
 		MaxRoomsCount: gameconfig.MaxRoomsInGame,
 	}
 
-	fmt.Println(app.MaxRoomsCount)
-
 	return app
 }
 
