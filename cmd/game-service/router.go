@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"2019_1_TheBang/pkg/game-service-pkg/app"
 	"2019_1_TheBang/pkg/public/middleware"
+	"github.com/gin-gonic/gin"
 )
 
 func setUpGameRouter() *gin.Engine {
