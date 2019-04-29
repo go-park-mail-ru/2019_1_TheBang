@@ -28,12 +28,14 @@ var (
 )
 
 var (
-	GAMEPORT = getGamePort()
+	GAMEPORT          = getGamePort()
+	CONFIGPATH string = "config/gameconfig"
+	CONFIGNAME        = "gameconfig"
 )
 
 func InitGameConfig() {
-	viper.AddConfigPath("config/gameconfig")
-	viper.SetConfigName("gameconfig")
+	viper.AddConfigPath(CONFIGPATH)
+	viper.SetConfigName(CONFIGNAME)
 	err := viper.ReadInConfig()
 	if err != nil {
 		config.Logger.Fatal(fmt.Sprintf("Fatal error config file: %s \n", err.Error()))
