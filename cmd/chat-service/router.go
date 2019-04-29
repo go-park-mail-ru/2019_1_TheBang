@@ -11,11 +11,11 @@ func getChatRouter() *gin.Engine {
 	router.Use(middleware.CorsMiddlewareGin,
 		middleware.AuthMiddlewareGin)
 
-	chatHub := hub.NewHub()
-	go chatHub.Run()
+	hub.InitChatHub()
+	go hub.HubInst.Run()
 
 	router.GET("/chat", func(c *gin.Context) {
-		hub.ServeChat(chatHub, c)
+		hub.ServeChat(hub.HubInst, c)
 	})
 	router.GET("/messages", hub.MessagesHandle)
 	router.PUT("/message", hub.EditMessageHandle)

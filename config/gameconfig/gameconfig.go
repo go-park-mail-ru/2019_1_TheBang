@@ -12,9 +12,9 @@ var (
 	MaxPlayersInRoom uint
 	MaxRoomsInGame   uint
 
-	RoomTickTime          = 200 * time.Microsecond
-	PlayerWritingTickTime = 200 * time.Microsecond
-	PlayerReadingTickTime = 200 * time.Microsecond
+	RoomTickTime          = 200 * time.Millisecond
+	PlayerWritingTickTime = 200 * time.Millisecond
+	PlayerReadingTickTime = 200 * time.Millisecond
 	WriteDeadline         = 10 * time.Second
 
 	GameWidth      int

@@ -2,6 +2,7 @@ package hub
 
 import (
 	"2019_1_TheBang/api"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -16,4 +17,14 @@ func EditMessageHandle(c *gin.Context) {
 
 		return
 	}
+
+	msg.Edited = true
+	bytes, err := json.Marshal(msg)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+
+		return
+	}
+
+	HubInst.Broadcast <- bytes
 }
