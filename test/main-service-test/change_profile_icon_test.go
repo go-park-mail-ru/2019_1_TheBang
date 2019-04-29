@@ -1,64 +1,69 @@
 package test
 
-// import (
-// 	"bytes"
-// 	"io"
-// 	"mime/multipart"
-// 	"net/http"
-// 	"net/http/httptest"
-// 	"os"
-// 	"path/filepath"
-// 	"testing"
+import (
+	"bytes"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"testing"
 
-// 	"2019_1_TheBang/config/mainconfig"
-// 	"2019_1_TheBang/pkg/main-serivce-pkg/user"
-// )
+	"2019_1_TheBang/config/mainconfig"
+	"2019_1_TheBang/pkg/main-serivce-pkg/user"
+	"github.com/gin-gonic/gin"
+)
 
-// func TestChangeProfileAvatarHandler(t *testing.T) {
-// 	cookie, _ := GetTESTAdminCookie()
-// 	defer DeleteTESTAdmin()
+func TestChangeProfileAvatarHandler(t *testing.T) {
+	cookie, _ := GetTESTAdminCookie()
+	defer DeleteTESTAdmin()
 
-// 	pathOS := "tmp/" + mainconfig.DefaultImg
-// 	req, err := newfileUploadRequest("/user/avatar", map[string]string{}, "photo", pathOS)
-// 	if err != nil {
-// 		t.Fatal(err.Error())
-// 	}
-// 	req.AddCookie(cookie)
+	path := "/user/avatar"
 
-// 	rr := httptest.NewRecorder()
+	pathOS := "tmp/" + mainconfig.DefaultImg
+	req, err := newfileUploadRequest(path, map[string]string{}, "photo", pathOS)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	req.AddCookie(cookie)
 
-// 	user.ChangeProfileAvatarHandler(rr, req)
+	rr := httptest.NewRecorder()
 
-// 	if rr.Code != http.StatusOK {
-// 		t.Errorf("TestChangeProfileAvatarHandler, have not cookie: expected %v, have %v!\n",
-// 			http.StatusOK, rr.Code)
-// 	}
-// }
+	router := gin.Default()
+	router.POST(path, user.ChangeProfileAvatarHandler)
+	router.ServeHTTP(rr, req)
 
-// func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
-// 	file, err := os.Open(path)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer file.Close()
+	if rr.Code != http.StatusOK {
+		t.Errorf("TestChangeProfileAvatarHandler, have not cookie: expected %v, have %v!\n",
+			http.StatusOK, rr.Code)
+	}
+}
 
-// 	body := &bytes.Buffer{}
-// 	writer := multipart.NewWriter(body)
-// 	part, err := writer.CreateFormFile(paramName, filepath.Base(path))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	_, err = io.Copy(part, file)
+func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
 
-// 	for key, val := range params {
-// 		_ = writer.WriteField(key, val)
-// 	}
-// 	err = writer.Close()
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(paramName, filepath.Base(path))
+	if err != nil {
+		return nil, err
+	}
+	_, err = io.Copy(part, file)
 
-// 	req, err := http.NewRequest("POST", uri, body)
-// 	req.Header.Set("Content-Type", writer.FormDataContentType())
-// 	return req, err
-// }
+	for key, val := range params {
+		_ = writer.WriteField(key, val)
+	}
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", uri, body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	return req, err
+}
