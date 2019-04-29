@@ -12,7 +12,7 @@ import (
 var (
 	ServerName = "TheBang server"
 	DefaultImg = "default_img"
-	DBSCHEMA   = getDBschema()
+	DBSCHEMA   = ""
 
 	DB               *sql.DB = connectDB()
 	RowsOnLeaderPage uint    = 6
@@ -21,13 +21,6 @@ var (
 )
 
 func connectDB() *sql.DB {
-	pos := os.Getenv("WORKPLACE")
-	if pos == "HEROKU" {
-		bd := connectDBHEROKU()
-
-		return bd
-	}
-
 	db, err := sql.Open("sqlite3", "local_bd.db")
 	if err != nil {
 		config.Logger.Fatal(err.Error())
@@ -37,58 +30,6 @@ func connectDB() *sql.DB {
 	config.Logger.Info("Database connected!")
 
 	return db
-}
-
-func getDBschema() string {
-	schema := os.Getenv("DBSCHEMA")
-	if schema != "" {
-		schema += `.`
-		return schema
-	}
-	config.Logger.Warn("There is no DBSCHEMA!")
-
-	return ""
-}
-
-func connectDBHEROKU() *sql.DB {
-	config.Logger.Info("SQL: Postgres sql")
-	DB, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
-	if err != nil {
-		config.Logger.Fatal(err.Error())
-	}
-	config.Logger.Info("Database connected!")
-
-	return DB
-}
-
-func getDBPasswd() string {
-	bdpass := os.Getenv("DBPASSWORD")
-	if bdpass == "" {
-		config.Logger.Warn("There is no DBPASSWORD!")
-		bdpass = "2017"
-	}
-
-	return bdpass
-}
-
-func getDBNAme() string {
-	dbname := os.Getenv("DBNAME")
-	if dbname == "" {
-		config.Logger.Warn("There is no DBNAME!")
-		dbname = "tp"
-	}
-
-	return dbname
-}
-
-func getDBUser() string {
-	dbuser := os.Getenv("DBUSER")
-	if dbuser == "" {
-		config.Logger.Warn("There is no DBUSER!")
-		dbuser = "postgres"
-	}
-
-	return dbuser
 }
 
 func getMainPort() string {
@@ -119,7 +60,7 @@ func preRunSQLliteDB(db *sql.DB) {
 
 }
 
-var sqlCreateTableSQLlite = `create table IF NOT EXISTS ` + DBSCHEMA + `users (
+var sqlCreateTableSQLlite = `create table IF NOT EXISTS ` + `users (
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	nickname citext unique not null,
 	name citext null,
