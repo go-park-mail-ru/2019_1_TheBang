@@ -9,10 +9,11 @@ const (
 )
 
 type GameMap struct {
-	Map    [][]int `json:"map"`
-	Height int     `json:"height"`
-	Width  int     `json:"width"`
-	Gems   int     `json:"gems"`
+	Map     [][]int           `json:"map"`
+	Height  int               `json:"height"`
+	Width   int               `json:"width"`
+	Gems    int               `json:"gems"`
+	GemsPos map[Position]bool `json:"gems_positions"`
 }
 
 func NewMap(height, width int) GameMap {
@@ -22,9 +23,10 @@ func NewMap(height, width int) GameMap {
 	}
 
 	gamemap := GameMap{
-		Map:    m,
-		Height: height,
-		Width:  width,
+		Map:     m,
+		Height:  height,
+		Width:   width,
+		GemsPos: make(map[Position]bool),
 	}
 
 	gamemap.AddGems()
@@ -43,9 +45,11 @@ func (m *GameMap) AddGems() {
 		}
 
 		m.Map[x][y] = Gem
-		m.Gems = m.Height
+		m.GemsPos[Position{X: x, Y: y}] = true
 		i++
 	}
+
+	m.Gems = m.Height
 }
 
 func (m *GameMap) AddWalls() {

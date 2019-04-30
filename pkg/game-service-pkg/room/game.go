@@ -11,6 +11,7 @@ type GameInst struct {
 	Room         *Room
 	IsTeleport   bool
 	Teleport     Position
+	GemsPos      map[Position]bool
 }
 
 func NewGame(r *Room) GameInst {
@@ -27,6 +28,7 @@ func NewGame(r *Room) GameInst {
 		Room:         r,
 		IsTeleport:   false,
 		Teleport:     teleport,
+		GemsPos:      m.GemsPos,
 	}
 }
 
@@ -37,6 +39,7 @@ type GameSnap struct {
 	MaxGemsCount int                 `json:"max_gems_count"`
 	IsTeleport   bool                `json:"is_teleport"`
 	Teleport     Position            `json:"teleport"`
+	GemsPos      map[Position]bool   `json:"gems_positions"`
 }
 
 func (g *GameInst) Snap() GameSnap {
@@ -47,5 +50,6 @@ func (g *GameInst) Snap() GameSnap {
 		MaxGemsCount: g.MaxGemsCount,
 		IsTeleport:   g.IsTeleport,
 		Teleport:     g.Teleport,
+		GemsPos:      g.GemsPos,
 	}
 }

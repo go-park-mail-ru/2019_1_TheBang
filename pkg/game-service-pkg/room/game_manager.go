@@ -22,7 +22,6 @@ type Position struct {
 	Y int `json:"y"`
 }
 
-//  todo ок заменить на финиш (имя переменной)
 func (g *GameInst) Aggregation(actions ...Action) bool {
 	for _, action := range actions {
 		ok := g.AcceptAction(action)
@@ -78,6 +77,7 @@ func (g *GameInst) AcceptAction(action Action) bool {
 	if g.Map.Map[newpos.X][newpos.Y] == Gem {
 		g.PlayersScore[action.Player]++
 		g.GemsCount--
+		delete(g.GemsPos, newpos)
 	}
 
 	//  заметка: ели телепорт отркылся, то не важно кто на него наступил, тому + 5 баллов
