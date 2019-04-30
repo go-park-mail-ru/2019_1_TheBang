@@ -77,7 +77,14 @@ func (g *GameInst) AcceptAction(action Action) bool {
 	if g.Map.Map[newpos.X][newpos.Y] == Gem {
 		g.PlayersScore[action.Player]++
 		g.GemsCount--
-		delete(g.GemsPos, newpos)
+		delete(g.GemsPosMap, newpos)
+
+		sliceGems := []Position{}
+		for gempos := range g.GemsPosMap {
+			sliceGems = append(sliceGems, gempos)
+		}
+
+		g.GemsPos = sliceGems
 	}
 
 	//  заметка: ели телепорт отркылся, то не важно кто на него наступил, тому + 5 баллов
