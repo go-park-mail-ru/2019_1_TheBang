@@ -2,8 +2,8 @@ package user
 
 import (
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/pkg/public/auth"
 	"2019_1_TheBang/config/mainconfig"
+	"2019_1_TheBang/pkg/public/auth"
 	"fmt"
 	"net/http"
 
@@ -51,6 +51,7 @@ func InfoFromCookie(token *jwt.Token) (userInfo UserInfo, status int) {
 
 func GetFreashToken(username string) string {
 	prof, _ := SelectUser(username)
+	fmt.Println(prof)
 
 	claims := auth.CustomClaims{
 		prof.Id,
