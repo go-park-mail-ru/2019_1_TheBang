@@ -1,11 +1,13 @@
 package user
 
 import (
+	"2019_1_TheBang/config"
 	"crypto/md5"
 	"encoding/hex"
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -75,6 +77,16 @@ func ChangeProfileAvatarHandler(c *gin.Context) {
 
 	DeletePhoto(profile.Photo)
 	profile.Photo = filename
+
+	ss := GetFreashToken(profile.Nickname)
+	expiration := time.Now().Add(10 * time.Hour)
+	cookie := http.Cookie{
+		Name:     config.CookieName,
+		Value:    ss,
+		Expires:  expiration,
+		HttpOnly: true,
+	}
+	http.SetCookie(c.Writer, &cookie)
 
 	c.Status(http.StatusOK)
 }
