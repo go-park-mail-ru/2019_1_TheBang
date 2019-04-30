@@ -13,7 +13,7 @@ func getAuhtPort() string {
 	port := os.Getenv("AUTHPORT")
 	if port == "" {
 		config.Logger.Warn("There is no AUTH_PORT!")
-		port = "50051"
+		port = "50061"
 	}
 
 	return port

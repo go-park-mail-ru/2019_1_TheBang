@@ -58,7 +58,7 @@ func getGamePort() string {
 	port := os.Getenv("GAMEPORT")
 	if port == "" {
 		config.Logger.Warn("There is no GAMEPORT!")
-		port = "8002"
+		port = "8005"
 	}
 
 	return port

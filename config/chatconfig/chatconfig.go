@@ -19,7 +19,7 @@ var (
 func getPort() string {
 	port := os.Getenv("CHATPORT")
 	if port == "" {
-		return "8003"
+		return "8006"
 	}
 
 	return port

@@ -36,7 +36,7 @@ func getMainPort() string {
 	port := os.Getenv("MAINPORT")
 	if port == "" {
 		config.Logger.Warn("There is no MAINPORT!")
-		port = "8001"
+		port = "8004"
 	}
 
 	return port
@@ -46,7 +46,7 @@ func getPointsPort() string {
 	port := os.Getenv("POINTSPORT")
 	if port == "" {
 		config.Logger.Warn("There is no POINTSPORT!")
-		port = "50052"
+		port = "50062"
 	}
 
 	return port

@@ -28,7 +28,7 @@ func getFrontDest() string {
 	dst := os.Getenv("FrontentDst")
 	if dst == "" {
 		Logger.Warn("There is no FrontentDst!")
-		dst = "http://95.163.212.32:8010"
+		dst = "http://95.163.212.32:8009"
 	}
 
 	return dst
