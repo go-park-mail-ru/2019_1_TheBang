@@ -1,3 +1,3 @@
 #!bin/bash
 
-kill -l $(lsof -i -P -n | grep main)
+pkill auth-service chat-service game-service main-service;
