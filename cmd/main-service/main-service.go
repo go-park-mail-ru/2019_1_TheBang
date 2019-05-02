@@ -19,8 +19,8 @@ func main() {
 
 	defer config.Logger.Sync()
 	config.Logger.Info(fmt.Sprintf("FrontenDest: %v", config.FrontentDst))
-	config.Logger.Info(fmt.Sprintf("MAINPORT: %v", mainconfig.MAINPORT))
-	config.Logger.Info(fmt.Sprintf("POINTSPORT: %v", mainconfig.POINTSPORT))
+	config.Logger.Info(fmt.Sprintf("MAINPORT: %v", config.MAINPORT))
+	config.Logger.Info(fmt.Sprintf("POINTSPORT: %v", config.POINTSPORT))
 
 	err := mainconfig.DB.Ping()
 	if err != nil {
@@ -30,9 +30,9 @@ func main() {
 	r := setUpMainRouter()
 
 	wg.Add(1)
-	go r.Run(":" + mainconfig.MAINPORT)
+	go r.Run(":" + config.MAINPORT)
 
-	lis, err := net.Listen("tcp", ":"+mainconfig.POINTSPORT)
+	lis, err := net.Listen("tcp", ":"+config.POINTSPORT)
 	if err != nil {
 		config.Logger.Fatalw("Listen port",
 			"error:", err.Error())

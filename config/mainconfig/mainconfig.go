@@ -3,7 +3,6 @@ package mainconfig
 import (
 	"2019_1_TheBang/config"
 	"database/sql"
-	"os"
 
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
@@ -16,8 +15,6 @@ var (
 
 	DB               *sql.DB = connectDB()
 	RowsOnLeaderPage uint    = 6
-	MAINPORT                 = getMainPort()
-	POINTSPORT               = getPointsPort()
 )
 
 func connectDB() *sql.DB {
@@ -30,26 +27,6 @@ func connectDB() *sql.DB {
 	config.Logger.Info("Database connected!")
 
 	return db
-}
-
-func getMainPort() string {
-	port := os.Getenv("MAINPORT")
-	if port == "" {
-		config.Logger.Warn("There is no MAINPORT!")
-		port = "8004"
-	}
-
-	return port
-}
-
-func getPointsPort() string {
-	port := os.Getenv("POINTSPORT")
-	if port == "" {
-		config.Logger.Warn("There is no POINTSPORT!")
-		port = "50062"
-	}
-
-	return port
 }
 
 func preRunSQLliteDB(db *sql.DB) {

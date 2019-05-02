@@ -13,9 +13,9 @@ func main() {
 
 	defer config.Logger.Sync()
 	config.Logger.Info(fmt.Sprintf("FrontenDest: %v", config.FrontentDst))
-	config.Logger.Info(fmt.Sprintf("GAMEPORT: %v", gameconfig.GAMEPORT))
+	config.Logger.Info(fmt.Sprintf("GAMEPORT: %v", config.GAMEPORT))
 
 	router := setUpGameRouter()
 
-	router.Run(":" + gameconfig.GAMEPORT)
+	router.Run(":" + config.GAMEPORT)
 }

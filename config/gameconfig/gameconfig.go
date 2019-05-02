@@ -3,9 +3,9 @@ package gameconfig
 import (
 	"2019_1_TheBang/config"
 	"fmt"
-	"github.com/spf13/viper"
-	"os"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 var (
@@ -28,7 +28,6 @@ var (
 )
 
 var (
-	GAMEPORT          = getGamePort()
 	CONFIGPATH string = "config/gameconfig"
 	CONFIGNAME        = "gameconfig"
 )
@@ -52,14 +51,4 @@ func InitGameConfig() {
 	SocketWriteBufferSize = viper.GetInt("networt.socket.write")
 	MaxMessageSize = viper.GetInt64("networt.message.size")
 	InOutBuffer = viper.GetInt("networt.chan_buffer")
-}
-
-func getGamePort() string {
-	port := os.Getenv("GAMEPORT")
-	if port == "" {
-		config.Logger.Warn("There is no GAMEPORT!")
-		port = "8005"
-	}
-
-	return port
 }

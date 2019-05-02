@@ -2,7 +2,6 @@ package main
 
 import (
 	"2019_1_TheBang/config"
-	"2019_1_TheBang/config/authconfig"
 	"2019_1_TheBang/pkg/auth-service-pkg/authchecker"
 	pb "2019_1_TheBang/pkg/public/protobuf"
 	"fmt"
@@ -13,9 +12,9 @@ import (
 
 func main() {
 	defer config.Logger.Sync()
-	config.Logger.Info(fmt.Sprintf("AUTH_PORT: %v", authconfig.AUTHPORT))
+	config.Logger.Info(fmt.Sprintf("AUTH_PORT: %v", config.AUTHPORT))
 
-	lis, err := net.Listen("tcp", ":"+authconfig.AUTHPORT)
+	lis, err := net.Listen("tcp", ":"+config.AUTHPORT)
 	if err != nil {
 		config.Logger.Fatalw("Listen port",
 			"error:", err.Error())
