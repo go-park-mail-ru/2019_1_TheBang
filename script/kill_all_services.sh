@@ -1,3 +1,6 @@
 #!bin/bash
 
-pkill auth-service chat-service game-service main-service;
+pkill auth-service;
+pkill chat-service;
+pkill game-service;
+pkill main-service;
