@@ -49,7 +49,7 @@ func NewApp() *App {
 	return app
 }
 
-func checkRoomID(id string) bool {
+func CheckRoomID(id string) bool {
 	ID, err := strconv.Atoi(id)
 	if err != nil {
 		return false

@@ -10,7 +10,7 @@ import (
 
 func ConnectRoomHandle(c *gin.Context) {
 	id := c.Param("id")
-	if ok := checkRoomID(id); !ok {
+	if ok := CheckRoomID(id); !ok {
 		c.AbortWithStatus(http.StatusNotFound)
 
 		return

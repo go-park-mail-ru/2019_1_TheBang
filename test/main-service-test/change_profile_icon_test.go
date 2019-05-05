@@ -12,6 +12,7 @@ import (
 
 	"2019_1_TheBang/config/mainconfig"
 	"2019_1_TheBang/pkg/main-serivce-pkg/user"
+
 	"github.com/gin-gonic/gin"
 )
 
