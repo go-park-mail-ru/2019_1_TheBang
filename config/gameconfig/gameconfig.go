@@ -22,7 +22,7 @@ var (
 
 	GameWidth      int
 	GameHeight     int
-	TeleportPoints uint
+	TeleportPoints int32
 
 	SocketReadBufferSize  int
 	SocketWriteBufferSize int
@@ -48,7 +48,7 @@ func InitGameConfig() {
 
 	GameWidth = viper.GetInt("app.room.game.map.width")
 	GameHeight = viper.GetInt("app.room.game.map.height")
-	TeleportPoints = uint(viper.GetInt("app.room.game.teleport_points"))
+	TeleportPoints = int32(viper.GetInt("app.room.game.teleport_points"))
 
 	SocketReadBufferSize = viper.GetInt("networt.socket.read")
 	SocketWriteBufferSize = viper.GetInt("networt.socket.write")
