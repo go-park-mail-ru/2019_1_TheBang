@@ -11,7 +11,7 @@ service ScoreUpdater {
 }
 
 message ScoreRequest {
-  int32 player_id = 1;
+  double player_id = 1;
   int32 point = 2;
 }
 

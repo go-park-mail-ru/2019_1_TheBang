@@ -125,9 +125,13 @@ Loop:
 					continue
 				}
 
-				ok := r.GameInst.Aggregation(action)
+				ok, endGameMsg := r.GameInst.Aggregation(action)
 				if ok {
-					r.Distribution(GameFinishedMsg)
+					r.Distribution(api.SocketMsg{
+						Type: api.RoomState,
+						Data: WrapedRoom(r),
+					})
+					r.Distribution(endGameMsg)
 
 					break Loop
 				}
@@ -166,11 +170,13 @@ Loop:
 				msg := api.SocketMsg{
 					Type: api.GameStarted,
 					Data: struct {
-						Msg string  `json:"msg"`
-						Map GameMap `json:"game_map"`
+						Msg          string           `json:"msg"`
+						Map          GameMap          `json:"game_map"`
+						PlayersScore map[string]int32 `json:"players_score"`
 					}{
-						Msg: "Game was started",
-						Map: r.GameInst.Map,
+						Msg:          "Game was started",
+						Map:          r.GameInst.Map,
+						PlayersScore: r.GameInst.PlayersScore,
 					},
 				}
 
@@ -182,7 +188,7 @@ Loop:
 		}
 	}
 
-	// отрубаем всех от игры
+	time.Sleep(3 * time.Second)
 	for player := range r.Players {
 		r.Disconection(player)
 	}

@@ -15,7 +15,10 @@ var (
 	RoomTickTime          = 20 * time.Millisecond
 	PlayerWritingTickTime = 20 * time.Millisecond
 	PlayerReadingTickTime = 20 * time.Millisecond
-	WriteDeadline         = 10 * time.Second
+	// RoomTickTime          = 1 * time.Second
+	// PlayerWritingTickTime = 1 * time.Second
+	// PlayerReadingTickTime = 1 * time.Second
+	WriteDeadline = 10 * time.Second
 
 	GameWidth      int
 	GameHeight     int

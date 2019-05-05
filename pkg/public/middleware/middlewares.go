@@ -39,8 +39,13 @@ func CorsMiddlewareGin(c *gin.Context) {
 
 func AuthMiddlewareGin(c *gin.Context) {
 	check := urlMehtod{URL: c.Request.URL.Path, Method: c.Request.Method}
-	m, _ := regexp.Match(`/messages*`, []byte(`seafood`))
+	m, _ := regexp.Match(`/messages*`, []byte(check.URL))
 	if m == true {
+		c.Next()
+	}
+
+	m, _ = regexp.Match(`/room*`, []byte(check.URL))
+	if m == true && check.Method == "GET" {
 		c.Next()
 	}
 

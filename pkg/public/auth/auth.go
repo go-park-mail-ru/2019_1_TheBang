@@ -23,7 +23,7 @@ type CustomClaims struct {
 }
 
 func GetUserInfo(token string) (user *pb.UserInfo, myerr error) {
-	conn, err := grpc.Dial(config.AuthServerAddr+":"+config.AuthServerPort, grpc.WithInsecure())
+	conn, err := grpc.Dial(config.AuthServerAddr+":"+config.AUTHPORT, grpc.WithInsecure())
 	if err != nil {
 		myerr = fmt.Errorf("did not connect: %v", err.Error())
 

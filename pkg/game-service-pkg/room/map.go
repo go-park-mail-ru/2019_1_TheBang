@@ -13,7 +13,7 @@ type GameMap struct {
 	Height     int               `json:"height"`
 	Width      int               `json:"width"`
 	Gems       int               `json:"gems"`
-	GemsPosMap map[Position]bool `json:"_"`
+	GemsPosMap map[Position]bool `json:"-"`
 	GemsPos    []Position        `json:"gems_positions"`
 }
 
@@ -60,9 +60,9 @@ func (m *GameMap) AddWalls() {
 
 }
 
-func (m *GameMap) AddPlayers(players map[*Player]interface{}) (positions map[string]Position, score map[string]uint) {
+func (m *GameMap) AddPlayers(players map[*Player]interface{}) (positions map[string]Position, score map[string]int32) {
 	positions = make(map[string]Position)
-	score = make(map[string]uint)
+	score = make(map[string]int32)
 	used := make(map[Position]interface{})
 
 	for player := range players {

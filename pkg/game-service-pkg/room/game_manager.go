@@ -1,7 +1,16 @@
 package room
 
 import (
+	"2019_1_TheBang/api"
+	"2019_1_TheBang/config"
 	"2019_1_TheBang/config/gameconfig"
+	"context"
+	"time"
+
+	pb "2019_1_TheBang/pkg/public/pbscore"
+	"fmt"
+
+	"google.golang.org/grpc"
 )
 
 const (
@@ -14,7 +23,7 @@ const (
 type Action struct {
 	Time   string `json:"time" mapstructure:"time"`
 	Player string `json:"player" mapstructure:"player"`
-	Move   string `json:"move" mapstructure:"move"` // left | right | up | down
+	Move   string `json:"move" mapstructure:"move"`
 }
 
 type Position struct {
@@ -22,18 +31,24 @@ type Position struct {
 	Y int `json:"y"`
 }
 
-func (g *GameInst) Aggregation(actions ...Action) bool {
+type EndGameInnerMsg struct {
+	Msg    string `json:"msg"`
+	Winner string `json:"winner"`
+	Points int32  `json:"points"`
+}
+
+func (g *GameInst) Aggregation(actions ...Action) (bool, api.SocketMsg) {
 	for _, action := range actions {
-		ok := g.AcceptAction(action)
+		ok, endGameMsg := g.AcceptAction(action)
 		if ok {
-			return true
+			return true, endGameMsg
 		}
 	}
 
-	return false
+	return false, api.SocketMsg{}
 }
 
-func (g *GameInst) AcceptAction(action Action) bool {
+func (g *GameInst) AcceptAction(action Action) (bool, api.SocketMsg) {
 	var (
 		leftBorder  int = 0
 		rightBorder int = g.Map.Width - 1
@@ -47,7 +62,7 @@ func (g *GameInst) AcceptAction(action Action) bool {
 	)
 
 	if pos, ok = g.PlayersPos[action.Player]; !ok {
-		return false
+		return false, api.SocketMsg{}
 	}
 
 	newpos := pos
@@ -87,11 +102,24 @@ func (g *GameInst) AcceptAction(action Action) bool {
 		g.GemsPos = sliceGems
 	}
 
-	//  заметка: ели телепорт отркылся, то не важно кто на него наступил, тому + 5 баллов
 	if newpos == g.Teleport && g.IsTeleport {
 		g.PlayersScore[action.Player] += gameconfig.TeleportPoints
+		inner := EndGameInnerMsg{
+			Msg:    "Game was finished",
+			Winner: action.Player,
+			Points: g.PlayersScore[action.Player],
+		}
+		endGameMsg := api.SocketMsg{
+			Type: api.GameFinish,
+			Data: inner,
+		}
 
-		return true
+		err := g.UpgradePoints(inner)
+		if err != nil {
+			config.Logger.Warn("AcceptAction", err.Error())
+		}
+
+		return true, endGameMsg
 	}
 
 	g.PlayersPos[action.Player] = newpos
@@ -101,5 +129,50 @@ func (g *GameInst) AcceptAction(action Action) bool {
 		g.IsTeleport = true
 	}
 
-	return false
+	return false, api.SocketMsg{}
+}
+
+func (g *GameInst) UpgradePoints(info EndGameInnerMsg) error {
+	rw := WrapedRoom(g.Room)
+	var player_id float64
+	for _, player := range rw.Players {
+		if player.Nickname == info.Winner {
+			player_id = player.Id
+
+			break
+		}
+	}
+
+	conn, err := grpc.Dial(config.PointsServerAddr+":"+config.POINTSPORT, grpc.WithInsecure())
+	if err != nil {
+		myerr := fmt.Errorf("did not connect: %v", err.Error())
+
+		return myerr
+	}
+	defer conn.Close()
+
+	client := pb.NewScoreUpdaterClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	req := &pb.ScoreRequest{
+		PlayerId: player_id,
+		Point:    info.Points,
+	}
+
+	res, err := client.UpdateScore(ctx, req)
+	if err != nil {
+		myerr := fmt.Errorf("could not update points: %v", err.Error())
+
+		return myerr
+	}
+
+	if !res.Ok {
+		myerr := fmt.Errorf("could not update points (invalid): %v", err.Error())
+
+		return myerr
+	}
+
+	return nil
 }
