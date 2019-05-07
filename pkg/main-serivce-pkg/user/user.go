@@ -196,7 +196,7 @@ func DeleteUser(nickname string) bool {
 	return true
 }
 
-func UpdateUserScore(id int32, points int32) bool {
+func UpdateUserScore(id float64, points int32) bool {
 	res, err := mainconfig.DB.Exec(SQLUpdateUserScore, points, id)
 	if err != nil {
 		config.Logger.Warnw("UpdateUserScore",

@@ -10,7 +10,7 @@ import (
 
 func ConnectRoomHandle(c *gin.Context) {
 	id := c.Param("id")
-	if ok := checkRoomID(id); !ok {
+	if ok := CheckRoomID(id); !ok {
 		c.AbortWithStatus(http.StatusNotFound)
 
 		return
@@ -18,8 +18,8 @@ func ConnectRoomHandle(c *gin.Context) {
 	param, _ := strconv.Atoi(id)
 	ID := uint(param)
 
-	AppInst.locker.Lock()
-	defer AppInst.locker.Unlock()
+	AppInst.Locker.Lock()
+	defer AppInst.Locker.Unlock()
 
 	if ok := c.IsWebsocket(); !ok {
 		c.AbortWithStatus(http.StatusBadRequest)

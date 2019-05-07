@@ -20,6 +20,7 @@ var ignorCheckAuth = map[urlMehtod]bool{
 	urlMehtod{URL: "/room", Method: "POST"}:    true,
 	urlMehtod{URL: "/chat", Method: "GET"}:     true,
 	urlMehtod{URL: "/messages", Method: "GET"}: true,
+	urlMehtod{URL: "/metrics", Method: "GET"}:  true,
 }
 
 func CorsMiddlewareGin(c *gin.Context) {
@@ -39,8 +40,13 @@ func CorsMiddlewareGin(c *gin.Context) {
 
 func AuthMiddlewareGin(c *gin.Context) {
 	check := urlMehtod{URL: c.Request.URL.Path, Method: c.Request.Method}
-	m, _ := regexp.Match(`/messages*`, []byte(`seafood`))
+	m, _ := regexp.Match(`/messages*`, []byte(check.URL))
 	if m == true {
+		c.Next()
+	}
+
+	m, _ = regexp.Match(`/room*`, []byte(check.URL))
+	if m == true && check.Method == "GET" {
 		c.Next()
 	}
 

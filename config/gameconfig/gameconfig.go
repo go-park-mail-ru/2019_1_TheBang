@@ -3,9 +3,10 @@ package gameconfig
 import (
 	"2019_1_TheBang/config"
 	"fmt"
-	"github.com/spf13/viper"
-	"os"
 	"time"
+
+	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -15,20 +16,25 @@ var (
 	RoomTickTime          = 20 * time.Millisecond
 	PlayerWritingTickTime = 20 * time.Millisecond
 	PlayerReadingTickTime = 20 * time.Millisecond
-	WriteDeadline         = 10 * time.Second
+	MonitoringTick        = 5 * time.Second
+	// RoomTickTime          = 1 * time.Second
+	// PlayerWritingTickTime = 1 * time.Second
+	// PlayerReadingTickTime = 1 * time.Second
+	WriteDeadline = 10 * time.Second
 
 	GameWidth      int
 	GameHeight     int
-	TeleportPoints uint
+	TeleportPoints int32
 
 	SocketReadBufferSize  int
 	SocketWriteBufferSize int
 	MaxMessageSize        int64
 	InOutBuffer           int
+
+	PointsConn = getPointsConn()
 )
 
 var (
-	GAMEPORT          = getGamePort()
 	CONFIGPATH string = "config/gameconfig"
 	CONFIGNAME        = "gameconfig"
 )
@@ -46,7 +52,7 @@ func InitGameConfig() {
 
 	GameWidth = viper.GetInt("app.room.game.map.width")
 	GameHeight = viper.GetInt("app.room.game.map.height")
-	TeleportPoints = uint(viper.GetInt("app.room.game.teleport_points"))
+	TeleportPoints = int32(viper.GetInt("app.room.game.teleport_points"))
 
 	SocketReadBufferSize = viper.GetInt("networt.socket.read")
 	SocketWriteBufferSize = viper.GetInt("networt.socket.write")
@@ -54,12 +60,13 @@ func InitGameConfig() {
 	InOutBuffer = viper.GetInt("networt.chan_buffer")
 }
 
-func getGamePort() string {
-	port := os.Getenv("GAMEPORT")
-	if port == "" {
-		config.Logger.Warn("There is no GAMEPORT!")
-		port = "8002"
+func getPointsConn() *grpc.ClientConn {
+	conn, err := grpc.Dial(config.PointsServerAddr+":"+config.POINTSPORT, grpc.WithInsecure())
+	if err != nil {
+		config.Logger.Fatal("Can not get grpc connection to points server")
+
+		return nil
 	}
 
-	return port
+	return conn
 }

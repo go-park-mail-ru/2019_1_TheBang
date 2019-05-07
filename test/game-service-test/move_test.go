@@ -23,7 +23,7 @@ func preGame(x, y int) (game room.GameInst, user room.Player) {
 
 	game = room.GameInst{
 		Map: room.NewMap(width, heith),
-		PlayersScore: map[string]uint{
+		PlayersScore: map[string]int32{
 			user.Nickname: 0,
 		},
 		GemsCount: 0,

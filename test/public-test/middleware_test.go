@@ -1,4 +1,4 @@
-package middleware
+package test
 
 import (
 	"2019_1_TheBang/pkg/public/middleware"

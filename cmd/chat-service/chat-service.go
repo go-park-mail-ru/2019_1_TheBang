@@ -12,5 +12,5 @@ func main() {
 	}
 
 	router := getChatRouter()
-	config.Logger.Fatal(router.Run(":" + chatconfig.CHATPORT))
+	config.Logger.Fatal(router.Run(":" + config.CHATPORT))
 }

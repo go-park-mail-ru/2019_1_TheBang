@@ -1,7 +1,6 @@
 package login
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -38,6 +37,7 @@ func LogInHandler(c *gin.Context) {
 		Value:    ss,
 		Expires:  expiration,
 		HttpOnly: true,
+		Path:     "",
 	}
 
 	http.SetCookie(c.Writer, &cookie)
@@ -59,9 +59,6 @@ func LoginAcount(username, passwd string) (ss string, status int) {
 	}
 
 	prof, _ := user.SelectUser(username)
-
-	// логирование
-	fmt.Println(prof)
 
 	claims := auth.CustomClaims{
 		prof.Id,

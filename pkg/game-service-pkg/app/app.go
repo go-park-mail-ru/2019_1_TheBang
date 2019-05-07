@@ -33,7 +33,7 @@ type App struct {
 	MaxRoomsCount uint                `json:"max_rooms_count"`
 	Rooms         map[uint]*room.Room `json:"rooms"`
 	RoomsCount    uint                `json:"rooms_count"`
-	locker        sync.Mutex
+	Locker        sync.Mutex
 }
 
 func NewApp() *App {
@@ -49,14 +49,14 @@ func NewApp() *App {
 	return app
 }
 
-func checkRoomID(id string) bool {
+func CheckRoomID(id string) bool {
 	ID, err := strconv.Atoi(id)
 	if err != nil {
 		return false
 	}
 
-	AppInst.locker.Lock()
-	defer AppInst.locker.Unlock()
+	AppInst.Locker.Lock()
+	defer AppInst.Locker.Unlock()
 
 	if _, ok := AppInst.Rooms[uint(ID)]; !ok {
 		return false
@@ -66,8 +66,8 @@ func checkRoomID(id string) bool {
 }
 
 func (a *App) WrappedRoomsList() []room.RoomWrap {
-	a.locker.Lock()
-	defer a.locker.Unlock()
+	a.Locker.Lock()
+	defer a.Locker.Unlock()
 
 	wraps := []room.RoomWrap{}
 
@@ -82,8 +82,8 @@ func (a *App) WrappedRoomsList() []room.RoomWrap {
 }
 
 func (a *App) RoomsList() []*room.Room {
-	a.locker.Lock()
-	defer a.locker.Unlock()
+	a.Locker.Lock()
+	defer a.Locker.Unlock()
 
 	rooms := []*room.Room{}
 	for _, room := range a.Rooms {
@@ -94,8 +94,8 @@ func (a *App) RoomsList() []*room.Room {
 }
 
 func (a *App) Room(id uint) (*room.Room, error) {
-	a.locker.Lock()
-	defer a.locker.Unlock()
+	a.Locker.Lock()
+	defer a.Locker.Unlock()
 
 	room, ok := a.Rooms[id]
 	if !ok {
@@ -106,8 +106,8 @@ func (a *App) Room(id uint) (*room.Room, error) {
 }
 
 func (a *App) WrappedRoom(id uint) (room.RoomWrap, error) {
-	a.locker.Lock()
-	defer a.locker.Unlock()
+	a.Locker.Lock()
+	defer a.Locker.Unlock()
 
 	gameRoom, ok := AppInst.Rooms[id]
 	if !ok {
@@ -121,8 +121,8 @@ func (a *App) WrappedRoom(id uint) (room.RoomWrap, error) {
 
 // Изменить способ получения id комнаты, возможны коллизии
 func (a *App) NewRoom() (room.RoomWrap, error) {
-	a.locker.Lock()
-	defer a.locker.Unlock()
+	a.Locker.Lock()
+	defer a.Locker.Unlock()
 
 	if a.RoomsCount == a.MaxRoomsCount {
 		config.Logger.Warnw("NewRoom",
@@ -155,10 +155,4 @@ func (a *App) NewRoom() (room.RoomWrap, error) {
 
 	wrap := room.WrapedRoom(a.Rooms[id])
 	return wrap, nil
-}
-
-func (a *App) DeleteRoom(id uint) {
-	a.locker.Lock()
-	defer a.locker.Unlock()
-
 }

@@ -11,7 +11,6 @@ import (
 	pb "2019_1_TheBang/pkg/public/protobuf"
 
 	"github.com/dgrijalva/jwt-go"
-	"google.golang.org/grpc"
 )
 
 type CustomClaims struct {
@@ -23,15 +22,7 @@ type CustomClaims struct {
 }
 
 func GetUserInfo(token string) (user *pb.UserInfo, myerr error) {
-	conn, err := grpc.Dial(config.AuthServerAddr+":"+config.AuthServerPort, grpc.WithInsecure())
-	if err != nil {
-		myerr = fmt.Errorf("did not connect: %v", err.Error())
-
-		return
-	}
-	defer conn.Close()
-
-	client := pb.NewCookieCheckerClient(conn)
+	client := pb.NewCookieCheckerClient(config.AuthConn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -54,6 +45,13 @@ func GetUserInfo(token string) (user *pb.UserInfo, myerr error) {
 }
 
 func CheckTocken(r *http.Request) (info *pb.UserInfo, ok bool) {
+	if r == nil {
+		config.Logger.Warnw("CheckTocken -> get cookie:",
+			"warn", "request is nil")
+
+		return
+	}
+
 	cookie, err := r.Cookie(config.CookieName)
 	if err != nil {
 		// config.Logger.Warnw("CheckTocken -> get cookie:",

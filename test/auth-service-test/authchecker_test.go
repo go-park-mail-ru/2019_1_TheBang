@@ -4,8 +4,9 @@ import (
 	"2019_1_TheBang/pkg/auth-service-pkg/authchecker"
 	pb "2019_1_TheBang/pkg/public/protobuf"
 	"context"
-	_ "google.golang.org/grpc"
 	"testing"
+
+	_ "google.golang.org/grpc"
 )
 
 func TestAuthcheckerServerSUCCESS(t *testing.T) {
@@ -24,7 +25,7 @@ func TestAuthcheckerServerSUCCESS(t *testing.T) {
 		t.Errorf("TestAuthcheckerServerSUCCESS: %v", err.Error())
 	}
 
-	if !res.Valid {
+	if !res.GetValid() {
 		t.Error("TestAuthcheckerServerSUCCESS, valid user is invalid")
 	}
 

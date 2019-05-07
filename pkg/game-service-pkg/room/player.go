@@ -75,7 +75,7 @@ Loop:
 }
 
 func PlayerFromCtx(ctx *gin.Context, conn *websocket.Conn) *Player {
-	info := playerInfoFromCookie(ctx)
+	info := PlayerInfoFromCookie(ctx)
 	player := &Player{
 		Id:       info.Id,
 		Nickname: info.Nickname,
@@ -91,8 +91,15 @@ func PlayerFromCtx(ctx *gin.Context, conn *websocket.Conn) *Player {
 	return player
 }
 
-func playerInfoFromCookie(ctx *gin.Context) UserInfo {
-	info, _ := auth.CheckTocken(ctx.Request)
+func PlayerInfoFromCookie(ctx *gin.Context) UserInfo {
+	info, ok := auth.CheckTocken(ctx.Request)
+	if !ok {
+		return UserInfo{
+			Id:       666,
+			Nickname: "DEBUG",
+			PhotoURL: "",
+		}
+	}
 
 	return UserInfo{
 		Id:       info.Id,

@@ -3,27 +3,16 @@ package chatconfig
 import (
 	"2019_1_TheBang/config"
 	"database/sql"
+
 	_ "github.com/mattn/go-sqlite3"
-	"os"
 )
 
 var (
-	CHATPORT = getPort()
-
 	DB       *sql.DB = connectDB()
 	DBSCHEMA         = getDBschema()
 
 	MessagesLimit = 10
 )
-
-func getPort() string {
-	port := os.Getenv("CHATPORT")
-	if port == "" {
-		return "8003"
-	}
-
-	return port
-}
 
 func getDBschema() string {
 	return ""

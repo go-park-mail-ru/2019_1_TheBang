@@ -6,13 +6,16 @@ import (
 	"2019_1_TheBang/pkg/main-serivce-pkg/logout"
 	"2019_1_TheBang/pkg/main-serivce-pkg/user"
 	"2019_1_TheBang/pkg/public/middleware"
+
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func setUpMainRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(middleware.CorsMiddlewareGin,
-		middleware.AuthMiddlewareGin)
+		middleware.AuthMiddlewareGin,
+		middleware.MetricMiddleware)
 
 	router.POST("/auth", login.LogInHandler)
 	router.DELETE("/auth", logout.LogoutHandler)
@@ -30,6 +33,11 @@ func setUpMainRouter() *gin.Engine {
 	router.GET("/icon/:filename", user.GetIconHandler)
 
 	router.GET("/leaderbord/:page", leaderboard.LeaderbordHandler)
+
+	router.GET("/metrics", func(ctx *gin.Context) {
+		h := promhttp.Handler()
+		h.ServeHTTP(ctx.Writer, ctx.Request)
+	})
 
 	return router
 }
