@@ -6,6 +6,7 @@ import (
 	"2019_1_TheBang/pkg/game-service-pkg/app"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -27,4 +28,6 @@ func TestConnectRoomHandle(t *testing.T) {
 		t.Fatalf("%v", err.Error())
 	}
 	defer ws.Close()
+
+	time.Sleep(1 * time.Second)
 }
