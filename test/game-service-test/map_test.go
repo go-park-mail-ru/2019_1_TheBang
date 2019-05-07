@@ -18,6 +18,8 @@ func TestMapGeneration(t *testing.T) {
 		}
 	}
 
+	m.AddWalls()
+
 	if count != size {
 		t.Errorf("Invalid gems count: expected %v, have %v", size, count)
 	}
