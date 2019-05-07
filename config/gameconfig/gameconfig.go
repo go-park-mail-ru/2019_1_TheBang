@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -29,6 +30,8 @@ var (
 	SocketWriteBufferSize int
 	MaxMessageSize        int64
 	InOutBuffer           int
+
+	PointsConn = getPointsConn()
 )
 
 var (
@@ -55,4 +58,15 @@ func InitGameConfig() {
 	SocketWriteBufferSize = viper.GetInt("networt.socket.write")
 	MaxMessageSize = viper.GetInt64("networt.message.size")
 	InOutBuffer = viper.GetInt("networt.chan_buffer")
+}
+
+func getPointsConn() *grpc.ClientConn {
+	conn, err := grpc.Dial(config.PointsServerAddr+":"+config.POINTSPORT, grpc.WithInsecure())
+	if err != nil {
+		config.Logger.Fatal("Can not get grpc connection to points server")
+
+		return nil
+	}
+
+	return conn
 }

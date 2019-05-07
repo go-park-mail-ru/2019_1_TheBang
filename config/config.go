@@ -1,6 +1,10 @@
 package config
 
-import "os"
+import (
+	"os"
+
+	"google.golang.org/grpc"
+)
 
 var (
 	SECRET      = getSecret()
@@ -17,7 +21,20 @@ var (
 	MAINPORT   = getMainPort()
 	POINTSPORT = getPointsPort()
 	GAMEPORT   = getGamePort()
+
+	AuthConn = getAuthConn()
 )
+
+func getAuthConn() *grpc.ClientConn {
+	conn, err := grpc.Dial(AuthServerAddr+":"+AUTHPORT, grpc.WithInsecure())
+	if err != nil {
+		Logger.Fatal("Can not get grpc connection to auth server")
+
+		return nil
+	}
+
+	return conn
+}
 
 func getAuhtPort() string {
 	port := os.Getenv("AUTHPORT")

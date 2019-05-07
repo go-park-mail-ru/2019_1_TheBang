@@ -9,8 +9,6 @@ import (
 
 	pb "2019_1_TheBang/pkg/public/pbscore"
 	"fmt"
-
-	"google.golang.org/grpc"
 )
 
 const (
@@ -143,15 +141,7 @@ func (g *GameInst) UpgradePoints(info EndGameInnerMsg) error {
 		}
 	}
 
-	conn, err := grpc.Dial(config.PointsServerAddr+":"+config.POINTSPORT, grpc.WithInsecure())
-	if err != nil {
-		myerr := fmt.Errorf("did not connect: %v", err.Error())
-
-		return myerr
-	}
-	defer conn.Close()
-
-	client := pb.NewScoreUpdaterClient(conn)
+	client := pb.NewScoreUpdaterClient(gameconfig.PointsConn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
