@@ -9,8 +9,9 @@ import (
 func getChatRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(middleware.CorsMiddlewareGin,
-		middleware.AuthMiddlewareGin)
-
+		middleware.AuthMiddlewareGin,
+		middleware.MetricMiddleware)
+		
 	hub.InitChatHub()
 	go hub.HubInst.Run()
 
