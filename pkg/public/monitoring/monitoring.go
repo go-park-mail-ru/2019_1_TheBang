@@ -1,4 +1,4 @@
-package metric
+package monitoring
 
 import (
 	"sync"

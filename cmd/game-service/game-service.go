@@ -4,6 +4,7 @@ import (
 	"2019_1_TheBang/config"
 	"2019_1_TheBang/config/gameconfig"
 	"2019_1_TheBang/pkg/game-service-pkg/app"
+	_ "2019_1_TheBang/pkg/game-service-pkg/gamemonitoring"
 	"fmt"
 )
 

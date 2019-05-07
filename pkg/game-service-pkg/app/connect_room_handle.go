@@ -18,8 +18,8 @@ func ConnectRoomHandle(c *gin.Context) {
 	param, _ := strconv.Atoi(id)
 	ID := uint(param)
 
-	AppInst.locker.Lock()
-	defer AppInst.locker.Unlock()
+	AppInst.Locker.Lock()
+	defer AppInst.Locker.Unlock()
 
 	if ok := c.IsWebsocket(); !ok {
 		c.AbortWithStatus(http.StatusBadRequest)

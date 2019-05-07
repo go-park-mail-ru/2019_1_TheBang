@@ -15,6 +15,7 @@ var (
 	RoomTickTime          = 20 * time.Millisecond
 	PlayerWritingTickTime = 20 * time.Millisecond
 	PlayerReadingTickTime = 20 * time.Millisecond
+	MonitoringTick        = 5 * time.Second
 	// RoomTickTime          = 1 * time.Second
 	// PlayerWritingTickTime = 1 * time.Second
 	// PlayerReadingTickTime = 1 * time.Second

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"2019_1_TheBang/pkg/public/metric"
+	"2019_1_TheBang/pkg/public/monitoring"
 	"net/http"
 	"strconv"
 
@@ -13,9 +13,9 @@ func MetricMiddleware(c *gin.Context) {
 	if !(c.Writer.Status() == http.StatusOK &&
 		c.Request.URL.Path == "/metrics") {
 
-		metric.MonitoringMutex.Lock()
-		defer metric.MonitoringMutex.Unlock()
+		monitoring.MonitoringMutex.Lock()
+		defer monitoring.MonitoringMutex.Unlock()
 
-		metric.HttpReqs.WithLabelValues(strconv.Itoa(c.Writer.Status())).Add(1)
+		monitoring.HttpReqs.WithLabelValues(strconv.Itoa(c.Writer.Status())).Add(1)
 	}
 }
