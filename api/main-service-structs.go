@@ -23,6 +23,8 @@ type Profile struct {
 	Score    int    `json:"score"`
 }
 
+type ProfileList []Profile
+
 type Signup struct {
 	Nickname string `json:"nickname"`
 	Name     string `json:"name"`
