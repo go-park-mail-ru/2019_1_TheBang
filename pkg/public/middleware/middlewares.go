@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"2019_1_TheBang/pkg/public/auth"
+	"2019_1_TheBang/config"
 	"net/http"
 	"regexp"
 
@@ -24,15 +25,15 @@ var ignorCheckAuth = map[urlMehtod]bool{
 
 func CorsMiddlewareGin(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
-	// c.Header("Access-Control-Allow-Origin", config.FrontentDst)
-	// c.Header("Access-Control-Allow-Credentials", "true")
-	// c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	// c.Header("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+	c.Header("Access-Control-Allow-Origin", config.FrontentDst)
+	c.Header("Access-Control-Allow-Credentials", "true")
+	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	c.Header("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 
-	// if c.Request.Method == "OPTIONS" {
-	// 	c.AbortWithStatus(http.StatusNoContent)
-	// 	return
-	// }
+	if c.Request.Method == "OPTIONS" {
+		c.AbortWithStatus(http.StatusNoContent)
+		return
+	}
 
 	c.Next()
 }
