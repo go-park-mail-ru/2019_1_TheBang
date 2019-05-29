@@ -3,7 +3,6 @@ package gamemonitoring
 import (
 	"2019_1_TheBang/config/gameconfig"
 	"2019_1_TheBang/pkg/game-service-pkg/app"
-	"fmt"
 	"sync"
 	"time"
 
@@ -37,7 +36,6 @@ func RoomCounter() {
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println("Tick")
 
 			if app.AppInst != nil {
 				app.AppInst.Locker.Lock()
