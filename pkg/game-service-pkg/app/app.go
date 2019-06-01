@@ -72,10 +72,10 @@ func (a *App) WrappedRoomsList() []room.RoomWrap {
 	wraps := []room.RoomWrap{}
 
 	for _, room := range a.Rooms {
-		if !room.Start {
-			wrap, _ := AppInst.WrappedRoom(room.Id)
-			wraps = append(wraps, wrap)
-		}
+		// if !room.Start {
+		wrap, _ := AppInst.WrappedRoom(room.Id)
+		wraps = append(wraps, wrap)
+		// }
 	}
 
 	return wraps
