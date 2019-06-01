@@ -40,15 +40,9 @@ func ConnectRoomHandle(c *gin.Context) {
 	go player.Reading()
 	go player.Writing()
 
-	r, err := AppInst.Room(ID)
+	_, err = AppInst.Room(ID)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
-
-		return
-	}
-
-	if r.Start {
-		c.AbortWithStatus(http.StatusBadRequest)
 
 		return
 	}
