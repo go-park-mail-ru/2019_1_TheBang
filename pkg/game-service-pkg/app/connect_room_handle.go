@@ -39,5 +39,19 @@ func ConnectRoomHandle(c *gin.Context) {
 	player := room.PlayerFromCtx(c, conn)
 	go player.Reading()
 	go player.Writing()
+
+	r, err := AppInst.Room(ID)
+	if err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+
+		return
+	}
+
+	if r.Start {
+		c.AbortWithStatus(http.StatusBadRequest)
+
+		return
+	}
+
 	AppInst.Rooms[ID].Register <- player
 }
