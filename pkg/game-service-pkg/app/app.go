@@ -87,9 +87,7 @@ func (a *App) RoomsList() []*room.Room {
 
 	rooms := []*room.Room{}
 	for _, room := range a.Rooms {
-		// if !room.Start {
 		rooms = append(rooms, room)
-		// }
 	}
 
 	return rooms
@@ -107,7 +105,7 @@ func (a *App) Room(id uint) (*room.Room, error) {
 	return room, nil
 }
 
-func (a *App) WrappedRoom(id uint) (room.RoomWrap, error) {
+func (a *App) lsqlsWrappedRoom(id uint) (room.RoomWrap, error) {
 	a.Locker.Lock()
 	defer a.Locker.Unlock()
 
