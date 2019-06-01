@@ -22,5 +22,6 @@ func LogoutHandler(c *gin.Context) {
 		Value:    token,
 		Expires:  time.Now().AddDate(0, 0, -1),
 		HttpOnly: true,
+		Path:     "/",
 	})
 }
