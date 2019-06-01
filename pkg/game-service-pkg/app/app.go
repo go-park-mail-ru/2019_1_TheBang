@@ -138,7 +138,15 @@ func (a *App) NewRoom() (room.RoomWrap, error) {
 	facker, _ := faker.New("en")
 	roomName := facker.Name()
 
-	id := uint(rand.Uint32())
+	var id uint
+	for {
+		id = uint(rand.Uint32())
+
+		if _, ok := AppInst.Rooms[id]; !ok {
+			break
+		}
+	}
+
 	a.Rooms[id] = &room.Room{
 		Id:         id,
 		Name:       roomName,
