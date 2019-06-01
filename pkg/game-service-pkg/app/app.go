@@ -87,9 +87,9 @@ func (a *App) RoomsList() []*room.Room {
 
 	rooms := []*room.Room{}
 	for _, room := range a.Rooms {
-		if !room.Start {
-			rooms = append(rooms, room)
-		}
+		// if !room.Start {
+		rooms = append(rooms, room)
+		// }
 	}
 
 	return rooms
