@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"sync"
 
+	"math/rand"
+
 	"github.com/gorilla/websocket"
 	"github.com/manveru/faker"
 )
@@ -136,7 +138,7 @@ func (a *App) NewRoom() (room.RoomWrap, error) {
 	facker, _ := faker.New("en")
 	roomName := facker.Name()
 
-	id := a.RoomsCount + 1
+	id := uint(rand.Uint32())
 	a.Rooms[id] = &room.Room{
 		Id:         id,
 		Name:       roomName,
