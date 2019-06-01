@@ -5,6 +5,10 @@ import (
 	"net/http"
 	"regexp"
 
+	// "fmt"
+	"2019_1_TheBang/config"
+
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +24,10 @@ var ignorCheckAuth = map[urlMehtod]bool{
 	urlMehtod{URL: "/chat", Method: "GET"}:     true,
 	urlMehtod{URL: "/messages", Method: "GET"}: true,
 	urlMehtod{URL: "/metrics", Method: "GET"}:  true,
+}
+
+func ProtectionMiddleware(c *gin.Context) {
+	c.Next()
 }
 
 func CorsMiddlewareGin(c *gin.Context) {
@@ -43,6 +51,8 @@ func AuthMiddlewareGin(c *gin.Context) {
 	if ok := ignorCheckAuth[check]; !ok {
 		if _, ok := auth.CheckTocken(c.Request); !ok {
 			c.AbortWithStatus(http.StatusUnauthorized)
+
+			config.Logger.Info("BAD COOOKIEEEE!!!!!")
 
 			return
 		}
