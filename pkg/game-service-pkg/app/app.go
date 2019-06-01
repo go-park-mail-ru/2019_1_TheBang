@@ -71,8 +71,8 @@ func (a *App) WrappedRoomsList() []room.RoomWrap {
 
 	wraps := []room.RoomWrap{}
 
-	for id := range a.Rooms {
-		roomNode, _ := a.Rooms[id]
+	for _, r := range a.Rooms {
+		roomNode, _ := a.Rooms[r.Id]
 		wrap := room.WrapedRoom(roomNode)
 
 		wraps = append(wraps, wrap)
