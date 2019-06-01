@@ -71,8 +71,7 @@ func (a *App) WrappedRoomsList() []room.RoomWrap {
 
 	wraps := []room.RoomWrap{}
 
-	for _, room a.Rooms {
-
+	for _, room := range a.Rooms {
 		if !room.Start {
 			roomNode, _ := a.Rooms[room.Id]
 			wrap := room.WrapedRoom(roomNode)
