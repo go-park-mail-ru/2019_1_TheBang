@@ -6,7 +6,7 @@ app:
         width: 12
         height: 12
       teleport_points: 5
-  max_rooms_in_game: 100
+  max_rooms_in_game: 1000
 
 networt:
   socket:
