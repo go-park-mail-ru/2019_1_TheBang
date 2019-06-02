@@ -3,8 +3,9 @@ package hub
 import (
 	"2019_1_TheBang/config"
 	"encoding/json"
-	"github.com/gorilla/websocket"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -15,8 +16,8 @@ const (
 )
 
 var (
-	newline = []byte{'\n'}
 	space   = []byte{' '}
+	newline = []byte{'\n'}
 )
 
 func (c *Client) ReadPump() {
