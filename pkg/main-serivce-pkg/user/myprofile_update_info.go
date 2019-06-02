@@ -34,5 +34,12 @@ func MyProfileInfoUpdateHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, profile)
+	bytes, err := profile.MarshalJSON()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}
+
+	c.Writer.Write(bytes)
+
+	c.AbortWithStatus(http.StatusOK)
 }

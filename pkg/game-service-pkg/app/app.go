@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"sync"
 
+	"math/rand"
+
 	"github.com/gorilla/websocket"
 	"github.com/manveru/faker"
 )
@@ -71,11 +73,13 @@ func (a *App) WrappedRoomsList() []room.RoomWrap {
 
 	wraps := []room.RoomWrap{}
 
-	for id := range a.Rooms {
-		roomNode, _ := a.Rooms[id]
-		wrap := room.WrapedRoom(roomNode)
+	for _, r := range a.Rooms {
+		if !r.Start {
+			roomNode, _ := a.Rooms[r.Id]
+			wrap := room.WrapedRoom(roomNode)
 
-		wraps = append(wraps, wrap)
+			wraps = append(wraps, wrap)
+		}
 	}
 
 	return wraps
@@ -134,7 +138,15 @@ func (a *App) NewRoom() (room.RoomWrap, error) {
 	facker, _ := faker.New("en")
 	roomName := facker.Name()
 
-	id := a.RoomsCount + 1
+	var id uint
+	for {
+		id = uint(rand.Uint32())
+
+		if _, ok := AppInst.Rooms[id]; !ok {
+			break
+		}
+	}
+
 	a.Rooms[id] = &room.Room{
 		Id:         id,
 		Name:       roomName,

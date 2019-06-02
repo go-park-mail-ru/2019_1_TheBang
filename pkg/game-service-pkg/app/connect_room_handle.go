@@ -39,5 +39,6 @@ func ConnectRoomHandle(c *gin.Context) {
 	player := room.PlayerFromCtx(c, conn)
 	go player.Reading()
 	go player.Writing()
+
 	AppInst.Rooms[ID].Register <- player
 }

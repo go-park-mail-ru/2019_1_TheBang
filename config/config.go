@@ -40,7 +40,7 @@ func getAuhtPort() string {
 	port := os.Getenv("AUTHPORT")
 	if port == "" {
 		Logger.Warn("There is no AUTH_PORT!")
-		port = "50061"
+		port = "50051"
 	}
 
 	return port
@@ -50,7 +50,7 @@ func getChatPort() string {
 	port := os.Getenv("CHATPORT")
 	if port == "" {
 		Logger.Warn("There is no CHATPORT!")
-		return "8006"
+		return "8003"
 	}
 
 	return port
@@ -60,7 +60,7 @@ func getGamePort() string {
 	port := os.Getenv("GAMEPORT")
 	if port == "" {
 		Logger.Warn("There is no GAMEPORT!")
-		port = "8005"
+		port = "8002"
 	}
 
 	return port
@@ -70,7 +70,7 @@ func getMainPort() string {
 	port := os.Getenv("MAINPORT")
 	if port == "" {
 		Logger.Warn("There is no MAINPORT!")
-		port = "8004"
+		port = "8001"
 	}
 
 	return port
@@ -80,7 +80,7 @@ func getPointsPort() string {
 	port := os.Getenv("POINTSPORT")
 	if port == "" {
 		Logger.Warn("There is no POINTSPORT!")
-		port = "50062"
+		port = "50052"
 	}
 
 	return port

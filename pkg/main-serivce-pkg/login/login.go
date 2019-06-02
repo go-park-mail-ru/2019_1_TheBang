@@ -37,7 +37,7 @@ func LogInHandler(c *gin.Context) {
 		Value:    ss,
 		Expires:  expiration,
 		HttpOnly: true,
-		Path:     "",
+		Path:     "/",
 	}
 
 	http.SetCookie(c.Writer, &cookie)
